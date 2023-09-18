@@ -1,0 +1,67 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+        <AssemblyName>Sorling.$(MSBuildProjectName)</AssemblyName>
+        <RootNamespace>Sorling.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+        <PackageId>Sorling.SQLConnAuthWeb</PackageId>
+        <PackageIcon>NugetLogo.png</PackageIcon>
+        <PackageTags>Authentication SQL Asp.Net Core</PackageTags>
+        <Version>0.8.0</Version>
+        <Authors>jsorling</Authors>
+        <Company>Sorling Systems</Company>
+        <Copyright>Sorling Systems @year</Copyright>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <RepositoryType>GIT</RepositoryType>
+        <PackageProjectUrl>https://github.com/jsorling/sqlConnectionAuth</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/jsorling/sqlConnectionAuth</RepositoryUrl>
+        <Description>SQL Authentication for ASP.Net Core</Description>
+        <PackageReadmeFile>README.md</PackageReadmeFile>        
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Content Remove="wwwroot\lib\bootstrap\js\bootstrap.bundle.min.js" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <_ContentIncludedByDefault Remove="areas\sqlconnauth\pages\AccessDenied.cshtml" />
+        <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\css\bootstrap.min.css" />
+        <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\js\bootstrap.bundle.min.js" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.1.175" />
+        <PackageReference Include="Sorling.SqlExec" Version="0.1.3253.788" />
+        <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Update="NugetLogo.png">
+            <PackagePath>\</PackagePath>
+            <Pack>True</Pack>
+        </None>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="..\..\README.md">
+          <Pack>True</Pack>
+          <PackagePath>\</PackagePath>
+        </None>
+        <None Include="wwwroot\lib\bootstrap\js\bootstrap.bundle.min.js" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <UpToDateCheckInput Remove="areas\sqlconnauth\pages\AccessDenied.cshtml" />
+    </ItemGroup>
+
+
+
+</Project>

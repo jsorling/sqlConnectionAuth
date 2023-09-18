@@ -1,0 +1,14 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs
+/src/.vs
+/src/SQLConnAuthWeb/bin
+/src/SQLConnAuthWeb/obj
+/src/MockupWeb/bin
+/src/MockupWeb/obj
+/src/SQLConnAuthWebTests/bin
+/src/SQLConnAuthWebTests/obj
+/src/MockupWeb
+/src/SQLConnAuthWeb/wwwroot/lib
