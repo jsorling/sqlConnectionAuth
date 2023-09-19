@@ -8,9 +8,9 @@ public interface ISqlConnAuthenticationService
 
    public string Version { get; }
 
-   public SqlConnAuthenticationData SQLConnAuthenticationData { get; }
+   public SqlConnAuthenticationData SqlConnAuthenticationData { get; }
 
-   public string SQLConnectionString(string? db = null);
+   public string SqlConnectionString(string? db = null);
 
    public Task<IEnumerable<SqlConnectionHelper.ListDBCmd.ListDBRes>> GetDBsAsync();
 

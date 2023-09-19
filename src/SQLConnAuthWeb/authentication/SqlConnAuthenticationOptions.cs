@@ -2,7 +2,7 @@
 
 public class SqlConnAuthenticationOptions
 {
-   public string SqlPath { get; set; } = "/db";
+   public string SqlRootPath { get; set; } = "/db";
 
    public bool AllowWinauth { get; set; } = false;
 

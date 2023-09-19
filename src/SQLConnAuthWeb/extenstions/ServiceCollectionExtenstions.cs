@@ -5,7 +5,7 @@ using Sorling.SqlConnAuthWeb.authentication;
 namespace Sorling.SqlConnAuthWeb.extenstions;
 public static class ServiceCollectionExtenstions
 {
-   public static IServiceCollection AddSQLConnAuthentication(this IServiceCollection services, Action<SqlConnAuthenticationOptions> configureOptions) {
+   public static IServiceCollection AddSqlConnAuthentication(this IServiceCollection services, Action<SqlConnAuthenticationOptions> configureOptions) {
       _ = services.AddHttpContextAccessor()
          .AddScoped<ISqlConnAuthenticationService, SqlConnAuthentication>()
          .AddAuthentication()
@@ -26,9 +26,9 @@ public static class ServiceCollectionExtenstions
    }
 
    public static IServiceCollection AddSQLConnAuthentication(this IServiceCollection services)
-      => services.AddSQLConnAuthentication(options => { });
+      => services.AddSqlConnAuthentication(options => { });
 
-   public static IServiceCollection AddSQLConnAuthorization(this IServiceCollection services)
+   public static IServiceCollection AddSqlConnAuthorization(this IServiceCollection services)
       => services.AddAuthorization(option => option.AddPolicy(SqlConnAuthConsts.SQLCONNAUTHPOLICY,
          p => p.RequireAuthenticatedUser().AddAuthenticationSchemes(SqlConnAuthConsts.SQLCONNAUTHSCHEME)));
 }

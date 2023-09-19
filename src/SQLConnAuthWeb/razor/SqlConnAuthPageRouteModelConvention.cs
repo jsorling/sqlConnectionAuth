@@ -10,7 +10,7 @@ public class SqlConnAuthPageRouteModelConvention : IPageRouteModelConvention
    public SqlConnAuthPageRouteModelConvention(SqlConnAuthenticationOptions options) => Options = options;
 
    public void Apply(PageRouteModel model) {
-      string p = Options.SqlPath.TrimStart('/').TrimEnd('/');
+      string p = Options.SqlRootPath.TrimStart('/').TrimEnd('/');
       foreach (SelectorModel selector in model.Selectors) {
          string? newtemplate = null;
          if (selector.AttributeRouteModel!.Template!.StartsWith(p + "/")

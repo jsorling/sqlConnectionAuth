@@ -21,7 +21,6 @@ public class SqlConnAuthentication : CookieAuthenticationEvents, ISqlConnAuthent
       _sqlConnAuthPwdStore = sqlConnAuthPwdStore ?? throw new ArgumentNullException(nameof(sqlConnAuthPwdStore));
       Options = options?.Value ?? throw new ArgumentNullException(nameof(options));
 
-
       _dbSrv = _httpContext.Request.RouteValues[SqlConnAuthConsts.URLROUTEPARAMSRV] as string;
       _userName = _httpContext.Request.RouteValues[SqlConnAuthConsts.URLROUTEPARAMUSR] as string;
    }
@@ -68,13 +67,13 @@ public class SqlConnAuthentication : CookieAuthenticationEvents, ISqlConnAuthent
       return result;
    }
 
-   public SqlConnAuthenticationData SQLConnAuthenticationData => new(_dbSrv, _userName, _password);
+   public SqlConnAuthenticationData SqlConnAuthenticationData => new(_dbSrv, _userName, _password);
 
    public object RouteValues => new { sqlauthparamsrv = _dbSrv, sqlauthparamusr = _userName };
 
-   public string UriEscapedPath => $"/{Uri.EscapeDataString(Options.SqlPath.Trim('/'))}/{Uri.EscapeDataString(_dbSrv)}/{Uri.EscapeDataString(_userName)}/srv";
+   public string UriEscapedPath => $"/{Uri.EscapeDataString(Options.SqlRootPath.Trim('/'))}/{Uri.EscapeDataString(_dbSrv ?? "")}/{Uri.EscapeDataString(_userName ?? "")}/srv";
 
-   public string SQLConnectionString(string? db) => SQLConnAuthenticationData.ConnectionString(db);
+   public string SqlConnectionString(string? db) => SqlConnAuthenticationData.ConnectionString(db);
 
    public async Task SignoutAsync() => await _httpContext.SignOutAsync(SqlConnAuthConsts.SQLCONNAUTHSCHEME);
 
@@ -93,7 +92,7 @@ public class SqlConnAuthentication : CookieAuthenticationEvents, ISqlConnAuthent
 
    public override Task SigningIn(CookieSigningInContext context) {
       context.CookieOptions.Path
-         = $"/{Options.SqlPath.Trim('/')}/{Uri.EscapeDataString(_dbSrv!)}/{Uri.EscapeDataString(_userName!)}";
+         = $"/{Options.SqlRootPath.Trim('/')}/{Uri.EscapeDataString(_dbSrv!)}/{Uri.EscapeDataString(_userName!)}";
       context.CookieOptions.SameSite = SameSiteMode.Strict;
 
       return base.SigningIn(context);
