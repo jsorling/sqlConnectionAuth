@@ -22,11 +22,20 @@ jobs:
     - name: Create nuget.config
       run: dotnet new nugetconfig      
     - name: Set nuget add azure public feed
-      run: dotnet nuget add source https://pkgs.dev.azure.com/sorling/PublicFeed/_packaging/PublicFeed/nuget/v3/index.json -n azurepublic --configfile nuget.config -u jsorling -p ${{ secrets.azpublicfeedpat }} --store-password-in-clear-text
-    - name: Restore
-      run: dotnet restore src/SQLConnAuthWeb/SqlConnAuthWeb.csproj    
+      run: >
+        dotnet nuget add
+        source https://pkgs.dev.azure.com/sorling/PublicFeed/_packaging/PublicFeed/nuget/v3/index.json
+        -n azurepublic
+        --configfile nuget.config
+        -u jsorling
+        -p ${{ secrets.azpublicfeedpat }}
+        --store-password-in-clear-text
     - name: Pack
-      run: dotnet pack src/SQLConnAuthWeb/SqlConnAuthWeb.csproj --configuration ${{ env.CONFIGURATION }} --no-restore --output "${{ env.NUGET_PACKAGE_PATH }}"
+      run: >
+        dotnet pack
+        src/SQLConnAuthWeb/SqlConnAuthWeb.csproj
+        --configuration ${{ env.CONFIGURATION }}
+        --output "${{ env.NUGET_PACKAGE_PATH }}"
     - name: Publish Artifacts
       uses: actions/upload-artifact@v3
       with:
