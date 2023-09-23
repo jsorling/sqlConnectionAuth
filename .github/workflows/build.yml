@@ -19,15 +19,14 @@ jobs:
     - name: Set build info
       run: '& iex ((New-Object System.Net.WebClient).DownloadString("$env:PS_SOURCE_URL/buildinfo.ps1"))'
       shell: pwsh
-    - name: Set nuget add sources
-      run: nuget sources Add -Name "azurepublicsource" -Source https://pkgs.dev.azure.com/sorling/PublicFeed/_packaging/PublicFeed/nuget/v3/index.json
+    - name: Set nuget add azure public feed
+      run: dotnet nuget add source https://pkgs.dev.azure.com/sorling/PublicFeed/_packaging/PublicFeed/nuget/v3/index.json -n azurepublicsource --configfile nuget.config
+    - name: Set nuget add nuget.org
+      run: dotnet nuget add source https://api.nuget.org/v3/index.json -n nuget.org --configfile nuget.config
     - name: Restore
-      run: dotnet restore src/SQLConnAuthWeb/SqlConnAuthWeb.csproj
+      run: dotnet restore src/SQLConnAuthWeb/SqlConnAuthWeb.csproj    
     - name: Pack
-      run: dotnet pack src/SQLConnAuthWeb/SqlConnAuthWeb.csproj \
-        --configuration ${{ env.CONFIGURATION }} \
-        --no-restore \
-        --output "${{ env.NUGET_PACKAGE_PATH }}"
+      run: dotnet pack src/SQLConnAuthWeb/SqlConnAuthWeb.csproj --configuration ${{ env.CONFIGURATION }} --no-restore --output "${{ env.NUGET_PACKAGE_PATH }}"
     - name: Publish Artifacts
       uses: actions/upload-artifact@v3
       with:
