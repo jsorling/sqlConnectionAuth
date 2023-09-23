@@ -20,7 +20,7 @@ jobs:
       run: '& iex ((New-Object System.Net.WebClient).DownloadString("$env:PS_SOURCE_URL/buildinfo.ps1"))'
       shell: pwsh
     - name: Restore
-      run: dotnet src/SQLConnAuthWeb/SqlConnAuthWeb.csproj
+      run: dotnet restore src/SQLConnAuthWeb/SqlConnAuthWeb.csproj
     - name: Pack
       run: dotnet pack src/SQLConnAuthWeb/SqlConnAuthWeb.csproj --configuration ${{ env.CONFIGURATION }} --no-restore --output "${{ env.NUGET_PACKAGE_PATH }}"
     - name: Publish Artifacts
