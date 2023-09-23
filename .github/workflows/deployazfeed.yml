@@ -52,4 +52,8 @@ jobs:
         name: nugetpkg
         path: ${{ env.NUGET_PACKAGE_PATH }}
     - name: Push nuget
-      run: nuget push "${{ env.NUGET_PACKAGE_PATH }}/**/*.nupkg" -src azurepublic -ApiKey AZ
+      run: >
+        dotnet nuget push
+        "${{ env.NUGET_PACKAGE_PATH }}/**/*.nupkg"
+        --source azurepublic
+        --api-key AZ
