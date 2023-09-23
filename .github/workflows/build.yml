@@ -1,0 +1,30 @@
+name: Build and pack
+on:
+  workflow_dispatch:
+env:
+  NUGET_PACKAGE_PATH: ./published
+  CONFIGURATION: Release
+  DOTNET_CORE_VERSION: 6.0.x
+  WORKING_DIRECTORY: .
+  PS_SOURCE_URL: "https://raw.githubusercontent.com/jsorling/miscscripts/main/github/actions"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
+    - name: Set build info
+      run: '& iex ((New-Object System.Net.WebClient).DownloadString("$env:PS_SOURCE_URL/buildinfo.ps1"))'
+      shell: pwsh
+    - name: Restore
+      run: dotnet src/SQLConnAuthWeb/SqlConnAuthWeb.csproj
+    - name: Pack
+      run: dotnet pack src/SQLConnAuthWeb/SqlConnAuthWeb.csproj --configuration ${{ env.CONFIGURATION }} --no-restore --output "${{ env.NUGET_PACKAGE_PATH }}"
+    - name: Publish Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: nugetpkg
+        path: ${{ env.NUGET_PACKAGE_PATH }}
