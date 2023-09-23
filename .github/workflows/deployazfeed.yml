@@ -26,10 +26,7 @@ jobs:
         dotnet nuget add
         source https://pkgs.dev.azure.com/sorling/PublicFeed/_packaging/PublicFeed/nuget/v3/index.json
         -n azurepublic
-        --configfile nuget.config
-        -u jsorling
-        -p ${{ secrets.azpublicfeedpat }}
-        --store-password-in-clear-text
+        --configfile nuget.config        
     - name: Pack
       run: >
         dotnet pack
@@ -51,6 +48,17 @@ jobs:
       with:
         name: nugetpkg
         path: ${{ env.NUGET_PACKAGE_PATH }}
+    - name: Create nuget.config
+      run: dotnet new nugetconfig      
+    - name: Set nuget add azure public feed
+      run: >
+        dotnet nuget add
+        source https://pkgs.dev.azure.com/sorling/PublicFeed/_packaging/PublicFeed/nuget/v3/index.json
+        -n azurepublic
+        --configfile nuget.config
+        -u jsorling
+        -p ${{ secrets.azpublicfeedpat }}
+        --store-password-in-clear-text
     - name: Push nuget
       run: >
         dotnet nuget push
