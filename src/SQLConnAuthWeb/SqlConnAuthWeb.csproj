@@ -39,7 +39,7 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.1.175" />
-        <PackageReference Include="Sorling.SqlExec" Version="0.1.3253.788" />
+        <PackageReference Include="Sorling.SqlExec" Version="0.8.0.2" />
         <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
     </ItemGroup>
 
