@@ -20,10 +20,7 @@ jobs:
       run: '& iex ((New-Object System.Net.WebClient).DownloadString("$env:PS_SOURCE_URL/buildinfo.ps1"))'
       shell: pwsh
     - name: Set nuget add sources
-      run: nuget sources Add -Name "azurepublic" \
-        -Source https://pkgs.dev.azure.com/sorling/PublicFeed/_packaging/PublicFeed/nuget/v3/index.json \
-        -UserName "jsorling" \
-        -Password ${{ secrets.azpublicfeedpat }}
+      run: nuget sources Add -Name "azurepublic" -Source https://pkgs.dev.azure.com/sorling/PublicFeed/_packaging/PublicFeed/nuget/v3/index.json -UserName "jsorling" -Password ${{ secrets.azpublicfeedpat }}
     - name: Restore
       run: dotnet restore src/SQLConnAuthWeb/SqlConnAuthWeb.csproj
     - name: Pack
