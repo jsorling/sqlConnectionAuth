@@ -71,7 +71,8 @@ public class SqlConnAuthentication : CookieAuthenticationEvents, ISqlConnAuthent
 
    public object RouteValues => new { sqlauthparamsrv = _dbSrv, sqlauthparamusr = _userName };
 
-   public string UriEscapedPath => $"/{Uri.EscapeDataString(Options.SqlRootPath.Trim('/'))}/{Uri.EscapeDataString(_dbSrv ?? "")}/{Uri.EscapeDataString(_userName ?? "")}/srv";
+   public string UriEscapedPath(string? server = null, string? user = null) 
+      => $"/{Uri.EscapeDataString(Options.SqlRootPath.Trim('/'))}/{Uri.EscapeDataString(server ?? _dbSrv ?? "")}/{Uri.EscapeDataString(user ?? _userName ?? "")}/srv";
 
    public string SqlConnectionString(string? db) => SqlConnAuthenticationData.ConnectionString(db);
 

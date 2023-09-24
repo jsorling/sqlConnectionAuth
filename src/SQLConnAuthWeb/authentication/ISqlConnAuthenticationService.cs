@@ -16,7 +16,7 @@ public interface ISqlConnAuthenticationService
 
    public object RouteValues { get; }
 
-   public string UriEscapedPath { get; }
+   public string UriEscapedPath(string? server = null, string? user = null);
 
    public SqlConnAuthenticationOptions Options { get; }
 }
