@@ -5,12 +5,12 @@ namespace Sorling.SqlConnAuthWeb.razor;
 
 public class SqlConnAuthPageRouteModelConvention : IPageRouteModelConvention
 {
-   public SqlConnAuthenticationOptions Options { get; init; }
+   public string SqlRootPath { get; init; }
 
-   public SqlConnAuthPageRouteModelConvention(SqlConnAuthenticationOptions options) => Options = options;
+   public SqlConnAuthPageRouteModelConvention(string sqlRootPath = "db") => SqlRootPath = sqlRootPath;
 
    public void Apply(PageRouteModel model) {
-      string p = Options.SqlRootPath.TrimStart('/').TrimEnd('/');
+      string p = SqlRootPath.TrimStart('/').TrimEnd('/');
       foreach (SelectorModel selector in model.Selectors) {
          string? newtemplate = null;
          if (selector.AttributeRouteModel!.Template!.StartsWith(p + "/")
