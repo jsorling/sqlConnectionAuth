@@ -34,7 +34,7 @@ public class ConnectModel : PageModel
             ModelState.AddModelError("Password", result.Exception.Message);
          }
 
-         return result.Success ? Redirect(returnUrl ?? _sqlConnAuthentication.UriEscapedPath) : Page();
+         return result.Success ? Redirect(returnUrl ?? _sqlConnAuthentication.UriEscapedPath(sqlauthparamsrv, sqlauthparamusr)) : Page();
       }
 
       return Page();
