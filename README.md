@@ -3,17 +3,16 @@
 ### Program.cs
 ```C#
 using Sorling.SqlConnAuthWeb;
-using Sorling.SqlConnAuthWeb.authentication;
 using Sorling.SqlConnAuthWeb.extenstions;
 using Sorling.SqlConnAuthWeb.razor;
 
 WebApplicationBuilder? builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddSQLConnAuthentication(o => { o.AllowWinauth = true; o.ThemeSwitcherLocalStorageName = "theme"; })
-   .AddSQLConnAuthorization()
-   .AddRazorPages(options => {
-      _ = options.Conventions.AuthorizeFolder(builder.Configuration.Get<SqlConnAuthenticationOptions>().SqlPath, SqlConnAuthConsts.SQLCONNAUTHPOLICY);
-      options.Conventions.Add(new SqlConnAuthPageRouteModelConvention(builder.Configuration.Get<SqlConnAuthenticationOptions>()));
+builder.Services.AddSqlConnAuthentication(o=>{ o.AllowWinauth = true; 
+   o.ThemeSwitcherLocalStorageName = "theme"; o.SqlRootPath = "sqlsrv"; })
+   .AddSqlConnAuthorization().AddRazorPages(options => {
+      _ = options.Conventions.AuthorizeFolder("/sqlsrv", SqlConnAuthConsts.SQLCONNAUTHPOLICY);
+      options.Conventions.Add(new SqlConnAuthPageRouteModelConvention("sqlsrv"));
    });
 
 WebApplication app = builder.Build();

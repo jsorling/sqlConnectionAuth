@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.Extensions.Options;
 using Sorling.SqlConnAuthWeb.authentication;
 
 namespace Sorling.SqlConnAuthWeb.razor;
