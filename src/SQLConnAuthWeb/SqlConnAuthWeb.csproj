@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
@@ -10,7 +10,7 @@
         <PackageId>Sorling.SqlConnAuthWeb</PackageId>
         <PackageIcon>NugetLogo.png</PackageIcon>
         <PackageTags>Authentication SQL Asp.Net Core</PackageTags>
-        <Version>0.8.1.0</Version>
+        <Version>0.9.1.0</Version>
         <Authors>jsorling</Authors>
         <Company>Sorling Systems</Company>
         <Copyright>Sorling Systems @year</Copyright>
@@ -38,7 +38,7 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.1.175" />
-        <PackageReference Include="Sorling.SqlExec" Version="0.8.0.2" />
+        <PackageReference Include="Sorling.SqlExec" Version="0.9.1.5" />
         <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
     </ItemGroup>
 
