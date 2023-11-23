@@ -23,13 +23,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Content Remove="wwwroot\lib\bootstrap\js\bootstrap.bundle.min.js" />
-    </ItemGroup>
-
-    <ItemGroup>
         <_ContentIncludedByDefault Remove="areas\sqlconnauth\pages\AccessDenied.cshtml" />
-        <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\css\bootstrap.min.css" />
-        <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\js\bootstrap.bundle.min.js" />
     </ItemGroup>
 
     <ItemGroup>
@@ -54,7 +48,6 @@
           <Pack>True</Pack>
           <PackagePath>\</PackagePath>
         </None>
-        <None Include="wwwroot\lib\bootstrap\js\bootstrap.bundle.min.js" />
     </ItemGroup>
 
     <ItemGroup>
