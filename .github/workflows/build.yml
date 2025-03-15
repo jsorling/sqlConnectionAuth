@@ -11,33 +11,23 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4.2.2
     - name: Setup .NET SDK
-      uses: actions/setup-dotnet@v3
+      uses: actions/setup-dotnet@v3.3.1
       with:
         dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
     - name: Set build info
       run: '& iex ((New-Object System.Net.WebClient).DownloadString("$env:PS_SOURCE_URL/buildinfo.ps1"))'
       shell: pwsh
-    - name: Create nuget.config
-      run: dotnet new nugetconfig      
-    - name: Set nuget add azure public feed
-      run: >
-        dotnet nuget add
-        source https://pkgs.dev.azure.com/sorling/PublicFeed/_packaging/PublicFeed/nuget/v3/index.json
-        -n azurepublic
-        --configfile nuget.config
-        -u jsorling
-        -p ${{ secrets.azpublicfeedpat }}
-        --store-password-in-clear-text
+    - name: Restore
+      run: dotnet restore src/SQLConnAuthWeb/SqlConnAuthWeb.csproj
     - name: Pack
-      run: >
-        dotnet pack
-        src/SQLConnAuthWeb/SqlConnAuthWeb.csproj
+      run: dotnet pack src/SQLConnAuthWeb/SqlConnAuthWeb.csproj
         --configuration ${{ env.CONFIGURATION }}
+        --no-restore
         --output "${{ env.NUGET_PACKAGE_PATH }}"
     - name: Publish Artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4.6.1
       with:
         name: nugetpkg
         path: ${{ env.NUGET_PACKAGE_PATH }}
