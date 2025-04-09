@@ -11,11 +11,12 @@ public class SqlConnAuthentication : CookieAuthenticationEvents, ISqlConnAuthent
 {
    private readonly HttpContext _httpContext;
    private readonly ISqlConnAuthPwdStore _sqlConnAuthPwdStore;
-   private string? _password;
+   private SqlConnAuthStoredSecrets? _storedSecrets;
    private readonly string? _userName;
    private readonly string? _dbSrv;
 
-   public SqlConnAuthentication(IHttpContextAccessor httpContextAccessor, ISqlConnAuthPwdStore sqlConnAuthPwdStore, IOptions<SqlConnAuthenticationOptions> options) {
+   public SqlConnAuthentication(IHttpContextAccessor httpContextAccessor, ISqlConnAuthPwdStore sqlConnAuthPwdStore
+      , IOptions<SqlConnAuthenticationOptions> options) {
       _httpContext = (httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor)))?.HttpContext
          ?? throw new InvalidOperationException("HttpContext is not accessible to authenticate");
       _sqlConnAuthPwdStore = sqlConnAuthPwdStore ?? throw new ArgumentNullException(nameof(sqlConnAuthPwdStore));
@@ -30,17 +31,21 @@ public class SqlConnAuthentication : CookieAuthenticationEvents, ISqlConnAuthent
    public SqlConnAuthenticationOptions Options { get; }
 
    public async Task<IEnumerable<SqlConnectionHelper.ListDBCmd.ListDBRes>> GetDBsAsync()
-      => await SqlConnectionHelper.GetDbsAsync(new(_dbSrv!, _userName!, _password!));
+      => await SqlConnectionHelper.GetDbsAsync(new(_dbSrv!, _userName!, _storedSecrets!));
 
-   public async Task<SqlConnAuthenticationResult> AuthenticateAsync(string sqlServer, string userName, string password) {
+   public async Task<SqlConnAuthenticationResult> AuthenticateAsync(string sqlServer, string userName
+      , SqlConnAuthStoredSecrets storedSecrets) {
       if (string.IsNullOrEmpty(sqlServer))
          throw new ArgumentException($"'{nameof(sqlServer)}' cannot be null or empty.", nameof(sqlServer));
       if (string.IsNullOrEmpty(userName))
          throw new ArgumentException($"'{nameof(userName)}' cannot be null or empty.", nameof(userName));
-      if (string.IsNullOrEmpty(password))
-         throw new ArgumentException($"'{nameof(password)}' cannot be null or empty.", nameof(password));
+      if (string.IsNullOrEmpty(storedSecrets.Password))
+         throw new ArgumentException($"'{nameof(storedSecrets.Password)}' cannot be null or empty.", nameof(storedSecrets.Password));
 
-      SqlConnAuthenticationData sca = new(sqlServer, userName, password);
+      if (storedSecrets.TrustServerCertificate && !Options.AllowTrustServerCertificate)
+         return new SqlConnAuthenticationResult(false, new ApplicationException("Trust server certificate not allowed"), null);
+
+      SqlConnAuthenticationData sca = new(sqlServer, userName, storedSecrets);
       if (sca.IsWinAuth && !Options.AllowWinauth)
          return new SqlConnAuthenticationResult(false, new ApplicationException("Windows authentication not allowed"), null);
 
@@ -49,16 +54,16 @@ public class SqlConnAuthentication : CookieAuthenticationEvents, ISqlConnAuthent
       if (result.Success) {
          await SignoutAsync();
 
-         List<Claim>? claims = new() {
+         List<Claim>? claims = [
             new Claim(SqlConnAuthConsts.CLAIMSQLSERVER, sqlServer, ClaimValueTypes.String
                , SqlConnAuthConsts.SQLCONNAUTHSCHEME),
             new Claim(SqlConnAuthConsts.CLAIMSQLUSERNAME, userName, ClaimValueTypes.String
                , SqlConnAuthConsts.SQLCONNAUTHSCHEME),
             new Claim(ClaimTypes.Name, $"{sqlServer}/{userName}", ClaimValueTypes.String
                , SqlConnAuthConsts.SQLCONNAUTHSCHEME),
-            new Claim(SqlConnAuthConsts.CLAIMSQLPASSWORDREF, await _sqlConnAuthPwdStore.StoreAsync(password)
+            new Claim(SqlConnAuthConsts.CLAIMSQLPASSWORDREF, await _sqlConnAuthPwdStore.StoreAsync(storedSecrets)
                , ClaimValueTypes.String, SqlConnAuthConsts.SQLCONNAUTHSCHEME)
-         };
+         ];
 
          ClaimsIdentity claimsidentity = new(claims, SqlConnAuthConsts.SQLCONNAUTHSCHEME);
          await _httpContext.SignInAsync(SqlConnAuthConsts.SQLCONNAUTHSCHEME, new ClaimsPrincipal(claimsidentity));
@@ -67,7 +72,7 @@ public class SqlConnAuthentication : CookieAuthenticationEvents, ISqlConnAuthent
       return result;
    }
 
-   public SqlConnAuthenticationData SqlConnAuthenticationData => new(_dbSrv, _userName, _password);
+   public SqlConnAuthenticationData SqlConnAuthenticationData => new(_dbSrv, _userName, _storedSecrets!);
 
    public object RouteValues => new { sqlauthparamsrv = _dbSrv, sqlauthparamusr = _userName };
 
@@ -79,10 +84,12 @@ public class SqlConnAuthentication : CookieAuthenticationEvents, ISqlConnAuthent
    public async Task SignoutAsync() => await _httpContext.SignOutAsync(SqlConnAuthConsts.SQLCONNAUTHSCHEME);
 
    public async override Task ValidatePrincipal(CookieValidatePrincipalContext context) {
-      SqlConnAuthenticationData? sca = (context ?? throw new ArgumentNullException(nameof(context))).Principal?.Identities.SQLConnAuthenticationData();
-      if (sca is not null) {
-         _password = await _sqlConnAuthPwdStore.RetrieveAsync(sca.Password!);
-         if (_password is null || (sca.IsWinAuth && !Options.AllowWinauth)) {
+      SqlConnAuthCookieClaims? scc = (context ?? throw new ArgumentNullException(nameof(context))).Principal?.Identities.SqlConnAuthCookieClaims();
+      _storedSecrets = scc?.SecretStoreKey is not null ? await _sqlConnAuthPwdStore.RetrieveAsync(scc.SecretStoreKey) : null;
+
+      if (_storedSecrets is not null && scc is not null) {
+         SqlConnAuthenticationData sca = new(scc.Server, scc.UserName, _storedSecrets);
+         if (_storedSecrets.Password is null || (sca.IsWinAuth && !Options.AllowWinauth)) {
             context.RejectPrincipal();
          }
       }

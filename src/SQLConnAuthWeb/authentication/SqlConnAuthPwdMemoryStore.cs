@@ -6,24 +6,24 @@ namespace Sorling.SqlConnAuthWeb.authentication;
 public class SqlConnAuthPwdMemoryStore : ISqlConnAuthPwdStore
 {
    private const string _keyPrefix = $"{nameof(SqlConnAuthPwdMemoryStore)}-";
-   private readonly IMemoryCache _cache;
+   private readonly MemoryCache _cache;
 
    public SqlConnAuthPwdMemoryStore() => _cache = new MemoryCache(new MemoryCacheOptions());
 
-   public async Task<string> StoreAsync(string pwd) {
+   public async Task<string> StoreAsync(SqlConnAuthStoredSecrets storedSecrets) {
       string? key = _keyPrefix + Guid.NewGuid().ToString();
-      await RenewAsync(key, pwd);
+      await RenewAsync(key, storedSecrets);
       return key;
    }
 
-   public Task RenewAsync(string key, string pwd) {
-      _ = _cache.Set(key, pwd, new MemoryCacheEntryOptions() { SlidingExpiration = TimeSpan.FromHours(3) });
+   public Task RenewAsync(string key, SqlConnAuthStoredSecrets storedSecrets) {
+      _ = _cache.Set(key, storedSecrets, new MemoryCacheEntryOptions() { SlidingExpiration = TimeSpan.FromHours(3) });
       return Task.FromResult(0);
    }
 
-   public Task<string?> RetrieveAsync(string key) {
-      _ = _cache.TryGetValue(key, out string? pwd);
-      return Task.FromResult(pwd);
+   public Task<SqlConnAuthStoredSecrets?> RetrieveAsync(string key) {
+      _ = _cache.TryGetValue(key, out SqlConnAuthStoredSecrets? secrets);
+      return Task.FromResult(secrets);
    }
 
    public Task RemoveAsync(string key) {

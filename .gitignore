@@ -10,5 +10,11 @@
 /src/MockupWeb/obj
 /src/SQLConnAuthWebTests/bin
 /src/SQLConnAuthWebTests/obj
-/src/MockupWeb
-/src/sqlexecDevWeb
+/src/MockupWeb/MockupWeb.csproj.user
+/src/MockupWeb/wwwroot/lib/bootstrap
+/src/MockupWeb/wwwroot/lib/jquery
+/src/MockupWeb/wwwroot/lib/jquery-validation
+/src/MockupWeb/wwwroot/lib/jquery-validation-unobtrusive
+/src/MockupWeb/Properties/launchSettings.json
+/src/MockupWeb/appsettings.Development.json
+/src/MockupWeb/appsettings.json

@@ -4,12 +4,9 @@ using Sorling.SqlConnAuthWeb.authentication;
 
 namespace Sorling.SqlConnAuthWeb.areas.sqlconnauth.pages;
 
-public class DisconnectModel : PageModel
+public class DisconnectModel(ISqlConnAuthenticationService sqlConnAuthenticationService) : PageModel
 {
-   private readonly ISqlConnAuthenticationService _sqlConnAuthentication;
-
-   public DisconnectModel(ISqlConnAuthenticationService sqlConnAuthenticationService)
-      => _sqlConnAuthentication = sqlConnAuthenticationService;
+   private readonly ISqlConnAuthenticationService _sqlConnAuthentication = sqlConnAuthenticationService;
 
    public async Task<IActionResult> OnGetAsync(string? returnUrl = null) {
       await _sqlConnAuthentication.SignoutAsync();

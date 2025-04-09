@@ -1,0 +1,33 @@
+﻿@page "{db?}"
+@model MockupWeb.Pages.db.IndexModel
+@using Sorling.SqlConnAuthWeb.extenstions;
+@using Sorling.SqlConnAuthWeb.authentication;
+@{
+}
+
+DB
+<p>
+    @if (Model.SQLConnectionString is not null)
+    {
+        <div>@Model.SQLConnectionString</div>
+    }
+    else
+    {
+        <div>Not connected</div>
+    }
+</p>
+<p>
+    @if (User is not null)
+    {
+        <div>@User?.Identity?.Name</div>
+        <div>@User?.Identity?.IsAuthenticated</div>
+    }
+</p>
+<p>
+    <table>
+        @foreach (var db in Model.DBs!)
+        {
+            <tr><td>@db.Name</td></tr>
+        }
+    </table>
+</p>

@@ -1,26 +1,24 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Sorling.SqlConnAuthWeb.authentication;
-using System;
 using System.IO;
+using System.Reflection;
 
 namespace SQLConnAuthWebTests;
 
-[TestClass]
-public class TestsInitialize
+public static class TestsInitialize
 {
-   private static SqlConnAuthenticationData? _sqlConnAuthenticationData;
+   private static readonly IConfigurationSection _conf = new ConfigurationBuilder()
+      .SetBasePath(Directory.GetCurrentDirectory())
+      .AddJsonFile("appsettings.json", true, false)
+      .AddUserSecrets(Assembly.GetExecutingAssembly())
+      .Build().GetSection("SQLConnAuthenticationData");
 
-   public static SqlConnAuthenticationData SQLConnAuthenticationData
-      => _sqlConnAuthenticationData ?? throw new ApplicationException("Failed to load SQLConnAuthenticationData-configuration");
+   public static SqlConnAuthenticationData SQLConnAuthenticationData(string? sqlServer = null
+      , string? userName = null, string? password = null) {
+      SqlConnAuthenticationData tor = new(sqlServer ?? _conf["SqlServer"]
+         , userName ?? _conf["UserName"]
+         , new(password ?? _conf["Password"] ?? "", true));
 
-   [AssemblyInitialize]
-#pragma warning disable IDE0060 // Remove unused parameter
-   public static void AssemblyInitialize(TestContext testContext) {
-#pragma warning restore IDE0060 // Remove unused parameter
-      IConfigurationSection conf = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory())
-      .AddJsonFile("appsettings.json", true, false).AddUserSecrets<TestsInitialize>().Build().GetSection("SQLConnAuthenticationData");
-
-      _sqlConnAuthenticationData = new(conf["SqlServer"], conf["UserName"], conf["Password"]);
+      return tor;
    }
 }

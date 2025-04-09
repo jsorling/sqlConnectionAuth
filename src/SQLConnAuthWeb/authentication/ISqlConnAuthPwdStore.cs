@@ -2,11 +2,11 @@
 
 public interface ISqlConnAuthPwdStore
 {
-   public Task<string> StoreAsync(string pwd);
+   public Task<string> StoreAsync(SqlConnAuthStoredSecrets storedSecrets);
 
-   public Task RenewAsync(string key, string pwd);
+   public Task RenewAsync(string key, SqlConnAuthStoredSecrets storedSecrets);
 
-   public Task<string?> RetrieveAsync(string key);
+   public Task<SqlConnAuthStoredSecrets?> RetrieveAsync(string key);
 
    public Task RemoveAsync(string key);
 }

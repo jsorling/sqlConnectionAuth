@@ -9,4 +9,6 @@ public class SqlConnAuthenticationOptions
    public string? ThemeSwitcherLocalStorageName {  get; set; } = null;
 
    public bool UseThemeSwitcher() => !string.IsNullOrEmpty(ThemeSwitcherLocalStorageName);
+
+   public bool AllowTrustServerCertificate { get; set; } = false;
 }

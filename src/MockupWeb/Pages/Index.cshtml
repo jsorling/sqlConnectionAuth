@@ -1,0 +1,21 @@
+﻿@page
+@model IndexModel
+@using Sorling.SqlConnAuthWeb.extenstions;
+@using Sorling.SqlConnAuthWeb.authentication;
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <p>
+        <a href="/sqlconnauth">Login</a>
+        <a asp-area="sqlconnauth" asp-page="/index">
+            Login
+        </a>
+        <a href='@Url.Page("/index", new { area = "sqlconnauth" })'>
+            Login
+        </a>
+    </p>
+</div>

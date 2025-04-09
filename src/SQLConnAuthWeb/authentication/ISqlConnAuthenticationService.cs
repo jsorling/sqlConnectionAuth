@@ -2,7 +2,8 @@
 
 public interface ISqlConnAuthenticationService
 {
-   public Task<SqlConnAuthenticationResult> AuthenticateAsync(string sqlServer, string userName, string password);
+   public Task<SqlConnAuthenticationResult> AuthenticateAsync(string sqlServer, string userName
+      , SqlConnAuthStoredSecrets storedSecrets);
 
    public Task SignoutAsync();
 

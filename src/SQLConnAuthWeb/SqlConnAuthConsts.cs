@@ -10,21 +10,15 @@ public class SqlConnAuthConsts
 
    public const string CLAIMSQLSERVER = "SQLConnAuthSqlServer";
 
-   //public const string CLAIMSQLDB = "SQLConnAuthDB";
-
    public const string CLAIMSQLUSERNAME = "SQLConnAuthUserName";
 
    public const string CLAIMSQLPASSWORDREF = "SQLConnAuthPasswordRef";
 
    public const string CLAIMSQLPASSWORD = "SQLConnAuthPassword";
 
-   //public const string SQLPWDSCHEME = "SQLPWDScheme";
-
    public const string URLROUTEPARAMSRV = "sqlauthparamsrv";
 
    public const string URLROUTEPARAMUSR = "sqlauthparamusr";
-
-   //public const string URLROUTEPARAMDB = "sqlauthparamdb";
 
    public const string WINDOWSAUTHENTICATION = "--win--auth--";
 }

@@ -11,15 +11,15 @@
         <form method="post">
             @if (Model.IsWinAuth)
             {
-                <p>Sign in to the SQL server @Model!.Input!.SqlServer using Windows authentication.</p>
+                <p>Sign in to the SQL server @Model.Input.SqlServer using Windows authentication.</p>
             }
             else
             {
-                <p>Sign in to the SQL server @Model!.Input!.SqlServer with user name @Model!.Input!.UserName</p>
+                <p>Sign in to the SQL server @Model.Input.SqlServer with user name @Model.Input.UserName</p>
             }            
             <div asp-validation-summary="All" class="text-danger"></div>
-            <input asp-for="Input!.SqlServer" hidden>
-            <input asp-for="Input!.UserName" hidden>
+            <input asp-for="Input.SqlServer" hidden>
+            <input asp-for="Input.UserName" hidden>
             <div class="form-group">
                 @if (Model.IsWinAuth)
                 {
@@ -27,10 +27,14 @@
                 }
                 else
                 {
-                    <label asp-for="Input!.Password"></label>
-                    <input asp-for="Input!.Password" class="form-control" autofocus>
+                    <label asp-for="Input.Password"></label>
+                    <input asp-for="Input.Password" class="form-control" autofocus>
                 }
-                <span asp-validation-for="Input!.Password" class="text-danger"></span>
+                <span asp-validation-for="Input.Password" class="text-danger"></span>
+            </div>
+            <div>
+                <label asp-for="Input.TrustServerCertificate"></label>
+                <input asp-for="Input.TrustServerCertificate">
             </div>
             <div class="form-group">
                 <button type="submit" class="btn btn-primary">Sign in</button>

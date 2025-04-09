@@ -1,14 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Microsoft.Extensions.Options;
-using Sorling.SqlConnAuthWeb.authentication;
 
 namespace Sorling.SqlConnAuthWeb.razor;
 
-public class SqlConnAuthPageRouteModelConvention : IPageRouteModelConvention
+public class SqlConnAuthPageRouteModelConvention(string sqlRootPath = "db") : IPageRouteModelConvention
 {
-   public string SqlRootPath { get; init; }
-
-   public SqlConnAuthPageRouteModelConvention(string sqlRootPath = "db") => SqlRootPath = sqlRootPath;
+   public string SqlRootPath { get; init; } = sqlRootPath;
 
    public void Apply(PageRouteModel model) {
       string p = SqlRootPath.TrimStart('/').TrimEnd('/');

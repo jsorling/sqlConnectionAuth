@@ -15,8 +15,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockupWeb", "MockupWeb\Mock
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SQLConnAuthWebTests", "SQLConnAuthWebTests\SQLConnAuthWebTests.csproj", "{2F7B79CB-014D-43C1-8052-727BB8128107}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "sqlexecDevWeb", "sqlexecDevWeb\sqlexecDevWeb.csproj", "{0248819F-4438-4CD5-B0AF-E38E4A6E5D83}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,10 +33,6 @@ Global
 		{2F7B79CB-014D-43C1-8052-727BB8128107}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2F7B79CB-014D-43C1-8052-727BB8128107}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2F7B79CB-014D-43C1-8052-727BB8128107}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0248819F-4438-4CD5-B0AF-E38E4A6E5D83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0248819F-4438-4CD5-B0AF-E38E4A6E5D83}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0248819F-4438-4CD5-B0AF-E38E4A6E5D83}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0248819F-4438-4CD5-B0AF-E38E4A6E5D83}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
