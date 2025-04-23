@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Sorling.SqlConnAuthWeb.authentication;
+using Sorling.SqlConnAuthWeb.helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +20,7 @@ public class SqlConnectionHelperTests
 
    [TestMethod]
    public void ListDbs() {
-      IEnumerable<SqlConnectionHelper.ListDBCmd.ListDBRes> t 
+      IEnumerable<SqlConnectionHelper.ListDBCmd.ListDBRes> t
          = SqlConnectionHelper.GetDbsAsync(TestsInitialize.SQLConnAuthenticationData()).Result;
 
       Console.WriteLine(t.First().Name);
@@ -31,10 +31,10 @@ public class SqlConnectionHelperTests
    [TestMethod]
    public void WrongServerVersion() {
       AggregateException ex = Assert.ThrowsExactly<AggregateException>(
-         () => _ = _ = SqlConnectionHelper.GetVerionAsync(TestsInitialize.SQLConnAuthenticationData(sqlServer:"xx")).Result);
+         () => _ = _ = SqlConnectionHelper.GetVerionAsync(TestsInitialize.SQLConnAuthenticationData(sqlServer: "xx")).Result);
 
       Console.WriteLine(ex.Message);
-   }  
+   }
 
    [TestMethod]
    public void WrongUserNameVersion() {

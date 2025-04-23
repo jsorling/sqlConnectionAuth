@@ -5,31 +5,35 @@ using Sorling.SqlConnAuthWeb.authentication;
 namespace Sorling.SqlConnAuthWeb.extenstions;
 public static class ServiceCollectionExtenstions
 {
-   public static IServiceCollection AddSqlConnAuthentication(this IServiceCollection services, Action<SqlConnAuthenticationOptions> configureOptions) {
+   public static IServiceCollection AddSqlConnAuthentication(this IServiceCollection services
+      , Action<SqlAuthOptions> configureOptions) {
       _ = services.AddHttpContextAccessor()
-         .AddScoped<ISqlConnAuthenticationService, SqlConnAuthentication>()
+         .AddTransient<ISqlAuthService, SqlAuthService>()
          .AddAuthentication()
-         .AddCookie(SqlConnAuthConsts.SQLCONNAUTHSCHEME, options => {
-            options.LoginPath = $"/{SqlConnAuthConsts.SQLCONNAUTHAREA}/connect";
-            options.AccessDeniedPath = $"/{SqlConnAuthConsts.SQLCONNAUTHAREA}/accessdenied";
-            options.LogoutPath = $"/{SqlConnAuthConsts.SQLCONNAUTHAREA}/disconnect";
+         .AddCookie(SqlAuthConsts.SQLAUTHSCHEME, options => {
+            options.LoginPath = $"/{SqlAuthConsts.SQLAUTHAREA}/connect";
+            options.AccessDeniedPath = $"/{SqlAuthConsts.SQLAUTHAREA}/accessdenied";
+            options.LogoutPath = $"/{SqlAuthConsts.SQLAUTHAREA}/disconnect";
             options.ExpireTimeSpan = new(30, 0, 0, 0, 0);
             options.SlidingExpiration = true;
-            options.EventsType = typeof(ISqlConnAuthenticationService);
-            options.Validate();
+            options.EventsType = typeof(SqlAuthCookieEvents);
+            //options.Validate();
          });
 
-      services.TryAddSingleton<ISqlConnAuthPwdStore, SqlConnAuthPwdMemoryStore>();
-      _ = services.Configure(configureOptions);
+      services.TryAddSingleton<ISqlAuthPwdStore, SqlAuthPwdMemoryStore>();
+      services.TryAddSingleton<ISqlAuthRuleValidator, SqlAuthRuleValidator>();
+      services.TryAddSingleton<SqlAuthCookieEvents, SqlAuthCookieEvents>();
 
-      return services;
+      return services.Configure(configureOptions);
+
+      //return services;
    }
 
    public static IServiceCollection AddSQLConnAuthentication(this IServiceCollection services)
       => services.AddSqlConnAuthentication(options => { });
 
    public static IServiceCollection AddSqlConnAuthorization(this IServiceCollection services)
-      => services.AddAuthorization(option => option.AddPolicy(SqlConnAuthConsts.SQLCONNAUTHPOLICY,
-         p => p.RequireAuthenticatedUser().AddAuthenticationSchemes(SqlConnAuthConsts.SQLCONNAUTHSCHEME)));
+      => services.AddAuthorization(option => option.AddPolicy(SqlAuthConsts.SQLAUTHPOLICY,
+         p => p.RequireAuthenticatedUser().AddAuthenticationSchemes(SqlAuthConsts.SQLAUTHSCHEME)));
 }
 

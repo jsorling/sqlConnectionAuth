@@ -13,11 +13,11 @@ public static class TestsInitialize
       .AddUserSecrets(Assembly.GetExecutingAssembly())
       .Build().GetSection("SQLConnAuthenticationData");
 
-   public static SqlConnAuthenticationData SQLConnAuthenticationData(string? sqlServer = null
+   public static SqlAuthConnectionstringProvider SQLConnAuthenticationData(string? sqlServer = null
       , string? userName = null, string? password = null) {
-      SqlConnAuthenticationData tor = new(sqlServer ?? _conf["SqlServer"]
+      SqlAuthConnectionstringProvider tor = new(sqlServer ?? _conf["SqlServer"]
          , userName ?? _conf["UserName"]
-         , new(password ?? _conf["Password"] ?? "", true));
+         , new(password ?? _conf["Password"] ?? "", true, null));
 
       return tor;
    }

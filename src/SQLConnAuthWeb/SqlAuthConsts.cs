@@ -1,12 +1,12 @@
 ﻿namespace Sorling.SqlConnAuthWeb;
 
-public class SqlConnAuthConsts
+public class SqlAuthConsts
 {
-   public const string SQLCONNAUTHSCHEME = "SQLConnAuthScheme";
+   public const string SQLAUTHSCHEME = "SQLConnAuthScheme";
 
-   public const string SQLCONNAUTHPOLICY = "SQLConnAuthPolicy";
+   public const string SQLAUTHPOLICY = "SQLConnAuthPolicy";
 
-   public const string SQLCONNAUTHAREA = "sqlconnauth";
+   public const string SQLAUTHAREA = "sqlconnauth";
 
    public const string CLAIMSQLSERVER = "SQLConnAuthSqlServer";
 

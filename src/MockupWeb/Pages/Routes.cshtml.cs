@@ -1,6 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Text;
 
 namespace MockupWeb.Pages;
 
@@ -8,7 +6,7 @@ public class RoutesModel : PageModel
 {
    public void OnGet(EndpointDataSource endpointSource) {
 
-      var x = endpointSource.Endpoints.Single();
+      Endpoint x = endpointSource.Endpoints.Single();
       //var sb = new StringBuilder();
       //var endpoints = endpointSource.Endpoints.SelectMany(es => es.Endpoints);
       //foreach (var endpoint in endpoints) {

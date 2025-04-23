@@ -11,19 +11,17 @@
         <form method="post">
             @if (Model.IsWinAuth)
             {
-                <p>Sign in to the SQL server @Model.Input.SqlServer using Windows authentication.</p>
+                <p>Sign in to the SQL server @Model.SQLServer using Windows authentication.</p>
             }
             else
             {
-                <p>Sign in to the SQL server @Model.Input.SqlServer with user name @Model.Input.UserName</p>
-            }            
+                <p>Sign in to the SQL server @Model.SQLServer with user name @Model.UserName</p>
+            }
             <div asp-validation-summary="All" class="text-danger"></div>
-            <input asp-for="Input.SqlServer" hidden>
-            <input asp-for="Input.UserName" hidden>
             <div class="form-group">
                 @if (Model.IsWinAuth)
                 {
-                    <input hidden type="text" name="Input.Password" value="@SqlConnAuthConsts.WINDOWSAUTHENTICATION">
+                    <input hidden type="text" name="Input.Password" value="@SqlAuthConsts.WINDOWSAUTHENTICATION">
                 }
                 else
                 {

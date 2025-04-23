@@ -8,32 +8,34 @@ namespace Sorling.SqlConnAuthWeb.areas.sqlconnauth.pages;
 
 [AllowAnonymous]
 [RequireHttps]
-public class ConnectModel(ISqlConnAuthenticationService sqlConnAuthenticationService) : PageModel
+public class ConnectModel(ISqlAuthService sqlConnAuthenticationService) : PageModel
 {
    [BindProperty]
-   public InputAuthenticationModel Input { get; set; } = new();
+   public InputPasswordModel Input { get; set; } = new();
 
-   private readonly ISqlConnAuthenticationService _sqlConnAuthentication = sqlConnAuthenticationService;
+   private readonly ISqlAuthService _sqlConnAuthentication = sqlConnAuthenticationService;
 
    public bool IsWinAuth { get; private set; }
 
-   public void OnGet([FromRoute] string sqlauthparamsrv, [FromRoute] string sqlauthparamusr) {
-      IsWinAuth = sqlauthparamusr == SqlConnAuthConsts.WINDOWSAUTHENTICATION && _sqlConnAuthentication.Options.AllowWinauth;
-      Input = new() { SqlServer = sqlauthparamsrv, UserName = sqlauthparamusr };
-   }
+   public string SQLServer => _sqlConnAuthentication.SQLServer;
 
-   public async Task<IActionResult> OnPostAsync([FromRoute] string sqlauthparamsrv, [FromRoute] string sqlauthparamusr
+   public string UserName => _sqlConnAuthentication.UserName;
+
+   public void OnGet([FromRoute] string sqlauthparamusr) => IsWinAuth = sqlauthparamusr == SqlAuthConsts.WINDOWSAUTHENTICATION && _sqlConnAuthentication.Options.AllowIntegratedSecurity;
+
+   public async Task<IActionResult> OnPostAsync([FromRoute] string sqlauthparamusr
       , string? returnUrl = null) {
-      if (ModelState.IsValid) {
-         IsWinAuth = sqlauthparamusr == SqlConnAuthConsts.WINDOWSAUTHENTICATION && _sqlConnAuthentication.Options.AllowWinauth;
-         SqlConnAuthenticationResult result = await _sqlConnAuthentication.AuthenticateAsync(sqlauthparamsrv
-            , sqlauthparamusr, new(Input.Password, Input.TrustServerCertificate));
+      if (ModelState.IsValid)
+      {
+         IsWinAuth = sqlauthparamusr == SqlAuthConsts.WINDOWSAUTHENTICATION && _sqlConnAuthentication.Options.AllowIntegratedSecurity;
+         SqlAuthenticationResult result = await _sqlConnAuthentication.AuthenticateAsync(Input);
 
-         if (!result.Success && result.Exception is not null) {
+         if (!result.Success && result.Exception is not null)
+         {
             ModelState.AddModelError("Password", result.Exception.Message);
          }
 
-         return result.Success ? Redirect(returnUrl ?? _sqlConnAuthentication.UriEscapedPath(sqlauthparamsrv, sqlauthparamusr))
+         return result.Success ? Redirect(returnUrl ?? _sqlConnAuthentication.UriEscapedPath)
             : Page();
       }
 

@@ -1,14 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc.RazorPages;
-using Sorling.SqlConnAuthWeb.authentication;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace MockupWeb.Pages;
 
-public class IndexModel(ILogger<IndexModel> logger, ISqlConnAuthenticationService sqlConnAuthenticationService) : PageModel
+[AllowAnonymous]
+[RequireHttps]
+public class IndexModel : PageModel
 {
-   private readonly ILogger<IndexModel> _logger = logger;
-
-   public readonly ISqlConnAuthenticationService SqlConnAuthentication = sqlConnAuthenticationService;
-
    public void OnGet() {
 
    }
