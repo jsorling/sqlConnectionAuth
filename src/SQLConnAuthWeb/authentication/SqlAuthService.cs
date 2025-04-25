@@ -7,7 +7,7 @@ using System.Security.Claims;
 namespace Sorling.SqlConnAuthWeb.authentication;
 
 public class SqlAuthService(IHttpContextAccessor httpContextAccessor, ISqlAuthRuleValidator ruleValidator
-   , ISqlAuthPwdStore pwdStore, IOptions<SqlAuthOptions> options) : ISqlAuthService
+   , ISqlAuthPwdStore pwdStore, IOptions<SqlAuthOptions> options, SqlAuthAppPaths sqlAuthAppPaths) : ISqlAuthService
 {
    private readonly HttpContext _httpContext = httpContextAccessor?.HttpContext
       ?? throw new ArgumentNullException(nameof(httpContextAccessor));
@@ -18,6 +18,9 @@ public class SqlAuthService(IHttpContextAccessor httpContextAccessor, ISqlAuthRu
    private readonly ISqlAuthPwdStore _pwdStore = pwdStore
       ?? throw new ArgumentNullException(nameof(pwdStore));
 
+   private readonly SqlAuthAppPaths _sqlAuthAppPaths = sqlAuthAppPaths 
+      ?? throw new ArgumentNullException(nameof(sqlAuthAppPaths));
+
    public SqlAuthOptions Options { get; } = options?.Value ?? throw new ArgumentNullException(nameof(options));
 
    public string SQLServer { get; } = httpContextAccessor.HttpContext?.Request.RouteValues[SqlAuthConsts.URLROUTEPARAMSRV] as string
@@ -26,7 +29,7 @@ public class SqlAuthService(IHttpContextAccessor httpContextAccessor, ISqlAuthRu
    public string UserName { get; } = httpContextAccessor.HttpContext?.Request.RouteValues[SqlAuthConsts.URLROUTEPARAMUSR] as string
       ?? throw new ApplicationException("SQL username cannot be null or empty on route.");
 
-   public string UriEscapedPath => Options.UriEscapedSqlPath(SQLServer, UserName);
+   public string UriEscapedPath => _sqlAuthAppPaths.UriEscapedSqlPath(SQLServer, UserName);
 
    public async Task<SqlAuthenticationResult> AuthenticateAsync(SQLAuthenticateRequest request) {
       SqlAuthRuleValidationResult validationresult = await _ruleValidator.ValidateAsync(

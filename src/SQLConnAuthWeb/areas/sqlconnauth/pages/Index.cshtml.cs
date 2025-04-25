@@ -9,7 +9,7 @@ namespace Sorling.SqlConnAuthWeb.areas.sqlconnauth.pages;
 
 [AllowAnonymous]
 [RequireHttps]
-public class IndexModel(IOptions<SqlAuthOptions> options) : PageModel
+public class IndexModel(IOptions<SqlAuthOptions> options, SqlAuthAppPaths sqlAuthAppPaths) : PageModel
 {
    public SqlAuthOptions SQLAuthOptions { get; } = options.Value ?? throw new ArgumentNullException(nameof(options));
 
@@ -24,7 +24,7 @@ public class IndexModel(IOptions<SqlAuthOptions> options) : PageModel
    {
       if (ModelState.IsValid)
       {
-         string redir = SQLAuthOptions.UriEscapedSqlPath(Input.SqlServer, Input.UserName);
+         string redir = sqlAuthAppPaths.UriEscapedSqlPath(Input.SqlServer, Input.UserName);
          return Redirect(redir);
       }
 

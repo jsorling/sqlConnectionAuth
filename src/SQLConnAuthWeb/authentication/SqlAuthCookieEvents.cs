@@ -1,14 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Options;
 using Sorling.SqlConnAuthWeb.extenstions;
 
 namespace Sorling.SqlConnAuthWeb.authentication;
 
 public class SqlAuthCookieEvents(ISqlAuthPwdStore sqlConnAuthPwdStore
-   , IOptions<SqlAuthOptions> options
-   , ISqlAuthRuleValidator ruleValidator) : CookieAuthenticationEvents
+   , ISqlAuthRuleValidator ruleValidator
+   , SqlAuthAppPaths sqlAuthAppPaths) : CookieAuthenticationEvents
 {
    public override Task SigningIn(CookieSigningInContext context) {
       string? server = context.Principal?.FindFirst(SqlAuthConsts.CLAIMSQLSERVER)?.Value;
@@ -16,7 +15,7 @@ public class SqlAuthCookieEvents(ISqlAuthPwdStore sqlConnAuthPwdStore
 
       context.CookieOptions.IsEssential = true;
       context.CookieOptions.Path
-         = $"/{options.Value.SqlRootPath.Trim('/')}/{Uri.EscapeDataString(server!)}/{Uri.EscapeDataString(user!)}";
+         = $"/{sqlAuthAppPaths.Root.Trim('/')}/{Uri.EscapeDataString(server!)}/{Uri.EscapeDataString(user!)}";
       context.CookieOptions.SameSite = SameSiteMode.Strict;
 
       return base.SigningIn(context);

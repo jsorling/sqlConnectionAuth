@@ -3,19 +3,19 @@ using Sorling.SqlConnAuthWeb.authentication;
 
 namespace Sorling.SqlConnAuthWeb.razor;
 
-public class SqlAuthPageRouteModelConvention(SqlAuthOptions options) : IPageRouteModelConvention
+public class SqlAuthPageRouteModelConvention(SqlAuthAppPaths path) : IPageRouteModelConvention
 {
-   private readonly SqlAuthOptions _options = options;
+   private readonly SqlAuthAppPaths _path = path;
 
    public void Apply(PageRouteModel model) {
-      string p = _options.SqlRootPath.TrimStart('/').TrimEnd('/');
+      string p = _path.Root.TrimStart('/').TrimEnd('/');
       foreach (SelectorModel selector in model.Selectors)
       {
          string? newtemplate = null;
          if (selector.AttributeRouteModel!.Template!.StartsWith(p + "/")
             || selector.AttributeRouteModel.Template == p)
             newtemplate = $"/{p}/{{{SqlAuthConsts.URLROUTEPARAMSRV}}}/{{{SqlAuthConsts.URLROUTEPARAMUSR}}}"
-               + (string.IsNullOrWhiteSpace(_options.SqlTailPath.Trim('/')) ? "/" : "/" + _options.SqlTailPath.Trim('/') + "/")
+               + (string.IsNullOrWhiteSpace(_path.Tail.Trim('/')) ? "/" : "/" + _path.Tail.Trim('/') + "/")
                + selector.AttributeRouteModel.Template[p.Length..].TrimStart('/');
 
          if (newtemplate is not null)
