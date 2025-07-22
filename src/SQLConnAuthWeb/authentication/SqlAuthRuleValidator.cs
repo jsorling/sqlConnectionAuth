@@ -4,10 +4,19 @@ using System.Net;
 
 namespace Sorling.SqlConnAuthWeb.authentication;
 
+/// <summary>
+/// Validates SQL authentication requests against configured security rules and network policies.
+/// </summary>
+/// <param name="options">The options used to configure rule validation behavior.</param>
 public class SqlAuthRuleValidator(IOptions<SqlAuthOptions> options) : ISqlAuthRuleValidator
 {
    private readonly SqlAuthOptions _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
 
+   /// <summary>
+   /// Validates the provided SQL authentication request against security and network rules.
+   /// </summary>
+   /// <param name="request">The validation request containing connection and credential information.</param>
+   /// <returns>A task that represents the asynchronous operation. The task result contains the rule validation result, including any exception and validated secrets.</returns>
    public async Task<SqlAuthRuleValidationResult> ValidateAsync(SqlAuthValidationRequest request) {
       if (!_options.AllowIntegratedSecurity && request.Password == SqlAuthConsts.WINDOWSAUTHENTICATION)
       {

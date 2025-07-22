@@ -3,16 +3,29 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Sorling.SqlConnAuthWeb.razor.models;
 
+/// <summary>
+/// Represents the input model for password-based SQL authentication in Razor Pages.
+/// </summary>
 public class InputPasswordModel
 {
+   /// <summary>
+   /// Gets or sets the password for authentication.
+   /// </summary>
    [Required(AllowEmptyStrings = true, ErrorMessage = "Required: password")]
    [DataType(DataType.Password)]
    public string Password { get; set; } = "";
 
+   /// <summary>
+   /// Gets or sets a value indicating whether to trust the SQL Server certificate.
+   /// </summary>
    [Required]
    public bool TrustServerCertificate { get; set; }
 
+   /// <summary>
+   /// Implicitly converts an <see cref="InputPasswordModel"/> to a <see cref="SQLAuthenticateRequest"/>.
+   /// </summary>
+   /// <param name="model">The input password model to convert.</param>
    public static implicit operator SQLAuthenticateRequest(InputPasswordModel model)
-      => new(Password: model.Password
-          , TrustServerCertificate: model.TrustServerCertificate);
+       => new(Password: model.Password
+           , TrustServerCertificate: model.TrustServerCertificate);
 }
