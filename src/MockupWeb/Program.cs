@@ -25,11 +25,4 @@ app.UseHttpsRedirection()
 
 app.MapRazorPages();
 
-//https://www.meziantou.net/list-all-routes-in-an-asp-net-core-application.htm
-if (app.Environment.IsDevelopment())
-{
-   _ = app.MapGet("/debug/routes", (IEnumerable<EndpointDataSource> endpointSources)
-      => string.Join("\n", endpointSources.SelectMany(source => source.Endpoints)));
-}
-
 app.Run();

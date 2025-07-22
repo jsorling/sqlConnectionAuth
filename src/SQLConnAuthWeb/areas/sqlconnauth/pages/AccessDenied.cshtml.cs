@@ -11,9 +11,9 @@ namespace Sorling.SqlConnAuthWeb.areas.sqlconnauth.pages;
 [RequireHttps]
 public class AccessDeniedModel : PageModel
 {
-    /// <summary>
-    /// Handles GET requests to the Access Denied page.
-    /// </summary>
-    /// <returns>The page result.</returns>
-    public IActionResult OnGet() => Page();
+   /// <summary>
+   /// Handles GET requests to the Access Denied page.
+   /// </summary>
+   /// <returns>The page result.</returns>
+   public IActionResult OnGet() => Page();
 }
