@@ -12,5 +12,5 @@ public class SqlAuthOptions
 
    public bool AllowLoopbackConnections { get; set; }
 
-   public bool AllowPrivateNetworkConnections { get; set; }   
+   public bool AllowPrivateNetworkConnections { get; set; }
 }
