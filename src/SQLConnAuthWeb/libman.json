@@ -22,7 +22,7 @@
         "js/bootstrap.bundle.min.js",
         "css/bootstrap.min.css"
       ],
-      "library": "bootstrap@5.3.3",
+      "library": "bootstrap@5.3.7",
       "provider": "cdnjs"
     },
     {

@@ -4,9 +4,16 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Sorling.SqlConnAuthWeb.areas.sqlconnauth.pages;
 
+/// <summary>
+/// Page model for the Access Denied page in the SQL authentication area.
+/// </summary>
 [AllowAnonymous]
 [RequireHttps]
 public class AccessDeniedModel : PageModel
 {
-   public IActionResult OnGet() => Page();
+    /// <summary>
+    /// Handles GET requests to the Access Denied page.
+    /// </summary>
+    /// <returns>The page result.</returns>
+    public IActionResult OnGet() => Page();
 }
