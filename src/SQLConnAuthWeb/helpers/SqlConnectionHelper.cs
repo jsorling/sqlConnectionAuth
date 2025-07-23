@@ -12,15 +12,15 @@ public class SqlConnectionHelper
    /// Represents a result row for a listed database.
    /// </summary>
    /// <param name="Name">The name of the database.</param>
-   public record ListDBRes(string Name);
+   public record DBName(string Name);
 
    /// <summary>
    /// Retrieves a list of databases from the SQL Server using the provided connection string provider.
    /// </summary>
    /// <param name="sca">The SQL authentication connection string provider.</param>
    /// <returns>A task that represents the asynchronous operation. The task result contains a collection of database result objects.</returns>
-   public static async Task<IEnumerable<ListDBRes>> GetDbsAsync(SqlAuthConnectionstringProvider sca) {
-      List<ListDBRes> results = [];
+   public static async Task<IEnumerable<DBName>> GetDbsAsync(SqlAuthConnectionstringProvider sca) {
+      List<DBName> results = [];
       string connstr = sca.ConnectionString("master");
       using (SqlConnection conn = new(connstr))
       using (SqlCommand cmd = new("select name from sys.databases order by case when owner_sid = 0x01 then 1 else 2 end, name", conn))
@@ -29,7 +29,7 @@ public class SqlConnectionHelper
          using SqlDataReader reader = await cmd.ExecuteReaderAsync();
          while (await reader.ReadAsync())
          {
-            results.Add(new ListDBRes(reader.GetString(0)));
+            results.Add(new DBName(reader.GetString(0)));
          }
       }
 

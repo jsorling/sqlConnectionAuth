@@ -11,7 +11,7 @@ public class IndexModel(ISqlAuthService sqlConAuth) : PageModel
 
    public string? SQLConnectionString => _sqlconauth.GetConnectionString("master");
 
-   public IEnumerable<SqlConnectionHelper.ListDBRes>? DBs;
+   public IEnumerable<SqlConnectionHelper.DBName>? DBs;
 
    public async Task<IActionResult> OnGetAsync([FromRoute] string? db) {
       DBs = await _sqlconauth.GetDBsAsync();
