@@ -2,6 +2,14 @@
 
 Sorling.SqlConnectionAuth is a library for ASP.NET Core Razor Pages that enables authentication and authorization using SQL Server connections. It allows you to secure your web applications by leveraging SQL Server credentials and connection properties, providing a flexible alternative to traditional identity systems. The library can also serve as a starting point for building management-type applications for SQL Server, enabling you to quickly create secure admin or management interfaces.
 
+## What can SqlConnectionAuth do?
+- Authenticate users based on SQL Server connection credentials, supporting both SQL authentication and integrated security.
+- Enforce authorization policies using SQL authentication context.
+- Configure network access rules, such as allowing loopback or private network connections.
+- Support trusted server certificates for secure connections.
+- Integrate seamlessly with Razor Pages routing and authorization conventions.
+- Provide user experience features like a theme switcher stored in local storage.
+
 ## UI
 Sorling.SqlConnectionAuth comes with a complete, ready-to-use UI for the authentication process, including login and connection management pages. If you need to customize the look, feel, or behavior, you can override the default UI by replacing the Razor Pages in the provided area with your own implementations. This follows the standard ASP.NET Core Razor Pages area view replacement pattern, allowing full control over the authentication experience.
 
@@ -15,13 +23,21 @@ Integrated Security (Windows Authentication) allows users to authenticate to SQL
 ## Password Handling
 By default, user passwords are stored only in memory for the duration of the session, ensuring they are not persisted to disk or external storage. For advanced scenarios or stricter security requirements, you can implement your own custom password storage mechanism by extending the library's interfaces.
 
-## What can SqlConnectionAuth do?
-- Authenticate users based on SQL Server connection credentials, supporting both SQL authentication and integrated security.
-- Enforce authorization policies using SQL authentication context.
-- Configure network access rules, such as allowing loopback or private network connections.
-- Support trusted server certificates for secure connections.
-- Integrate seamlessly with Razor Pages routing and authorization conventions.
-- Provide user experience features like a theme switcher stored in local storage.
+## IP Allow List, Private Network, and Loopback Controls
+
+Sorling.SqlConnectionAuth provides flexible network access control for SQL authentication. You can restrict which SQL Server IP addresses or ranges can be authenticated against by configuring the `AllowedIPAddresses` property. This property accepts single IPs, CIDR ranges, or subnet mask notation. If the allow-list is set (not empty), only authentication requests targeting SQL Servers with matching IPs/ranges are permitted. If the allow-list is empty, the following options apply:
+
+- **AllowLoopbackConnections**: Controls whether authentication requests against loopback SQL Server addresses (e.g., `127.0.0.1`, `::1`) are permitted.
+- **AllowPrivateNetworkConnections**: Controls whether authentication requests against private network SQL Server addresses (e.g., `192.168.x.x`, `10.x.x.x`, etc.) are permitted.
+
+If both options are set to `true` and the allow-list is empty, authentication requests against all network locations are allowed. If either is set to `false`, requests to those address types are blocked unless explicitly allowed in the allow-list.
+
+**Example usage:**
+- To allow authentication only against specific SQL Server IPs or ranges, populate `AllowedIPAddresses`.
+- To allow authentication against all private and loopback SQL Server addresses, leave the allow-list empty and set both options to `true`.
+- To block authentication against private or loopback SQL Server addresses, set the corresponding option to `false`.
+
+The allow-list takes precedence: if it is not empty, only those SQL Server IPs/ranges can be authenticated against, regardless of the other settings.
 
 ### Program.cs
 ```C#
