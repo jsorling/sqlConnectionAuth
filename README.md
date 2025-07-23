@@ -39,7 +39,89 @@ If both options are set to `true` and the allow-list is empty, authentication re
 
 The allow-list takes precedence: if it is not empty, only those SQL Server IPs/ranges can be authenticated against, regardless of the other settings.
 
-### Program.cs
+## Routing
+
+The routing system in Sorling.SqlConnectionAuth is designed to support SQL authentication scenarios by dynamically generating URL patterns that include SQL Server connection parameters. This enables each authentication session to be uniquely identified by the server and user being authenticated against, and allows for flexible, parameterized navigation within the Razor Pages application.
+
+### How Routing Works
+
+Routing is configured in `Program.cs` using the `SqlAuthAppPaths` object, which defines the root and tail segments for SQL authentication URLs. For example:
+
+```csharp
+SqlAuthAppPaths sqlauthpath = new("/db", "srv");
+```
+
+This configuration, combined with the custom route conventions, results in URLs like:
+
+```
+https://localhost:7061/db/192.168.1.233/sa/srv
+```
+
+- `/db` is the root path for SQL authentication pages.
+- `192.168.1.233` is the SQL Server address (injected as a route parameter).
+- `sa` is the SQL Server username (also a route parameter).
+- `/srv` is an optional tail segment, as defined in `SqlAuthAppPaths`.
+
+The route parameters are injected by the custom convention, so Razor Pages can access them directly from the route data.
+
+### How SqlAuthAppPaths Works
+
+`SqlAuthAppPaths` is a configuration object that defines the root and tail segments for all SQL authentication-related routes. The `Root` property sets the base path (e.g., `/db`), and the `Tail` property can add an additional segment (e.g., `/srv`). These values are used by the route convention to generate the full URL structure for authentication pages.
+
+### Custom Route Convention: AddSqlAuthRazorPageRouteConventions
+
+The extension method `AddSqlAuthRazorPageRouteConventions` (see `MvcBuilderExtensions.cs`) adds a custom Razor Pages route convention via the `SqlAuthPageRouteModelConvention` class. This convention rewrites the route templates for authentication pages to include the server and user as route parameters, and optionally appends the tail segment. For example, a page that would normally be at `/db` becomes accessible at `/db/{server}/{user}/srv`.
+
+**How it works:**
+- The convention inspects each Razor Page route.
+- If the route starts with the configured root path, it rewrites the template to include `/{server}/{user}/[tail]`.
+- This enables URLs to carry the SQL Server and user context, which can be used for authentication and authorization logic within the page handlers.
+
+### Root Path Authorization: AuthorizeSqlAuthRootPath
+
+The extension method `AuthorizeSqlAuthRootPath` (see `MvcBuilderExtensions.cs`) configures Razor Pages to require a specific authorization policy for all pages under the SQL authentication root path. It does this by calling `options.Conventions.AuthorizeFolder` with the root path and a custom policy name. This ensures that all authentication-related pages are protected by the appropriate authorization logic, and only accessible to users who have passed SQL authentication.
+
+## Accessing the Authenticated Connection String in Razor Pages
+
+To access the authenticated SQL connection string within your Razor PageModels or views, you can inject the `ISqlAuthService` interface. This service provides methods to retrieve the current connection string, user, and server context for the authenticated session.
+
+### Injecting ISqlAuthService in a PageModel
+
+You can inject `ISqlAuthService` via constructor injection in your PageModel:
+
+```csharp
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Sorling.SqlConnAuthWeb.authentication;
+
+public class IndexModel : PageModel
+{
+    private readonly ISqlAuthService _sqlAuthService;
+
+    public IndexModel(ISqlAuthService sqlAuthService)
+    {
+        _sqlAuthService = sqlAuthService;
+    }
+
+    public string? ConnectionString => _sqlAuthService.GetConnectionString();
+}
+```
+
+### Accessing the Connection String in a Razor View
+
+You can also inject `ISqlAuthService` directly into a Razor view using the `@inject` directive:
+
+```csharp
+@inject Sorling.SqlConnAuthWeb.authentication.ISqlAuthService SqlAuthService
+
+<p>Current connection string: @SqlAuthService.GetConnectionString()</p>
+```
+
+### Additional Context
+- `ISqlAuthService.GetConnectionString()` returns the connection string for the current authenticated SQL context.
+- You can also access the current SQL Server and user via `ISqlAuthService.SQLServer` and `ISqlAuthService.UserName`.
+- The service is available for injection in both PageModels and Razor views, making it easy to use the authenticated connection throughout your application.
+
+## Program.cs
 ```C#
 using Sorling.SqlConnAuthWeb.authentication;
 using Sorling.SqlConnAuthWeb.extenstions;
@@ -84,3 +166,4 @@ The code in `Program.cs` demonstrates how to integrate SQL connection-based auth
   - Applies custom route conventions and root path authorization specific to SQL authentication.
 
 These features extend a standard Razor Pages app to support secure, SQL-authenticated access and custom authorization logic.
+
