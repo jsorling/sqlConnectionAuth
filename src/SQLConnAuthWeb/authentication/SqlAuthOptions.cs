@@ -3,7 +3,7 @@
 /// <summary>
 /// Provides configuration options for SQL authentication and connection settings.
 /// </summary>
-public class SqlAuthOptions
+public partial class SqlAuthOptions
 {
    /// <summary>
    /// Gets or sets a value indicating whether integrated security (Windows Authentication) is allowed for SQL connections.
@@ -35,4 +35,9 @@ public class SqlAuthOptions
    /// Gets or sets a value indicating whether connections to private network addresses are permitted.
    /// </summary>
    public bool AllowPrivateNetworkConnections { get; set; }
+
+   /// <summary>
+   /// Gets or sets the list of allowed IP addresses or ranges (CIDR or subnet mask notation).
+   /// </summary>
+   public IPAddressRangeList AllowedIPAddresses { get; set; } = new IPAddressRangeList();
 }
