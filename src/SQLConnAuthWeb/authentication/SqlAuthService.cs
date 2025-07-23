@@ -92,7 +92,7 @@ public class SqlAuthService(IHttpContextAccessor httpContextAccessor, ISqlAuthRu
    }
 
    /// <inheritdoc/>
-   public async Task<IEnumerable<SqlConnectionHelper.ListDBRes>> GetDBsAsync() {
+   public async Task<IEnumerable<SqlConnectionHelper.DBName>> GetDBsAsync() {
       SqlAuthStoredSecrets? storedsecrets = _httpContext.Items[typeof(SqlAuthStoredSecrets)] as SqlAuthStoredSecrets;
       if (storedsecrets is not null)
       {

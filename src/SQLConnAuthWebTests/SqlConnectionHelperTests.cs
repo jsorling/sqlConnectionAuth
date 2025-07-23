@@ -20,7 +20,7 @@ public class SqlConnectionHelperTests
 
    [TestMethod]
    public void ListDbs() {
-      IEnumerable<SqlConnectionHelper.ListDBRes> t
+      IEnumerable<SqlConnectionHelper.DBName> t
          = SqlConnectionHelper.GetDbsAsync(TestsInitialize.SQLConnAuthenticationData()).Result;
 
       Console.WriteLine(t.First().Name);
