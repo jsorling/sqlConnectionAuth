@@ -1,4 +1,4 @@
-﻿@page "{sqlauthparamsrv}/{sqlauthparamusr}"
+﻿@page "{sqlauthparamsrv}/{sqlauthparamusr}/{temppasswordkey?}"
 @using Sorling.SqlConnAuthWeb;
 @model Sorling.SqlConnAuthWeb.areas.sqlconnauth.pages.ConnectModel
 @{
@@ -33,6 +33,10 @@
             <div>
                 <label asp-for="Input.TrustServerCertificate"></label>
                 <input asp-for="Input.TrustServerCertificate">
+            </div>
+            <div>
+                <label asp-for="Input.Bogus"></label>
+                <input asp-for="Input.Bogus">
             </div>
             <div class="form-group">
                 <button type="submit" class="btn btn-primary">Sign in</button>

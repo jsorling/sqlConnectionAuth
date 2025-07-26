@@ -76,6 +76,20 @@ public class SqlAuthService(IHttpContextAccessor httpContextAccessor, ISqlAuthRu
    }
 
    /// <inheritdoc/>
+   public async Task<SqlAuthenticationResult> TestAuthenticateAsync(SqlAuthTempPasswordInfo sqlAuthTempPasswordInfo, string? dbName) {
+      ArgumentNullException.ThrowIfNull(sqlAuthTempPasswordInfo, nameof(sqlAuthTempPasswordInfo));
+
+      SqlAuthRuleValidationResult validationresult = await _ruleValidator.ValidateAsync(
+          new(SQLServer, UserName, sqlAuthTempPasswordInfo.Password, sqlAuthTempPasswordInfo.TrustServerCertificate));
+
+      SqlAuthStoredSecrets? storedsecrets = validationresult.StoredSecrets;
+      return storedsecrets is null
+         ? new(false, validationresult.Exception, null)
+         : await SqlConnectionHelper.TryConnectWithResultAsync(
+          new(SQLServer, UserName, storedsecrets));
+   }
+
+   /// <inheritdoc/>
    public async Task SignoutAsync()
        => await _httpContext.SignOutAsync(SqlAuthConsts.SQLAUTHSCHEME);
 

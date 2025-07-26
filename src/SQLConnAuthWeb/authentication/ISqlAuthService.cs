@@ -52,4 +52,12 @@ public interface ISqlAuthService
    /// Gets the user name associated with the current authentication context.
    /// </summary>
    public string UserName { get; }
+
+   /// <summary>
+   /// Tests SQL authentication using a temporary password and optional database name, without affecting the current authentication state.
+   /// </summary>
+   /// <param name="sqlAuthTempPasswordInfo">The temporary password information for SQL authentication.</param>
+   /// <param name="dbName">The name of the database to test authentication against, or null for the default database.</param>
+   /// <returns>A task that represents the asynchronous operation. The task result contains the authentication result.</returns>
+   public Task<SqlAuthenticationResult> TestAuthenticateAsync(SqlAuthTempPasswordInfo sqlAuthTempPasswordInfo, string? dbName);
 }

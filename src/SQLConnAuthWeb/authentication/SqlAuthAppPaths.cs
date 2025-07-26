@@ -5,7 +5,7 @@
 /// </summary>
 /// <param name="Root">The root segment of the path (default is "/db").</param>
 /// <param name="Tail">The tail segment of the path (default is "srv").</param>
-public record SqlAuthAppPaths(string Root = "/db", string Tail = "srv")
+public record SqlAuthAppPaths(string Root = "/db", string Tail = "srv", bool UseDBNameRouting = false)
 {
    /// <summary>
    /// Constructs a URI-escaped SQL path using the specified server and user names, along with the configured root and tail segments.

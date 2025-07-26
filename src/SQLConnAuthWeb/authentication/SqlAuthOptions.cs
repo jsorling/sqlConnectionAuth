@@ -39,5 +39,5 @@ public partial class SqlAuthOptions
    /// <summary>
    /// Gets or sets the list of allowed IP addresses or ranges (CIDR or subnet mask notation).
    /// </summary>
-   public IPAddressRangeList AllowedIPAddresses { get; set; } = new IPAddressRangeList();
+   public IPAddressRangeList AllowedIPAddresses { get; set; } = [];
 }

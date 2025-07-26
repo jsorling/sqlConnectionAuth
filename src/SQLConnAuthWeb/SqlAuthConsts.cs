@@ -1,24 +1,62 @@
 ﻿namespace Sorling.SqlConnAuthWeb;
 
+/// <summary>
+/// Contains constants used for SQL Connection Authentication in the SqlConnAuthWeb project.
+/// </summary>
 public class SqlAuthConsts
 {
-   public const string SQLAUTHSCHEME = "SQLConnAuthScheme";
+    /// <summary>
+    /// The authentication scheme name for SQL connection authentication.
+    /// </summary>
+    public const string SQLAUTHSCHEME = "SQLConnAuthScheme";
 
-   public const string SQLAUTHPOLICY = "SQLConnAuthPolicy";
+    /// <summary>
+    /// The policy name for SQL connection authentication.
+    /// </summary>
+    public const string SQLAUTHPOLICY = "SQLConnAuthPolicy";
 
-   public const string SQLAUTHAREA = "sqlconnauth";
+    /// <summary>
+    /// The area name for SQL connection authentication routes.
+    /// </summary>
+    public const string SQLAUTHAREA = "sqlconnauth";
 
-   public const string CLAIMSQLSERVER = "SQLConnAuthSqlServer";
+    /// <summary>
+    /// Claim type for the SQL Server name.
+    /// </summary>
+    public const string CLAIMSQLSERVER = "SQLConnAuthSqlServer";
 
-   public const string CLAIMSQLUSERNAME = "SQLConnAuthUserName";
+    /// <summary>
+    /// Claim type for the SQL username.
+    /// </summary>
+    public const string CLAIMSQLUSERNAME = "SQLConnAuthUserName";
 
-   public const string CLAIMSQLPASSWORDREF = "SQLConnAuthPasswordRef";
+    /// <summary>
+    /// Claim type for the SQL password reference.
+    /// </summary>
+    public const string CLAIMSQLPASSWORDREF = "SQLConnAuthPasswordRef";
 
-   public const string CLAIMSQLPASSWORD = "SQLConnAuthPassword";
+    /// <summary>
+    /// Claim type for the SQL password.
+    /// </summary>
+    public const string CLAIMSQLPASSWORD = "SQLConnAuthPassword";
 
-   public const string URLROUTEPARAMSRV = "sqlauthparamsrv";
+    /// <summary>
+    /// Route parameter for SQL server.
+    /// </summary>
+    public const string URLROUTEPARAMSRV = "sqlauthparamsrv";
 
-   public const string URLROUTEPARAMUSR = "sqlauthparamusr";
+    /// <summary>
+    /// Route parameter for SQL user.
+    /// </summary>
+    public const string URLROUTEPARAMUSR = "sqlauthparamusr";
 
+   /// <summary>
+   /// Route parameter for SQL database name.
+   /// </summary>
+   public const string URLROUTEPARAMDB = "sqlauthparamdb";
+
+   /// <summary>
+   /// Value representing Windows Authentication.
+   /// </summary>
    public const string WINDOWSAUTHENTICATION = "--win--auth--";
 }

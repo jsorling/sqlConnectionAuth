@@ -41,7 +41,9 @@ public class ConnectModel(ISqlAuthService sqlConnAuthenticationService) : PageMo
    /// Handles GET requests to the Connect page, setting the IsWinAuth property based on the route and options.
    /// </summary>
    /// <param name="sqlauthparamusr">The user name route parameter.</param>
-   public void OnGet([FromRoute] string sqlauthparamusr) => IsWinAuth = sqlauthparamusr == SqlAuthConsts.WINDOWSAUTHENTICATION && _sqlConnAuthentication.Options.AllowIntegratedSecurity;
+   public void OnGet([FromRoute] string sqlauthparamusr)
+      => IsWinAuth = sqlauthparamusr == SqlAuthConsts.WINDOWSAUTHENTICATION
+         && _sqlConnAuthentication.Options.AllowIntegratedSecurity;
 
    /// <summary>
    /// Handles POST requests to the Connect page, performing authentication and redirecting or returning the page as appropriate.
@@ -49,11 +51,13 @@ public class ConnectModel(ISqlAuthService sqlConnAuthenticationService) : PageMo
    /// <param name="sqlauthparamusr">The user name route parameter.</param>
    /// <param name="returnUrl">The URL to redirect to on successful authentication.</param>
    /// <returns>An <see cref="IActionResult"/> representing the result of the operation.</returns>
-   public async Task<IActionResult> OnPostAsync([FromRoute] string sqlauthparamusr
-       , string? returnUrl = null) {
+   public async Task<IActionResult> OnPostAsync([FromRoute] string sqlauthparamusr, [FromQuery] string? sqlauthparamdb
+      , [FromQuery] string? returnUrl = null) {
       if (ModelState.IsValid)
       {
-         IsWinAuth = sqlauthparamusr == SqlAuthConsts.WINDOWSAUTHENTICATION && _sqlConnAuthentication.Options.AllowIntegratedSecurity;
+         IsWinAuth = sqlauthparamusr == SqlAuthConsts.WINDOWSAUTHENTICATION
+            && _sqlConnAuthentication.Options.AllowIntegratedSecurity;
+
          SqlAuthenticationResult result = await _sqlConnAuthentication.AuthenticateAsync(Input);
 
          if (!result.Success && result.Exception is not null)

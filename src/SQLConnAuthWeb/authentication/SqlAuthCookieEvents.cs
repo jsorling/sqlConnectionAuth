@@ -41,6 +41,7 @@ public class SqlAuthCookieEvents(ISqlAuthPwdStore sqlConnAuthPwdStore
       string? server = context.Principal?.FindFirst(SqlAuthConsts.CLAIMSQLSERVER)?.Value;
       string? user = context.Principal?.FindFirst(SqlAuthConsts.CLAIMSQLUSERNAME)?.Value;
       string? passwordref = context.Principal?.FindFirst(SqlAuthConsts.CLAIMSQLPASSWORDREF)?.Value;
+      string? dbname = context.Principal?.FindFirst(SqlAuthConsts.URLROUTEPARAMDB)?.Value;
 
       if (string.IsNullOrEmpty(server) || string.IsNullOrEmpty(user) || string.IsNullOrEmpty(passwordref))
       {
@@ -53,22 +54,33 @@ public class SqlAuthCookieEvents(ISqlAuthPwdStore sqlConnAuthPwdStore
              ? await sqlConnAuthPwdStore.RetrieveAsync(scc.SecretStoreKey) : null;
          if (storedsecrets is not null)
          {
-            if (storedsecrets.RuleReValidationAfter.HasValue && storedsecrets.RuleReValidationAfter.Value < DateTime.UtcNow)
+            if (sqlAuthAppPaths.UseDBNameRouting && (!string.IsNullOrEmpty(dbname) || dbname != storedsecrets.DBName))
             {
-               SqlAuthRuleValidationResult validationresult = await ruleValidator
-                   .ValidateAsync(new(server, user, storedsecrets.Password, storedsecrets.TrustServerCertificate));
-               if (validationresult.Exception is not null || validationresult.StoredSecrets is null)
-               {
-                  context.RejectPrincipal();
-               }
-               else
-               {
-                  await sqlConnAuthPwdStore.RenewAsync(scc!.SecretStoreKey, validationresult.StoredSecrets);
-                  storedsecrets = validationresult.StoredSecrets;
-               }
+               context.RejectPrincipal();
+               context.HttpContext.Response.Redirect(
+                   sqlAuthAppPaths.UriEscapedSqlPath(server, user)
+                   + (string.IsNullOrWhiteSpace(dbname) ? "" : $"/{Uri.EscapeDataString(dbname)}"));
             }
+            else
+            {
+               if (storedsecrets.RuleReValidationAfter.HasValue && storedsecrets.RuleReValidationAfter.Value < DateTime.UtcNow)
+               {
+                  SqlAuthRuleValidationResult validationresult = await ruleValidator
+                      .ValidateAsync(new(server, user, storedsecrets.Password, storedsecrets.TrustServerCertificate));
+                  if (validationresult.Exception is not null || validationresult.StoredSecrets is null)
+                  {
+                     context.RejectPrincipal();
+                  }
+                  else
+                  {
+                     await sqlConnAuthPwdStore.RenewAsync(scc!.SecretStoreKey, validationresult.StoredSecrets);
+                     storedsecrets = validationresult.StoredSecrets;
+                  }
+               }
 
-            context.HttpContext.Items[typeof(SqlAuthStoredSecrets)] = storedsecrets;
+
+               context.HttpContext.Items[typeof(SqlAuthStoredSecrets)] = storedsecrets;
+            }
          }
          else
          {
