@@ -1,4 +1,5 @@
-﻿using Sorling.SqlConnAuthWeb.helpers;
+﻿using Sorling.SqlConnAuthWeb.authentication.passwords;
+using Sorling.SqlConnAuthWeb.helpers;
 
 namespace Sorling.SqlConnAuthWeb.authentication;
 
@@ -60,4 +61,19 @@ public interface ISqlAuthService
    /// <param name="dbName">The name of the database to test authentication against, or null for the default database.</param>
    /// <returns>A task that represents the asynchronous operation. The task result contains the authentication result.</returns>
    public Task<SqlAuthenticationResult> TestAuthenticateAsync(SqlAuthTempPasswordInfo sqlAuthTempPasswordInfo, string? dbName);
+
+   /// <summary>
+   /// Tests SQL authentication using a specified key and optional database name, without affecting the current authentication state.
+   /// The key is only peeked and not removed.
+   /// </summary>
+   /// <param name="key">The key used to retrieve temporary authentication information. The key is not removed (peek only).</param>
+   /// <param name="dbName">The name of the database to test authentication against, or null for the default database.</param>
+   /// <returns>A task that represents the asynchronous operation. The task result contains the authentication result.</returns>
+   public Task<SqlAuthenticationResult> TestAuthenticateAsync(string key, string? dbName);
+
+   /// <summary>
+   /// Gets the stored secrets used for SQL authentication, such as credentials or sensitive connection information.
+   /// Returns <c>null</c> if no secrets are available in the current authentication context.
+   /// </summary>
+   public SqlAuthStoredSecrets? SqlAuthStoredSecrets { get; }
 }

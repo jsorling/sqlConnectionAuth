@@ -1,4 +1,4 @@
-﻿namespace Sorling.SqlConnAuthWeb.authentication;
+﻿namespace Sorling.SqlConnAuthWeb.authentication.passwords;
 
 /// <summary>
 /// Defines methods for securely storing, renewing, retrieving, and removing SQL authentication secrets.

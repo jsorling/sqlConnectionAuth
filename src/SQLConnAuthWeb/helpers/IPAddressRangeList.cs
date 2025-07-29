@@ -3,7 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text.RegularExpressions;
 
-namespace Sorling.SqlConnAuthWeb.authentication;
+namespace Sorling.SqlConnAuthWeb.helpers;
 
 /// <summary>
 /// Represents a validated, normalized list of IP addresses or ranges (for allow or deny lists).
@@ -47,7 +47,7 @@ public partial class IPAddressRangeList : IEnumerable<string>
          {
             if (ip.AddressFamily == AddressFamily.InterNetwork && mask.AddressFamily == AddressFamily.InterNetwork)
             {
-               int prefix = SubnetMaskToPrefix(mask);
+               int prefix = IPHelper.SubnetMaskToPrefix(mask);
                _normalizedCidrs.Add($"{ip}/{prefix}");
                return;
             }
@@ -81,35 +81,6 @@ public partial class IPAddressRangeList : IEnumerable<string>
    /// </summary>
    public IEnumerator<string> GetEnumerator() => _normalizedCidrs.GetEnumerator();
    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-   /// <summary>
-   /// Converts a subnet mask to a prefix length (e.g., 255.255.255.0 -> 24).
-   /// </summary>
-   private static int SubnetMaskToPrefix(IPAddress mask) {
-      byte[] bytes = mask.GetAddressBytes();
-      int prefix = 0;
-      bool zerofound = false;
-      foreach (byte b in bytes)
-      {
-         for (int i = 7; i >= 0; i--)
-         {
-            bool bit = (b & (1 << i)) != 0;
-            if (zerofound && bit)
-            {
-               // Non-contiguous mask (e.g., 255.0.255.0)
-               throw new FormatException($"Invalid subnet mask: {mask}");
-            }
-
-            if (!bit)
-               zerofound = true;
-            else
-               prefix++;
-         }
-      }
-
-      // Mask must not be all zeros
-      return prefix == 0 ? throw new FormatException($"Invalid subnet mask: {mask}") : prefix;
-   }
 
    /// <summary>
    /// Returns a compiled regular expression that matches CIDR notation (e.g., "192.168.1.1/24" or "2001:db8::/64").

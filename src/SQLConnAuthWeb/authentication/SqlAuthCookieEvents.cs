@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
+using Sorling.SqlConnAuthWeb.authentication.passwords;
+using Sorling.SqlConnAuthWeb.authentication.validation;
 using Sorling.SqlConnAuthWeb.extenstions;
 
 namespace Sorling.SqlConnAuthWeb.authentication;

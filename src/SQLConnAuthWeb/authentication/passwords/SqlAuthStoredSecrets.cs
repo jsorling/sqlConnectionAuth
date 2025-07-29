@@ -1,4 +1,4 @@
-﻿namespace Sorling.SqlConnAuthWeb.authentication;
+﻿namespace Sorling.SqlConnAuthWeb.authentication.passwords;
 
 /// <summary>
 /// Represents stored secrets for SQL authentication, including password, certificate trust, and rule revalidation time.

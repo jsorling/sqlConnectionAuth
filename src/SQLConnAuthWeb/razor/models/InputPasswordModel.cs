@@ -21,10 +21,6 @@ public class InputPasswordModel
    [Required]
    public bool TrustServerCertificate { get; set; }
 
-   [Required]
-   [Display(Name = "Bogus")]
-   public string Bogus { get; set; } = "This is a bogus property to ensure the model is not empty.";
-
    /// <summary>
    /// Implicitly converts an <see cref="InputPasswordModel"/> to a <see cref="SQLAuthenticateRequest"/>.
    /// </summary>

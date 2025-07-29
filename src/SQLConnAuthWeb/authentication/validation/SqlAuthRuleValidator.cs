@@ -2,7 +2,7 @@
 using Sorling.SqlConnAuthWeb.helpers;
 using System.Net;
 
-namespace Sorling.SqlConnAuthWeb.authentication;
+namespace Sorling.SqlConnAuthWeb.authentication.validation;
 
 /// <summary>
 /// Validates SQL authentication requests against configured security rules and network policies.
@@ -19,9 +19,7 @@ public class SqlAuthRuleValidator(IOptions<SqlAuthOptions> options) : ISqlAuthRu
    /// <returns>A task that represents the asynchronous operation. The task result contains the rule validation result, including any exception and validated secrets.</returns>
    public async Task<SqlAuthRuleValidationResult> ValidateAsync(SqlAuthValidationRequest request) {
       if (!_options.AllowIntegratedSecurity && request.Password == SqlAuthConsts.WINDOWSAUTHENTICATION)
-      {
          return new SqlAuthRuleValidationResult(new ApplicationException("Windows authentication not allowed"), null);
-      }
 
       IPAddress[] ips;
       try
@@ -37,9 +35,7 @@ public class SqlAuthRuleValidator(IOptions<SqlAuthOptions> options) : ISqlAuthRu
       ips = [.. ips.Where(ip => !ip.Equals(IPAddress.Any) && !ip.Equals(IPAddress.IPv6Any))];
 
       if (ips.Length == 0)
-      {
          return new SqlAuthRuleValidationResult(new ApplicationException("No IP address found for SQL Server"), null);
-      }
 
       // If allowed IP addresses list is not null or empty, enforce allow-list logic
       if (_options.AllowedIPAddresses != null && _options.AllowedIPAddresses.Count > 0)
@@ -56,13 +52,9 @@ public class SqlAuthRuleValidator(IOptions<SqlAuthOptions> options) : ISqlAuthRu
             IPNetworkType iptype = IPReservedNetworks.GetIPNetworkType(ip);
 
             if (iptype == IPNetworkType.Loopback && !_options.AllowLoopbackConnections)
-            {
                return new SqlAuthRuleValidationResult(new ApplicationException("Loopback connections not allowed"), null);
-            }
             else if (iptype != IPNetworkType.Public && !_options.AllowPrivateNetworkConnections)
-            {
                return new SqlAuthRuleValidationResult(new ApplicationException("Private network connections not allowed"), null);
-            }
          }
       }
 
@@ -76,16 +68,11 @@ public class SqlAuthRuleValidator(IOptions<SqlAuthOptions> options) : ISqlAuthRu
    /// <summary>
    /// Checks if any of the given IP addresses are allowed by the allow-list.
    /// </summary>
-   private static bool IsIpAllowed(IPAddress[] ips, IPAddressRangeList allowedList)
-   {
+   private static bool IsIpAllowed(IPAddress[] ips, IPAddressRangeList allowedList) {
       foreach (IPAddress ip in ips)
-      {
          foreach (string cidr in allowedList)
-         {
             if (IsIpInCidr(ip, cidr))
                return true;
-         }
-      }
 
       return false;
    }
@@ -93,16 +80,19 @@ public class SqlAuthRuleValidator(IOptions<SqlAuthOptions> options) : ISqlAuthRu
    /// <summary>
    /// Checks if an IP address is within a CIDR range.
    /// </summary>
-   private static bool IsIpInCidr(IPAddress ip, string cidr)
-   {
+   private static bool IsIpInCidr(IPAddress ip, string cidr) {
       string[] parts = cidr.Split('/');
-      if (parts.Length != 2) return false;
-      if (!IPAddress.TryParse(parts[0], out IPAddress? networkip)) return false;
-      if (!int.TryParse(parts[1], out int prefixlength)) return false;
+      if (parts.Length != 2)
+         return false;
+      if (!IPAddress.TryParse(parts[0], out IPAddress? networkip))
+         return false;
+      if (!int.TryParse(parts[1], out int prefixlength))
+         return false;
 
       byte[] ipbytes = ip.GetAddressBytes();
       byte[] networkbytes = networkip.GetAddressBytes();
-      if (ipbytes.Length != networkbytes.Length) return false;
+      if (ipbytes.Length != networkbytes.Length)
+         return false;
 
       int bits = prefixlength;
       for (int i = 0; i < ipbytes.Length; i++)
@@ -111,7 +101,8 @@ public class SqlAuthRuleValidator(IOptions<SqlAuthOptions> options) : ISqlAuthRu
          if ((ipbytes[i] & mask) != (networkbytes[i] & mask))
             return false;
          bits -= 8;
-         if (bits <= 0) break;
+         if (bits <= 0)
+            break;
       }
 
       return true;

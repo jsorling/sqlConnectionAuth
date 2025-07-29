@@ -1,5 +1,7 @@
-﻿@page "{sqlauthparamsrv}/{sqlauthparamusr}/{temppasswordkey?}"
-@using Sorling.SqlConnAuthWeb;
+﻿@page
+@using Microsoft.AspNetCore.Razor.Hosting
+@using Sorling.SqlConnAuthWeb
+@attribute [RazorCompiledItemMetadata("RouteTemplate", SqlAuthConsts.URLROUTETEMPLATECONNECT)]
 @model Sorling.SqlConnAuthWeb.areas.sqlconnauth.pages.ConnectModel
 @{
     ViewData["Title"] = "Sign in";
@@ -33,10 +35,6 @@
             <div>
                 <label asp-for="Input.TrustServerCertificate"></label>
                 <input asp-for="Input.TrustServerCertificate">
-            </div>
-            <div>
-                <label asp-for="Input.Bogus"></label>
-                <input asp-for="Input.Bogus">
             </div>
             <div class="form-group">
                 <button type="submit" class="btn btn-primary">Sign in</button>

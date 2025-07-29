@@ -1,4 +1,4 @@
-﻿namespace Sorling.SqlConnAuthWeb.authentication;
+﻿namespace Sorling.SqlConnAuthWeb.authentication.passwords;
 
 /// <summary>
 /// Contains temporary password information for SQL authentication.

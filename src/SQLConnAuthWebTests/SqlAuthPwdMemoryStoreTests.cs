@@ -1,5 +1,5 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Sorling.SqlConnAuthWeb.authentication;
+using Sorling.SqlConnAuthWeb.authentication.passwords;
 using System;
 using System.Threading.Tasks;
 

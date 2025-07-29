@@ -9,7 +9,7 @@
         <RootNamespace>Sorling.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
         <PackageId>Sorling.SqlConnAuthWeb</PackageId>
         <PackageIcon>NugetLogo.png</PackageIcon>
-        <PackageTags>Authentication SQL Asp.Net Core</PackageTags>
+        <PackageTags>Authentication SQL Asp.Net.Core Razor</PackageTags>
         <Version>0.9.2.0</Version>
         <Authors>jsorling</Authors>
         <Company>Sorling Systems</Company>
@@ -27,7 +27,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.2" />
+        <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.0" />
         <PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="3.0.71" />
     </ItemGroup>
 

@@ -2,7 +2,7 @@
 using Sorling.SqlConnAuthWeb.helpers;
 using System.Security.Cryptography;
 
-namespace Sorling.SqlConnAuthWeb.authentication;
+namespace Sorling.SqlConnAuthWeb.authentication.passwords;
 
 /// <summary>
 /// An in-memory implementation of <see cref="ISqlAuthPwdStore"/> for storing SQL authentication secrets using <see cref="MemoryCache"/>.
@@ -83,9 +83,7 @@ public class SqlAuthPwdMemoryStore : ISqlAuthPwdStore
    /// <returns>A task that represents the asynchronous operation. The task result contains the password info, or null if not found.</returns>
    public Task<SqlAuthTempPasswordInfo?> GetTempPasswordAsync(string key) {
       if (_cache.TryGetValue(key, out SqlAuthTempPasswordInfo? info))
-      {
          _cache.Remove(key); // Remove after retrieval to prevent reuse
-      }
 
       return Task.FromResult(info);
    }

@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Sorling.SqlConnAuthWeb.authentication;
+using Sorling.SqlConnAuthWeb.authentication.passwords;
+using Sorling.SqlConnAuthWeb.authentication.validation;
 
 namespace Sorling.SqlConnAuthWeb.extenstions;
 

@@ -31,11 +31,6 @@ public static class StringFilterExtensions
       RegexOptions options = caseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase;
       Regex regex = new(regexpattern, options);
 
-      // Debug output for diagnosis
-      Console.WriteLine($"Regex pattern: {regexpattern}");
-      foreach (string s in source)
-         Console.WriteLine($"Testing '{s}' => {regex.IsMatch(s)}");
-
       return negative ? source.Where(s => !regex.IsMatch(s)) : source.Where(s => regex.IsMatch(s));
    }
 }

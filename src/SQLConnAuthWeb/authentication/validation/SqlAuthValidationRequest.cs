@@ -1,4 +1,4 @@
-﻿namespace Sorling.SqlConnAuthWeb.authentication;
+﻿namespace Sorling.SqlConnAuthWeb.authentication.validation;
 
 /// <summary>
 /// Represents a request to validate SQL authentication, including connection and credential information.
