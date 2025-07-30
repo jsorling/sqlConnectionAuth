@@ -7,9 +7,13 @@ namespace Sorling.SqlConnAuthWeb.razor;
 /// A Razor Pages route model convention that rewrites page routes to include SQL authentication parameters (server and user) in the path.
 /// </summary>
 /// <param name="path">The SQL authentication application path configuration.</param>
-public class SqlAuthPageRouteModelConvention(SqlAuthAppPaths path) : IPageRouteModelConvention
+public class SqlAuthPageRouteModelConvention(SqlAuthAppPaths path) : ISqlAuthPageRouteModelConvention
 {
    private readonly SqlAuthAppPaths _path = path;
+
+   private readonly string _trimmedRoot = string.IsNullOrWhiteSpace(path.Root) ? string.Empty : path.Root.Trim('/');
+
+   private readonly string _trimmedTail = string.IsNullOrWhiteSpace(path.Tail) ? "/" : '/' + path.Tail.Trim('/') + '/';
 
    /// <summary>
    /// Applies the route convention to the specified <see cref="PageRouteModel"/>, rewriting routes to include server and user parameters.
@@ -32,29 +36,6 @@ public class SqlAuthPageRouteModelConvention(SqlAuthAppPaths path) : IPageRouteM
          }
       }
    }
-
-   //private string RewriteTemplate(string template, string path, string tailPath) {
-   //   string tp = template?.TrimStart('/') ?? string.Empty;
-
-
-
-   //   string tor = string.IsNullOrWhiteSpace(tailPath)
-   //      ? template.StartsWith(path + "/")
-   //         ? template[path.Length..].TrimStart('/')
-   //         : template == path
-   //            ? string.Empty
-   //            : template
-   //      : template.StartsWith(path + "/")
-   //         ? $"{template[path.Length..].TrimStart('/')}{tailPath}"
-   //         : template == path
-   //            ? tailPath
-   //            : $"{template}{tailPath}";
-   //}
-      //=> template.StartsWith(path + "/")
-      //   ? template[path.Length..].TrimStart('/')
-      //   : template == path
-      //      ? string.Empty
-      //      : template;
 
    private static bool SelectorTemplateMatch(SelectorModel selectorModel, string path)
       => selectorModel.AttributeRouteModel is not null
