@@ -20,6 +20,12 @@
         <RepositoryUrl>https://github.com/jsorling/sqlConnectionAuth</RepositoryUrl>
         <Description>SQL Authentication for ASP.Net Core</Description>
         <PackageReadmeFile>README.md</PackageReadmeFile>
+        <!-- Source Link settings -->
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     </PropertyGroup>
     
     <ItemGroup>
@@ -28,6 +34,10 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.0" />
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+          <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
         <PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="3.0.71" />
     </ItemGroup>
 

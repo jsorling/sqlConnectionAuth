@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Sorling.SqlConnAuthWeb.authentication;
 using Sorling.SqlConnAuthWeb.helpers;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Sorling.SqlConnAuthWeb.razor;
 
@@ -22,7 +23,7 @@ public class SqlAuthPageRouteModelConvention(SqlAuthAppPaths path) : ISqlAuthPag
       }
    }
 
-   [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0046:Convert to conditional expression", Justification = "<Pending>")]
+   [SuppressMessage("Style", "IDE0046:Convert to conditional expression", Justification = "<Pending>")]
    private bool SelectorTemplateMatch(SelectorModel selectorModel) {
       if (selectorModel.AttributeRouteModel is null || selectorModel.AttributeRouteModel.Template is null) {
          return false; 
