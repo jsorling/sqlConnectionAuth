@@ -69,7 +69,7 @@ public class SqlAuthConsts
    /// The route template for selecting a SQL database, including server, user, and temporary password parameters.
    /// Example: <c>{sqlauthparamsrv}/{sqlauthparamusr}/{sqlauthparamtemppwd}</c>
    /// </summary>
-   public const string URLROUTETEMPLATESELECTDB = $"{{{URLROUTEPARAMSRV}}}/{{[{URLROUTEPARAMUSR}]}}/{{{URLROUTEPARAMTEMPPWD}}}";
+   public const string URLROUTETEMPLATESELECTDB = $"{{{URLROUTEPARAMSRV}}}/{{{URLROUTEPARAMUSR}}}/{{{URLROUTEPARAMTEMPPWD}}}";
 
    /// <summary>
    /// The route template for connecting to a SQL database, including server, user, and optional database name parameters.

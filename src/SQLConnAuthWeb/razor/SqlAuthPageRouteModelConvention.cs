@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Sorling.SqlConnAuthWeb.authentication;
+using Sorling.SqlConnAuthWeb.helpers;
 
 namespace Sorling.SqlConnAuthWeb.razor;
 
@@ -7,39 +8,39 @@ namespace Sorling.SqlConnAuthWeb.razor;
 /// A Razor Pages route model convention that rewrites page routes to include SQL authentication parameters (server and user) in the path.
 /// </summary>
 /// <param name="path">The SQL authentication application path configuration.</param>
-public class SqlAuthPageRouteModelConvention(SqlAuthAppPaths path) : ISqlAuthPageRouteModelConvention
-{
-   private readonly SqlAuthAppPaths _path = path;
-
-   private readonly string _trimmedRoot = string.IsNullOrWhiteSpace(path.Root) ? string.Empty : path.Root.Trim('/');
-
-   private readonly string _trimmedTail = string.IsNullOrWhiteSpace(path.Tail) ? "/" : '/' + path.Tail.Trim('/') + '/';
+public class SqlAuthPageRouteModelConvention(SqlAuthAppPaths path) : ISqlAuthPageRouteModelConvention {
+   private readonly RouteTemplateBuilder _templateBuilder = new(path ?? throw new ArgumentNullException(nameof(path)));
 
    /// <summary>
    /// Applies the route convention to the specified <see cref="PageRouteModel"/>, rewriting routes to include server and user parameters.
    /// </summary>
    /// <param name="model">The page route model to modify.</param>
    public void Apply(PageRouteModel model) {
-      string p = _path.Root.TrimStart('/').TrimEnd('/');
-      foreach (SelectorModel selector in model.Selectors.Where(w => SelectorTemplateMatch(w, p)))
+      foreach (SelectorModel selector in model.Selectors.Where(w => SelectorTemplateMatch(w)))
       {
-         string? newtemplate = null;
-         if (selector.AttributeRouteModel!.Template!.StartsWith(p + "/")
-             || selector.AttributeRouteModel.Template == p)
-            newtemplate = $"/{p}/{{{SqlAuthConsts.URLROUTEPARAMSRV}}}/{{{SqlAuthConsts.URLROUTEPARAMUSR}}}"
-                + (string.IsNullOrWhiteSpace(_path.Tail.Trim('/')) ? "/" : "/" + _path.Tail.Trim('/') + "/")
-                + selector.AttributeRouteModel.Template[p.Length..].TrimStart('/');
-
-         if (newtemplate is not null)
-         {
-            selector.AttributeRouteModel.Template = newtemplate;
-         }
+         selector!.AttributeRouteModel!.Template = _templateBuilder.BuildTemplate(selector!.AttributeRouteModel!.Template!);
       }
    }
 
-   private static bool SelectorTemplateMatch(SelectorModel selectorModel, string path)
-      => selectorModel.AttributeRouteModel is not null
-         && selectorModel.AttributeRouteModel.Template is not null
-         && (selectorModel.AttributeRouteModel.Template.StartsWith(path + "/")
-            || selectorModel.AttributeRouteModel.Template == path);
+   [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0046:Convert to conditional expression", Justification = "<Pending>")]
+   private bool SelectorTemplateMatch(SelectorModel selectorModel) {
+      if (selectorModel.AttributeRouteModel is null || selectorModel.AttributeRouteModel.Template is null) {
+         return false; 
+      }
+
+      if (_templateBuilder.RootIsTopLevel)
+      { 
+         // match any template
+         return true;
+      }
+
+      if (_templateBuilder.RootIsTopLevelFolder 
+         && (selectorModel.AttributeRouteModel.Template.Trim('/') == _templateBuilder.EffectiveRoot.Trim('/')
+            || selectorModel.AttributeRouteModel.Template.TrimStart('/').StartsWith(_templateBuilder.EffectiveRoot.TrimStart('/') + "/")))
+      {
+         return true; 
+      }
+
+      return selectorModel.AttributeRouteModel.Template.Trim('/').StartsWith(_templateBuilder.EffectiveRoot);
+   }
 }

@@ -12,16 +12,16 @@ public class RouteTemplateBuilderTests
    public void BasePath_Should_Build_Correctly_With_DBNameRouting() {
       SqlAuthAppPaths paths = new("/db", "srv", true);
       RouteTemplateBuilder builder = new(paths);
-      string expected = "/db/{sqlauthparamsrv}/{sqlauthparamusr}/{sqlauthparamdb}/srv/";
-      Assert.AreEqual(expected, builder.BasePath);
+      string expected = "db/{sqlauthparamsrv}/{sqlauthparamusr}/{sqlauthparamdb}/srv/";
+      Assert.AreEqual(expected, builder.BaseTemplatePath);
    }
 
    [TestMethod]
    public void BasePath_Should_Build_Correctly_Without_DBNameRouting() {
       SqlAuthAppPaths paths = new("/db", "srv", false);
       RouteTemplateBuilder builder = new(paths);
-      string expected = "/db/{sqlauthparamsrv}/{sqlauthparamusr}/srv/";
-      Assert.AreEqual(expected, builder.BasePath);
+      string expected = "db/{sqlauthparamsrv}/{sqlauthparamusr}/srv/";
+      Assert.AreEqual(expected, builder.BaseTemplatePath);
    }
 
    [TestMethod]
@@ -29,7 +29,7 @@ public class RouteTemplateBuilderTests
       SqlAuthAppPaths paths = new("/db", "srv", true);
       RouteTemplateBuilder builder = new(paths);
       string template = "/db/extra/path";
-      string expected = "/db/{sqlauthparamsrv}/{sqlauthparamusr}/{sqlauthparamdb}/srv/db/extra/path";
+      string expected = "/db/{sqlauthparamsrv}/{sqlauthparamusr}/{sqlauthparamdb}/srv/extra/path";
       Assert.AreEqual(expected, builder.BuildTemplate(template));
    }
 
@@ -50,10 +50,10 @@ public class RouteTemplateBuilderTests
    public void BasePath_Should_Build_Correctly_With_DBNameRouting_EmptyTail() {
       SqlAuthAppPaths paths = new("/db", "", true);
       RouteTemplateBuilder builder = new(paths);
-      string expected = "/db/{sqlauthparamsrv}/{sqlauthparamusr}/{sqlauthparamdb}/";
-      Assert.AreEqual(expected, builder.BasePath);
+      string expected = "db/{sqlauthparamsrv}/{sqlauthparamusr}/{sqlauthparamdb}/";
+      Assert.AreEqual(expected, builder.BaseTemplatePath);
       string template = "/db/extra/path";
-      string expectedtemplate = "/db/{sqlauthparamsrv}/{sqlauthparamusr}/{sqlauthparamdb}/db/extra/path";
+      string expectedtemplate = "/db/{sqlauthparamsrv}/{sqlauthparamusr}/{sqlauthparamdb}/extra/path";
       Assert.AreEqual(expectedtemplate, builder.BuildTemplate(template));
    }
 
@@ -61,10 +61,10 @@ public class RouteTemplateBuilderTests
    public void BasePath_Should_Build_Correctly_Without_DBNameRouting_EmptyTail() {
       SqlAuthAppPaths paths = new("/db", "", false);
       RouteTemplateBuilder builder = new(paths);
-      string expected = "/db/{sqlauthparamsrv}/{sqlauthparamusr}/";
-      Assert.AreEqual(expected, builder.BasePath);
+      string expected = "db/{sqlauthparamsrv}/{sqlauthparamusr}/";
+      Assert.AreEqual(expected, builder.BaseTemplatePath);
       string template = "/db/extra/path";
-      string expectedtemplate = "/db/{sqlauthparamsrv}/{sqlauthparamusr}/db/extra/path";
+      string expectedtemplate = "/db/{sqlauthparamsrv}/{sqlauthparamusr}/extra/path";
       Assert.AreEqual(expectedtemplate, builder.BuildTemplate(template));
    }
 }
