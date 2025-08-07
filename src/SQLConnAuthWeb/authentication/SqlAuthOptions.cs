@@ -1,4 +1,6 @@
-﻿namespace Sorling.SqlConnAuthWeb.authentication;
+﻿using Sorling.SqlConnAuthWeb.helpers;
+
+namespace Sorling.SqlConnAuthWeb.authentication;
 
 /// <summary>
 /// Provides configuration options for SQL authentication and connection settings.
@@ -39,5 +41,5 @@ public partial class SqlAuthOptions
    /// <summary>
    /// Gets or sets the list of allowed IP addresses or ranges (CIDR or subnet mask notation).
    /// </summary>
-   public IPAddressRangeList AllowedIPAddresses { get; set; } = new IPAddressRangeList();
+   public IPAddressRangeList AllowedIPAddresses { get; set; } = [];
 }

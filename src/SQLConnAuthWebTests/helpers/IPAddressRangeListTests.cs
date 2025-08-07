@@ -1,9 +1,9 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Sorling.SqlConnAuthWeb.authentication;
+using Sorling.SqlConnAuthWeb.helpers;
 using System;
 using System.Linq;
 
-namespace SQLConnAuthWebTests;
+namespace SQLConnAuthWebTests.helpers;
 
 [TestClass]
 public class IPAddressRangeListTests

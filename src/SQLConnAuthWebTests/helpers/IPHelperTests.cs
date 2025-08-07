@@ -3,7 +3,7 @@ using Sorling.SqlConnAuthWeb.helpers;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace SQLConnAuthWebTests;
+namespace SQLConnAuthWebTests.helpers;
 [TestClass]
 public class IPHelperTests
 {

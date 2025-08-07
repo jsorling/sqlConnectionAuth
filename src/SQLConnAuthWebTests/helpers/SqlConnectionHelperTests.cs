@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SQLConnAuthWebTests;
+namespace SQLConnAuthWebTests.helpers;
 
 [TestClass]
 public class SqlConnectionHelperTests

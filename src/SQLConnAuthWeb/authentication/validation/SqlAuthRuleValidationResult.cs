@@ -1,4 +1,6 @@
-﻿namespace Sorling.SqlConnAuthWeb.authentication;
+﻿using Sorling.SqlConnAuthWeb.authentication.passwords;
+
+namespace Sorling.SqlConnAuthWeb.authentication.validation;
 
 /// <summary>
 /// Represents the result of validating SQL authentication rules, including any exception and the validated secrets.

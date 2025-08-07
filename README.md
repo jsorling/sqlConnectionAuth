@@ -1,8 +1,8 @@
-# Sorling.SqlConnectionAuth
+# Sorling.SqlConnAuthWeb
 
-Sorling.SqlConnectionAuth is a library for ASP.NET Core Razor Pages that enables authentication and authorization using SQL Server connections. It allows you to secure your web applications by leveraging SQL Server credentials and connection properties, providing a flexible alternative to traditional identity systems. The library can also serve as a starting point for building management-type applications for SQL Server, enabling you to quickly create secure admin or management interfaces.
+Sorling.SqlConnAuthWeb is a library for ASP.NET Core Razor Pages that enables authentication and authorization using SQL Server connections. It allows you to secure your web applications by leveraging SQL Server credentials and connection properties, providing a flexible alternative to traditional identity systems. The library can also serve as a starting point for building management-type applications for SQL Server, enabling you to quickly create secure admin or management interfaces.
 
-## What can SqlConnectionAuth do?
+## What can Sorling.SqlConnAuthWeb do?
 - Authenticate users based on SQL Server connection credentials, supporting both SQL authentication and integrated security.
 - Enforce authorization policies using SQL authentication context.
 - Configure network access rules, such as allowing loopback or private network connections.
@@ -11,7 +11,7 @@ Sorling.SqlConnectionAuth is a library for ASP.NET Core Razor Pages that enables
 - Provide user experience features like a theme switcher stored in local storage.
 
 ## UI
-Sorling.SqlConnectionAuth comes with a complete, ready-to-use UI for the authentication process, including login and connection management pages. If you need to customize the look, feel, or behavior, you can override the default UI by replacing the Razor Pages in the provided area with your own implementations. This follows the standard ASP.NET Core Razor Pages area view replacement pattern, allowing full control over the authentication experience.
+Sorling.SqlConnAuthWeb comes with a complete, ready-to-use UI for the authentication process, including login and connection management pages. If you need to customize the look, feel, or behavior, you can override the default UI by replacing the Razor Pages in the provided area with your own implementations. This follows the standard ASP.NET Core Razor Pages area view replacement pattern, allowing full control over the authentication experience.
 
 **Connection Error Handling and Security Considerations**
 
@@ -25,7 +25,7 @@ By default, user passwords are stored only in memory for the duration of the ses
 
 ## IP Allow List, Private Network, and Loopback Controls
 
-Sorling.SqlConnectionAuth provides flexible network access control for SQL authentication. You can restrict which SQL Server IP addresses or ranges can be authenticated against by configuring the `AllowedIPAddresses` property. This property accepts single IPs, CIDR ranges, or subnet mask notation. If the allow-list is set (not empty), only authentication requests targeting SQL Servers with matching IPs/ranges are permitted. If the allow-list is empty, the following options apply:
+Sorling.SqlConnAuthWeb provides flexible network access control for SQL authentication. You can restrict which SQL Server IP addresses or ranges can be authenticated against by configuring the `AllowedIPAddresses` property. This property accepts single IPs, CIDR ranges, or subnet mask notation. If the allow-list is set (not empty), only authentication requests targeting SQL Servers with matching IPs/ranges are permitted. If the allow-list is empty, the following options apply:
 
 - **AllowLoopbackConnections**: Controls whether authentication requests against loopback SQL Server addresses (e.g., `127.0.0.1`, `::1`) are permitted.
 - **AllowPrivateNetworkConnections**: Controls whether authentication requests against private network SQL Server addresses (e.g., `192.168.x.x`, `10.x.x.x`, etc.) are permitted.
@@ -41,7 +41,7 @@ The allow-list takes precedence: if it is not empty, only those SQL Server IPs/r
 
 ## Routing
 
-The routing system in Sorling.SqlConnectionAuth is designed to support SQL authentication scenarios by dynamically generating URL patterns that include SQL Server connection parameters. This enables each authentication session to be uniquely identified by the server and user being authenticated against, and allows for flexible, parameterized navigation within the Razor Pages application.
+The routing system in Sorling.SqlConnAuthWeb is designed to support SQL authentication scenarios by dynamically generating URL patterns that include SQL Server connection parameters. This enables each authentication session to be uniquely identified by the server and user being authenticated against, and allows for flexible, parameterized navigation within the Razor Pages application.
 
 ### How Routing Works
 
@@ -138,8 +138,8 @@ builder.Services.AddSqlConnAuthentication(sqlauthpath, o => {
 })
    .AddSqlConnAuthorization()
    .AddRazorPages()
-   .AddSqlAuthRazorPageRouteConventions(sqlauthpath)
-   .AuthorizeSqlAuthRootPath(sqlauthpath);
+   .AddSqlAuthRazorPageRouteConventions()
+   .AuthorizeSqlAuthRootPath();
 
 WebApplication app = builder.Build();
 app.UseHttpsRedirection()

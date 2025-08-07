@@ -1,5 +1,7 @@
-﻿@page "{sqlauthparamsrv}/{sqlauthparamusr}"
-@using Sorling.SqlConnAuthWeb;
+﻿@page
+@using Microsoft.AspNetCore.Razor.Hosting
+@using Sorling.SqlConnAuthWeb
+@attribute [RazorCompiledItemMetadata("RouteTemplate", SqlAuthConsts.URLROUTETEMPLATECONNECT)]
 @model Sorling.SqlConnAuthWeb.areas.sqlconnauth.pages.ConnectModel
 @{
     ViewData["Title"] = "Sign in";

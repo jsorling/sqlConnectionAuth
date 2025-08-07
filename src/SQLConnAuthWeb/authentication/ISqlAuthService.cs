@@ -1,4 +1,5 @@
-﻿using Sorling.SqlConnAuthWeb.helpers;
+﻿using Sorling.SqlConnAuthWeb.authentication.passwords;
+using Sorling.SqlConnAuthWeb.helpers;
 
 namespace Sorling.SqlConnAuthWeb.authentication;
 
@@ -13,19 +14,6 @@ public interface ISqlAuthService
    /// <param name="request">The authentication request containing credentials and connection details.</param>
    /// <returns>A task that represents the asynchronous operation. The task result contains the authentication result.</returns>
    public Task<SqlAuthenticationResult> AuthenticateAsync(SQLAuthenticateRequest request);
-
-   /// <summary>
-   /// Signs out the current user and clears any authentication state.
-   /// </summary>
-   /// <returns>A task that represents the asynchronous operation.</returns>
-   public Task SignoutAsync();
-
-   /// <summary>
-   /// Gets the SQL connection string for the specified database, or the default if no database is specified.
-   /// </summary>
-   /// <param name="database">The name of the database, or null for the default.</param>
-   /// <returns>The connection string, or null if not available.</returns>
-   public string? GetConnectionString(string? database = null);
 
    /// <summary>
    /// Retrieves a list of available databases for the current SQL connection.
@@ -44,12 +32,19 @@ public interface ISqlAuthService
    public string UriEscapedPath { get; }
 
    /// <summary>
-   /// Gets the SQL Server name associated with the current authentication context.
+   /// Tests SQL authentication using a temporary password and optional database name, without affecting the current authentication state.
    /// </summary>
-   public string SQLServer { get; }
+   /// <param name="sqlAuthTempPasswordInfo">The temporary password information for SQL authentication.</param>
+   /// <param name="dbName">The name of the database to test authentication against, or null for the default database.</param>
+   /// <returns>A task that represents the asynchronous operation. The task result contains the authentication result.</returns>
+   public Task<SqlAuthenticationResult> TestAuthenticateAsync(SqlAuthTempPasswordInfo sqlAuthTempPasswordInfo, string? dbName);
 
    /// <summary>
-   /// Gets the user name associated with the current authentication context.
+   /// Tests SQL authentication using a specified key and optional database name, without affecting the current authentication state.
+   /// The key is only peeked and not removed.
    /// </summary>
-   public string UserName { get; }
+   /// <param name="key">The key used to retrieve temporary authentication information. The key is not removed (peek only).</param>
+   /// <param name="dbName">The name of the database to test authentication against, or null for the default database.</param>
+   /// <returns>A task that represents the asynchronous operation. The task result contains the authentication result.</returns>
+   public Task<SqlAuthenticationResult> TestAuthenticateAsync(string key, string? dbName);
 }

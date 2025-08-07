@@ -13,33 +13,32 @@ public static class MvcBuilderExtensions
    /// Adds custom Razor Page route conventions for SQL authentication paths.
    /// </summary>
    /// <param name="builder">The MVC builder to configure.</param>
-   /// <param name="sqlAuthPath">The SQL authentication application path configuration.</param>
    /// <returns>The configured <see cref="IMvcBuilder"/> instance.</returns>
-   /// <exception cref="ArgumentNullException">Thrown if <paramref name="builder"/> or <paramref name="sqlAuthPath"/> is null.</exception>
-   public static IMvcBuilder AddSqlAuthRazorPageRouteConventions(this IMvcBuilder builder, SqlAuthAppPaths sqlAuthPath) {
+   /// <exception cref="ArgumentNullException">Thrown if <paramref name="builder"/></exception>
+   public static IMvcBuilder AddSqlAuthRazorPageRouteConventions(this IMvcBuilder builder) {
       ArgumentNullException.ThrowIfNull(builder);
-      ArgumentNullException.ThrowIfNull(sqlAuthPath);
 
-      return !string.IsNullOrEmpty(sqlAuthPath.Root) || !string.IsNullOrEmpty(sqlAuthPath.Tail)
-          ? builder.AddRazorPagesOptions(options
-              => options.Conventions.Add(new SqlAuthPageRouteModelConvention(sqlAuthPath)))
-          : builder;
+      return builder.AddRazorPagesOptions(options => {
+         ServiceProvider provider = builder.Services.BuildServiceProvider();
+         ISqlAuthPageRouteModelConvention convention = provider.GetRequiredService<ISqlAuthPageRouteModelConvention>();
+         options.Conventions.Add(convention);
+      });
    }
 
    /// <summary>
    /// Adds authorization for the root path of SQL authentication Razor Pages.
    /// </summary>
    /// <param name="builder">The MVC builder to configure.</param>
-   /// <param name="sqlAuthPath">The SQL authentication application path configuration.</param>
    /// <returns>The configured <see cref="IMvcBuilder"/> instance.</returns>
-   /// <exception cref="ArgumentNullException">Thrown if <paramref name="builder"/> or <paramref name="sqlAuthPath"/> is null.</exception>
-   public static IMvcBuilder AuthorizeSqlAuthRootPath(this IMvcBuilder builder, SqlAuthAppPaths sqlAuthPath) {
+   /// <exception cref="ArgumentNullException">Thrown if <paramref name="builder"/> is null or SqlAuthAppPaths is not registered in DI.</exception>
+   public static IMvcBuilder AuthorizeSqlAuthRootPath(this IMvcBuilder builder) {
       ArgumentNullException.ThrowIfNull(builder);
-      ArgumentNullException.ThrowIfNull(sqlAuthPath);
+      ServiceProvider provider = builder.Services.BuildServiceProvider();
+      SqlAuthAppPaths sqlauthpath = provider.GetRequiredService<SqlAuthAppPaths>();
 
-      return !string.IsNullOrEmpty(sqlAuthPath.Root)
+      return !string.IsNullOrEmpty(sqlauthpath.Root)
           ? builder.AddRazorPagesOptions(options
-              => options.Conventions.AuthorizeFolder(sqlAuthPath.Root, SqlAuthConsts.SQLAUTHPOLICY))
+              => options.Conventions.AuthorizeFolder(sqlauthpath.Root, SqlAuthConsts.SQLAUTHPOLICY))
           : builder;
    }
 }

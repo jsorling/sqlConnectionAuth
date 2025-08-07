@@ -1,7 +1,7 @@
 using Sorling.SqlConnAuthWeb.authentication;
 using Sorling.SqlConnAuthWeb.extenstions;
 
-SqlAuthAppPaths sqlauthpath = new("/db", "srv");
+SqlAuthAppPaths sqlauthpath = new("/db", UseDBNameRouting: false);
 WebApplicationBuilder? builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSqlConnAuthentication(sqlauthpath, o => {
@@ -13,8 +13,8 @@ builder.Services.AddSqlConnAuthentication(sqlauthpath, o => {
 })
    .AddSqlConnAuthorization()
    .AddRazorPages()
-   .AddSqlAuthRazorPageRouteConventions(sqlauthpath)
-   .AuthorizeSqlAuthRootPath(sqlauthpath);
+   .AddSqlAuthRazorPageRouteConventions()
+   .AuthorizeSqlAuthRootPath();
 
 WebApplication app = builder.Build();
 app.UseHttpsRedirection()

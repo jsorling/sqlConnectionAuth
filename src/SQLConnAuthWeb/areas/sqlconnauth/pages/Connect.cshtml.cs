@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Sorling.SqlConnAuthWeb.authentication;
+using Sorling.SqlConnAuthWeb.extenstions;
 using Sorling.SqlConnAuthWeb.razor.models;
 
 namespace Sorling.SqlConnAuthWeb.areas.sqlconnauth.pages;
@@ -27,33 +28,41 @@ public class ConnectModel(ISqlAuthService sqlConnAuthenticationService) : PageMo
    /// </summary>
    public bool IsWinAuth { get; private set; }
 
+   public string RouteParamSrv => Request.RouteValues[SqlAuthConsts.URLROUTEPARAMSRV]?.ToString() ?? string.Empty;
+
+   public string RouteParamUsr => Request.RouteValues[SqlAuthConsts.URLROUTEPARAMUSR]?.ToString() ?? string.Empty;
+
+   public string? RouteParamDb => Request.RouteValues[SqlAuthConsts.URLROUTEPARAMDB]?.ToString();
+
    /// <summary>
    /// Gets the SQL Server name from the authentication context.
    /// </summary>
-   public string SQLServer => _sqlConnAuthentication.SQLServer;
+   public string SQLServer => Request.HttpContext.SqlAuthServer();
 
    /// <summary>
    /// Gets the user name from the authentication context.
    /// </summary>
-   public string UserName => _sqlConnAuthentication.UserName;
+   public string UserName => Request.HttpContext.SqlAuthUserName();
 
    /// <summary>
    /// Handles GET requests to the Connect page, setting the IsWinAuth property based on the route and options.
    /// </summary>
-   /// <param name="sqlauthparamusr">The user name route parameter.</param>
-   public void OnGet([FromRoute] string sqlauthparamusr) => IsWinAuth = sqlauthparamusr == SqlAuthConsts.WINDOWSAUTHENTICATION && _sqlConnAuthentication.Options.AllowIntegratedSecurity;
+   public void OnGet()
+      => IsWinAuth = RouteParamUsr == SqlAuthConsts.WINDOWSAUTHENTICATION
+         && _sqlConnAuthentication.Options.AllowIntegratedSecurity;
 
    /// <summary>
    /// Handles POST requests to the Connect page, performing authentication and redirecting or returning the page as appropriate.
    /// </summary>
-   /// <param name="sqlauthparamusr">The user name route parameter.</param>
    /// <param name="returnUrl">The URL to redirect to on successful authentication.</param>
    /// <returns>An <see cref="IActionResult"/> representing the result of the operation.</returns>
-   public async Task<IActionResult> OnPostAsync([FromRoute] string sqlauthparamusr
-       , string? returnUrl = null) {
+   public async Task<IActionResult> OnPostAsync([FromRoute] string? sqlauthparamdb
+      , [FromQuery] string? returnUrl = null) {
       if (ModelState.IsValid)
       {
-         IsWinAuth = sqlauthparamusr == SqlAuthConsts.WINDOWSAUTHENTICATION && _sqlConnAuthentication.Options.AllowIntegratedSecurity;
+         IsWinAuth = RouteParamUsr == SqlAuthConsts.WINDOWSAUTHENTICATION
+            && _sqlConnAuthentication.Options.AllowIntegratedSecurity;
+
          SqlAuthenticationResult result = await _sqlConnAuthentication.AuthenticateAsync(Input);
 
          if (!result.Success && result.Exception is not null)

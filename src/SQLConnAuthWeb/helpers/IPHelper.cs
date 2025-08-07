@@ -85,5 +85,34 @@ public static class IPHelper
           ? [IPAddress.Loopback, IPAddress.IPv6Loopback]
           : await Dns.GetHostAddressesAsync(host);
    }
+
+   /// <summary>
+   /// Converts a subnet mask to a prefix length (e.g., 255.255.255.0 -> 24).
+   /// </summary>
+   public static int SubnetMaskToPrefix(IPAddress mask) {
+      byte[] bytes = mask.GetAddressBytes();
+      int prefix = 0;
+      bool zerofound = false;
+      foreach (byte b in bytes)
+      {
+         for (int i = 7; i >= 0; i--)
+         {
+            bool bit = (b & (1 << i)) != 0;
+            if (zerofound && bit)
+            {
+               // Non-contiguous mask (e.g., 255.0.255.0)
+               throw new FormatException($"Invalid subnet mask: {mask}");
+            }
+
+            if (!bit)
+               zerofound = true;
+            else
+               prefix++;
+         }
+      }
+
+      // Mask must not be all zeros
+      return prefix == 0 ? throw new FormatException($"Invalid subnet mask: {mask}") : prefix;
+   }
 }
 

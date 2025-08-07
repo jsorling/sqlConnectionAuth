@@ -2,6 +2,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Sorling.SqlConnAuthWeb;
 using Sorling.SqlConnAuthWeb.authentication;
+using Sorling.SqlConnAuthWeb.authentication.validation;
 using System.Threading.Tasks;
 
 namespace SQLConnAuthWebTests;
