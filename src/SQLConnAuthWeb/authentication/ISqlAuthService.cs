@@ -16,19 +16,6 @@ public interface ISqlAuthService
    public Task<SqlAuthenticationResult> AuthenticateAsync(SQLAuthenticateRequest request);
 
    /// <summary>
-   /// Signs out the current user and clears any authentication state.
-   /// </summary>
-   /// <returns>A task that represents the asynchronous operation.</returns>
-   public Task SignoutAsync();
-
-   /// <summary>
-   /// Gets the SQL connection string for the specified database, or the default if no database is specified.
-   /// </summary>
-   /// <param name="database">The name of the database, or null for the default.</param>
-   /// <returns>The connection string, or null if not available.</returns>
-   public string? GetConnectionString(string? database = null);
-
-   /// <summary>
    /// Retrieves a list of available databases for the current SQL connection.
    /// </summary>
    /// <returns>A task that represents the asynchronous operation. The task result contains a collection of database information.</returns>
@@ -43,16 +30,6 @@ public interface ISqlAuthService
    /// Gets the URI-escaped path for the current SQL connection context.
    /// </summary>
    public string UriEscapedPath { get; }
-
-   /// <summary>
-   /// Gets the SQL Server name associated with the current authentication context.
-   /// </summary>
-   public string SQLServer { get; }
-
-   /// <summary>
-   /// Gets the user name associated with the current authentication context.
-   /// </summary>
-   public string UserName { get; }
 
    /// <summary>
    /// Tests SQL authentication using a temporary password and optional database name, without affecting the current authentication state.
@@ -70,10 +47,4 @@ public interface ISqlAuthService
    /// <param name="dbName">The name of the database to test authentication against, or null for the default database.</param>
    /// <returns>A task that represents the asynchronous operation. The task result contains the authentication result.</returns>
    public Task<SqlAuthenticationResult> TestAuthenticateAsync(string key, string? dbName);
-
-   /// <summary>
-   /// Gets the stored secrets used for SQL authentication, such as credentials or sensitive connection information.
-   /// Returns <c>null</c> if no secrets are available in the current authentication context.
-   /// </summary>
-   public SqlAuthStoredSecrets? SqlAuthStoredSecrets { get; }
 }

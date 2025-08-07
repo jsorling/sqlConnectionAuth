@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Sorling.SqlConnAuthWeb.authentication;
+using Sorling.SqlConnAuthWeb.extenstions;
 
 namespace Sorling.SqlConnAuthWeb.areas.sqlconnauth.pages;
 
@@ -18,7 +19,7 @@ public class DisconnectModel(ISqlAuthService sqlConAuthService) : PageModel
    /// <param name="returnUrl">The URL to redirect to after sign-out, or null to return the page.</param>
    /// <returns>An <see cref="IActionResult"/> representing the result of the operation.</returns>
    public async Task<IActionResult> OnGetAsync(string? returnUrl = null) {
-      await _sqlconauth.SignoutAsync();
+      await Request.HttpContext.SqlAuthSignoutAsync();
 
       return returnUrl is not null ? Redirect(returnUrl) : Page();
    }

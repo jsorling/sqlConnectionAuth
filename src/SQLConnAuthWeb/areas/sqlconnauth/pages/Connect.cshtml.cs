@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Sorling.SqlConnAuthWeb.authentication;
+using Sorling.SqlConnAuthWeb.extenstions;
 using Sorling.SqlConnAuthWeb.razor.models;
 
 namespace Sorling.SqlConnAuthWeb.areas.sqlconnauth.pages;
@@ -36,12 +37,12 @@ public class ConnectModel(ISqlAuthService sqlConnAuthenticationService) : PageMo
    /// <summary>
    /// Gets the SQL Server name from the authentication context.
    /// </summary>
-   public string SQLServer => _sqlConnAuthentication.SQLServer;
+   public string SQLServer => Request.HttpContext.SqlAuthServer();
 
    /// <summary>
    /// Gets the user name from the authentication context.
    /// </summary>
-   public string UserName => _sqlConnAuthentication.UserName;
+   public string UserName => Request.HttpContext.SqlAuthUserName();
 
    /// <summary>
    /// Handles GET requests to the Connect page, setting the IsWinAuth property based on the route and options.
