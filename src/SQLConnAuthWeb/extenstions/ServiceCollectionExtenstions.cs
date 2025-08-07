@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Sorling.SqlConnAuthWeb.authentication;
 using Sorling.SqlConnAuthWeb.authentication.passwords;
 using Sorling.SqlConnAuthWeb.authentication.validation;
+using Sorling.SqlConnAuthWeb.razor;
 
 namespace Sorling.SqlConnAuthWeb.extenstions;
 
@@ -40,6 +41,7 @@ public static class ServiceCollectionExtenstions
       services.TryAddSingleton<ISqlAuthRuleValidator, SqlAuthRuleValidator>();
       services.TryAddSingleton<SqlAuthCookieEvents, SqlAuthCookieEvents>();
       services.TryAddSingleton(sqlAuthPaths);
+      services.TryAddSingleton<ISqlAuthPageRouteModelConvention, SqlAuthPageRouteModelConvention>();
 
       return services.Configure(configureOptions);
    }

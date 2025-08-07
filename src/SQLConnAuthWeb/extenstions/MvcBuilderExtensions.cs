@@ -16,14 +16,20 @@ public static class MvcBuilderExtensions
    /// <param name="sqlAuthPath">The SQL authentication application path configuration.</param>
    /// <returns>The configured <see cref="IMvcBuilder"/> instance.</returns>
    /// <exception cref="ArgumentNullException">Thrown if <paramref name="builder"/> or <paramref name="sqlAuthPath"/> is null.</exception>
-   public static IMvcBuilder AddSqlAuthRazorPageRouteConventions(this IMvcBuilder builder, SqlAuthAppPaths sqlAuthPath) {
-      ArgumentNullException.ThrowIfNull(builder);
-      ArgumentNullException.ThrowIfNull(sqlAuthPath);
+   public static IMvcBuilder AddSqlAuthRazorPageRouteConventions(this IMvcBuilder builder) {
+      ArgumentNullException.ThrowIfNull(builder);      
 
-      return !string.IsNullOrEmpty(sqlAuthPath.Root) || !string.IsNullOrEmpty(sqlAuthPath.Tail)
-          ? builder.AddRazorPagesOptions(options
-              => options.Conventions.Add(new SqlAuthPageRouteModelConvention(sqlAuthPath)))
-          : builder;
+      return builder.AddRazorPagesOptions(options =>
+      {
+         ServiceProvider provider = builder.Services.BuildServiceProvider();
+         ISqlAuthPageRouteModelConvention convention = provider.GetRequiredService<ISqlAuthPageRouteModelConvention>();
+         options.Conventions.Add(convention);
+      });
+
+      //return !string.IsNullOrEmpty(sqlAuthPath.Root) || !string.IsNullOrEmpty(sqlAuthPath.Tail)
+      //    ? builder.AddRazorPagesOptions(options
+      //        => options.Conventions.Add(new SqlAuthPageRouteModelConvention(sqlAuthPath)))
+      //    : builder;
    }
 
    /// <summary>

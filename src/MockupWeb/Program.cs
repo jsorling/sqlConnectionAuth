@@ -13,7 +13,7 @@ builder.Services.AddSqlConnAuthentication(sqlauthpath, o => {
 })
    .AddSqlConnAuthorization()
    .AddRazorPages()
-   .AddSqlAuthRazorPageRouteConventions(sqlauthpath)
+   .AddSqlAuthRazorPageRouteConventions()
    .AuthorizeSqlAuthRootPath(sqlauthpath);
 
 WebApplication app = builder.Build();
