@@ -1,8 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Configuration;
 using Sorling.SqlConnAuthWeb.authentication;
 using Sorling.SqlConnAuthWeb.authentication.passwords;
 using Sorling.SqlConnAuthWeb.authentication.validation;
+using Sorling.SqlConnAuthWeb.configuration;
 using Sorling.SqlConnAuthWeb.razor;
 
 namespace Sorling.SqlConnAuthWeb.extenstions;
@@ -21,7 +24,7 @@ public static class ServiceCollectionExtenstions
    /// <returns>The configured <see cref="IServiceCollection"/> instance.</returns>
    /// <exception cref="ArgumentNullException">Thrown if <paramref name="sqlAuthPaths"/> is null.</exception>
    public static IServiceCollection AddSqlConnAuthentication(this IServiceCollection services, SqlAuthAppPaths sqlAuthPaths
-       , Action<SqlAuthOptions> configureOptions) {
+       , Action<SqlAuthOptions>? configureOptions = null) {
       ArgumentNullException.ThrowIfNull(sqlAuthPaths);
 
       _ = services.AddHttpContextAccessor()
@@ -43,7 +46,14 @@ public static class ServiceCollectionExtenstions
       services.TryAddSingleton(sqlAuthPaths);
       services.TryAddSingleton<ISqlAuthPageRouteModelConvention, SqlAuthPageRouteModelConvention>();
 
-      return services.Configure(configureOptions);
+      // Register options from configuration and allow delegate override
+      _ = services.AddOptions<SqlAuthOptions>()
+          .Configure<IConfiguration>((opts, config) =>               // This will be handled by SqlAuthOptionsConfigurator for AllowedIPAddresses
+                                                                     // But allow delegate to override
+              configureOptions?.Invoke(opts));
+      _ = services.AddSingleton<IConfigureOptions<SqlAuthOptions>, SqlAuthOptionsConfigurator>();
+
+      return services;
    }
 
    /// <summary>
@@ -53,7 +63,7 @@ public static class ServiceCollectionExtenstions
    /// <param name="sqlAuthPaths">The SQL authentication application path configuration.</param>
    /// <returns>The configured <see cref="IServiceCollection"/> instance.</returns>
    public static IServiceCollection AddSQLConnAuthentication(this IServiceCollection services, SqlAuthAppPaths sqlAuthPaths)
-       => services.AddSqlConnAuthentication(sqlAuthPaths, options => { });
+       => services.AddSqlConnAuthentication(sqlAuthPaths, null);
 
    /// <summary>
    /// Adds SQL connection authorization policy to the service collection.

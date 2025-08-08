@@ -4,14 +4,10 @@ using Sorling.SqlConnAuthWeb.extenstions;
 SqlAuthAppPaths sqlauthpath = new("/db", UseDBNameRouting: false);
 WebApplicationBuilder? builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddSqlConnAuthentication(sqlauthpath, o => {
-   o.AllowIntegratedSecurity = true;
-   o.ThemeSwitcherLocalStorageName = "theme";
-   o.AllowTrustServerCertificate = true;
-   o.AllowLoopbackConnections = true;
-   o.AllowPrivateNetworkConnections = true;
-})
-   .AddSqlConnAuthorization()
+// Bind SqlAuthOptions from configuration (appsettings.json) and allow override via delegate
+builder.Services.AddSqlConnAuthentication(sqlauthpath, builder.Configuration.GetSection("SqlAuthOptions").Bind);
+
+builder.Services.AddSqlConnAuthorization()
    .AddRazorPages()
    .AddSqlAuthRazorPageRouteConventions()
    .AuthorizeSqlAuthRootPath();
