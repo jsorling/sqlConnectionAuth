@@ -42,4 +42,14 @@ public partial class SqlAuthOptions
    /// Gets or sets the list of allowed IP addresses or ranges (CIDR or subnet mask notation).
    /// </summary>
    public IPAddressRangeList AllowedIPAddresses { get; set; } = [];
+
+   /// <summary>
+   /// Gets or sets the list of allowed database names. Case-insensitive, no duplicates.
+   /// </summary>
+   public CaseInsensitiveStringSet AllowDatabases { get; set; } = [];
+
+   /// <summary>
+   /// Gets or sets the list of denied database names. Case-insensitive, no duplicates.
+   /// </summary>
+   public CaseInsensitiveStringSet DenyDatabases { get; set; } = [];
 }

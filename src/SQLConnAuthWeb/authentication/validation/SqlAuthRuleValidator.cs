@@ -7,18 +7,14 @@ namespace Sorling.SqlConnAuthWeb.authentication.validation;
 /// <summary>
 /// Validates SQL authentication requests against configured security rules and network policies.
 /// </summary>
-public class SqlAuthRuleValidator : ISqlAuthRuleValidator
+/// <remarks>
+/// Initializes a new instance of the <see cref="SqlAuthRuleValidator"/> class.
+/// </remarks>
+/// <param name="optionsMonitor">The options monitor used to retrieve current rule validation options at runtime.</param>
+public class SqlAuthRuleValidator(IOptionsMonitor<SqlAuthOptions> optionsMonitor) : ISqlAuthRuleValidator
 {
-   private readonly IOptionsMonitor<SqlAuthOptions> _optionsMonitor;
-
-   /// <summary>
-   /// Initializes a new instance of the <see cref="SqlAuthRuleValidator"/> class.
-   /// </summary>
-   /// <param name="optionsMonitor">The options monitor used to retrieve current rule validation options at runtime.</param>
-   public SqlAuthRuleValidator(IOptionsMonitor<SqlAuthOptions> optionsMonitor)
-   {
-      _optionsMonitor = optionsMonitor ?? throw new ArgumentNullException(nameof(optionsMonitor));
-   }
+   private readonly IOptionsMonitor<SqlAuthOptions> _optionsMonitor 
+      = optionsMonitor ?? throw new ArgumentNullException(nameof(optionsMonitor));
 
    /// <inheritdoc/>
    public async Task<SqlAuthRuleValidationResult> ValidateAsync(SqlAuthValidationRequest request) {
