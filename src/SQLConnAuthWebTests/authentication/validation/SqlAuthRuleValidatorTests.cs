@@ -6,7 +6,7 @@ using Sorling.SqlConnAuthWeb.authentication.validation;
 using System.Threading.Tasks;
 using Moq;
 
-namespace SQLConnAuthWebTests;
+namespace SQLConnAuthWebTests.authentication.validation;
 
 [TestClass]
 public class SqlAuthRuleValidatorTests
