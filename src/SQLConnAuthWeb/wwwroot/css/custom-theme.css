@@ -1,5 +1,3 @@
-/* Custom theme CSS for clean, centered UI */
-/* Theme color variables moved to layout for dynamic support */
 body {
     background: var(--background-color);
     color: var(--foreground-color);
@@ -10,9 +8,11 @@ body {
 .centered-container {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
-    min-height: 100vh;
+    height: 100vh;
+    padding-top: 4vh;
+    box-sizing: border-box;
 }
 input, select, textarea, button {
     font-size: 1rem;
@@ -55,6 +55,10 @@ form button,
 }
 .error-text {
     color: #a94442 !important;
+}
+.error-text::after {
+    content: "";
+    display: block;
 }
 [data-bs-theme="dark"] .error-text,
 [data-theme="dark"] .error-text {

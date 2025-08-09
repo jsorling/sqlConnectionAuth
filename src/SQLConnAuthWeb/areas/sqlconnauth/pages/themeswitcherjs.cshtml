@@ -5,10 +5,10 @@
     this.Response.ContentType = "application/javascript";
 }
 (function () {
-@if (Model.SQLAuthOptions.UseThemeSwitcher())
+@if (Model.SqlAuthUIOptions.UseThemeSwitcher())
 {
     <text>
-        const THEME_KEY = '@(Model.SQLAuthOptions.ThemeSwitcherLocalStorageName)';
+        const THEME_KEY = '@(Model.SqlAuthUIOptions.ThemeSwitcherLocalStorageName)';
         const themeSelect = document.getElementById('theme-switcher-select');
         const forcedTheme = document.documentElement.getAttribute('data-bss-forced-theme');
 

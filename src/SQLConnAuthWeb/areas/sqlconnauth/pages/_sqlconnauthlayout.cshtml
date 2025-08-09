@@ -1,6 +1,8 @@
-﻿@inject Microsoft.Extensions.Options.IOptionsMonitor<Sorling.SqlConnAuthWeb.authentication.SqlAuthOptions> Options
+﻿@using Microsoft.Extensions.Options
+@using Sorling.SqlConnAuthWeb.razor
+@inject IOptionsMonitor<SqlAuthUIOptions> UIOptions
 @{
-    var theme = Options.CurrentValue;
+    var theme = UIOptions.CurrentValue;
 }
 <!DOCTYPE html>
 <html data-bs-theme="auto" lang="en">

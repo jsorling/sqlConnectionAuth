@@ -1,24 +1,30 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
-using Sorling.SqlConnAuthWeb.authentication;
+using Sorling.SqlConnAuthWeb.razor;
 
 namespace Sorling.SqlConnAuthWeb.areas.sqlconnauth.pages;
 
 /// <summary>
-/// Page model for serving the theme switcher JavaScript, using SQL authentication options.
+/// Page model for serving the theme switcher JavaScript, using SQL UI options.
 /// </summary>
-/// <param name="options">The SQL authentication options.</param>
-public class ThemeSwitcherJS(IOptions<SqlAuthOptions> options) : PageModel
+public class ThemeSwitcherJS : PageModel
 {
-   /// <summary>
-   /// Gets the SQL authentication options.
-   /// </summary>
-   public SqlAuthOptions SQLAuthOptions { get; } = options.Value ?? throw new ArgumentNullException(nameof(options));
+    private readonly IOptionsMonitor<SqlAuthUIOptions> _options;
 
-   /// <summary>
-   /// Handles GET requests to the ThemeSwitcherJS page.
-   /// </summary>
-   /// <returns>The page result.</returns>
-   public IActionResult OnGet() => Page();
+    public ThemeSwitcherJS(IOptionsMonitor<SqlAuthUIOptions> options)
+    {
+        _options = options;
+    }
+
+    /// <summary>
+    /// Gets the SQL UI options.
+    /// </summary>
+    public SqlAuthUIOptions SqlAuthUIOptions => _options.CurrentValue;
+
+    /// <summary>
+    /// Handles GET requests to the ThemeSwitcherJS page.
+    /// </summary>
+    /// <returns>The page result.</returns>
+    public IActionResult OnGet() => Page();
 }
