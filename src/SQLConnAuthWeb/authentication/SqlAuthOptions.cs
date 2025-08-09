@@ -52,4 +52,24 @@ public partial class SqlAuthOptions
    /// Gets or sets the list of denied database names. Case-insensitive, no duplicates.
    /// </summary>
    public CaseInsensitiveStringSet DenyDatabases { get; set; } = [];
+
+   /// <summary>
+   /// Gets or sets the background color for the light theme.
+   /// </summary>
+   public string LightBackgroundColor { get; set; } = "#fff";
+
+   /// <summary>
+   /// Gets or sets the foreground color for the light theme.
+   /// </summary>
+   public string LightForegroundColor { get; set; } = "#222";
+
+   /// <summary>
+   /// Gets or sets the background color for the dark theme.
+   /// </summary>
+   public string DarkBackgroundColor { get; set; } = "#181818";
+
+   /// <summary>
+   /// Gets or sets the foreground color for the dark theme.
+   /// </summary>
+   public string DarkForegroundColor { get; set; } = "#f5f5f5";
 }

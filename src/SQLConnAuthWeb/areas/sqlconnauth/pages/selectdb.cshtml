@@ -4,6 +4,16 @@
 @attribute [RazorCompiledItemMetadata("RouteTemplate", SqlAuthConsts.URLROUTETEMPLATESELECTDB)]
 @model Sorling.SqlConnAuthWeb.areas.sqlconnauth.pages.SelectDBModel
 
-Select DB
-
-<div asp-validation-summary="All" class="text-danger"></div>
+<h2>Select DB</h2>
+<div class="form-box">
+    <form method="post">
+        <div class="form-group">
+            <label asp-for="Input.DBName"></label>
+            <input asp-for="Input.DBName" class="form-control">
+            <span asp-validation-for="Input.DBName" class="error-text"></span>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+    </form>
+</div>
