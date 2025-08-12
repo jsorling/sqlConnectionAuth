@@ -23,7 +23,9 @@ public class SqlConnectionHelper
       List<DBName> results = [];
       string connstr = sca.ConnectionString("master");
       using (SqlConnection conn = new(connstr))
-      using (SqlCommand cmd = new("select name from sys.databases order by case when owner_sid = 0x01 then 1 else 2 end, name", conn))
+      using (SqlCommand cmd = new(
+         "select name from sys.databases where has_dbaccess(name) = 1 order by case when owner_sid = 0x01 then 1 else 2 end, name"
+         , conn))
       {
          await conn.OpenAsync();
          using SqlDataReader reader = await cmd.ExecuteReaderAsync();

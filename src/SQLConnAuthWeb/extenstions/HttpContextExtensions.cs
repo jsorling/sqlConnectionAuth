@@ -17,13 +17,13 @@ public static class HttpContextExtensions
    /// <summary>
    /// Gets the SQL Server name associated with the current authentication context.
    /// </summary>
-   public static string SqlAuthServer(this HttpContext httpContext) => httpContext.Request.RouteValues[SqlAuthConsts.URLROUTEPARAMSRV]
+   public static string GetSqlAuthServer(this HttpContext httpContext) => httpContext.Request.RouteValues[SqlAuthConsts.URLROUTEPARAMSRV]
       as string ?? throw new ApplicationException("SQL server cannot be null or empty on route.");
 
    /// <summary>
    /// Gets the user name associated with the current authentication context.
    /// </summary>
-   public static string SqlAuthUserName(this HttpContext httpContext)
+   public static string GetSqlAuthUserName(this HttpContext httpContext)
       => httpContext.Request.RouteValues[SqlAuthConsts.URLROUTEPARAMUSR] as string
          ?? throw new ApplicationException("SQL username cannot be null or empty on route.");
 
@@ -31,7 +31,7 @@ public static class HttpContextExtensions
    /// Gets the stored secrets used for SQL authentication, such as credentials or sensitive connection information.
    /// Returns <c>null</c> if no secrets are available in the current authentication context.
    /// </summary>
-   public static SqlAuthStoredSecrets? SqlAuthStoredSecrets(this HttpContext httpContext)
+   public static SqlAuthStoredSecrets? GetSqlAuthStoredSecrets(this HttpContext httpContext)
       => httpContext.Items[typeof(SqlAuthStoredSecrets)] as SqlAuthStoredSecrets;
 
    /// <summary>
@@ -39,10 +39,10 @@ public static class HttpContextExtensions
    /// </summary>
    /// <param name="database">The name of the database, or null for the default.</param>
    /// <returns>The connection string, or null if not available.</returns>
-   public static string? SqlAuthGetConnectionString(this HttpContext httpContext, string? database = null) {
-      if (httpContext.SqlAuthStoredSecrets() is SqlAuthStoredSecrets storedsecrets)
+   public static string? GetSqlAuthGetConnectionString(this HttpContext httpContext, string? database = null) {
+      if (httpContext.GetSqlAuthStoredSecrets() is SqlAuthStoredSecrets storedsecrets)
       {
-         SqlAuthConnectionstringProvider sca = new(httpContext.SqlAuthServer(), httpContext.SqlAuthUserName(), storedsecrets);
+         SqlAuthConnectionstringProvider sca = new(httpContext.GetSqlAuthServer(), httpContext.GetSqlAuthUserName(), storedsecrets);
          return sca.ConnectionString(database);
       }
 

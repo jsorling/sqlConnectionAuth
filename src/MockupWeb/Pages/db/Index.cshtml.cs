@@ -10,7 +10,7 @@ public class IndexModel(ISqlAuthService sqlConAuth) : PageModel
 {
    private readonly ISqlAuthService _sqlconauth = sqlConAuth;
 
-   public string? SQLConnectionString => Request.HttpContext.SqlAuthGetConnectionString("master");
+   public string? SQLConnectionString => Request.HttpContext.GetSqlAuthGetConnectionString("master");
 
    public IEnumerable<SqlConnectionHelper.DBName>? DBs;
 

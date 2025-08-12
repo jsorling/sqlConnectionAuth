@@ -22,7 +22,6 @@ public class SelectDBModel(ISqlAuthService sqlConnAuthenticationService) : PageM
          return;
       }
 
-
       if (tresult.Success) {
          //Input.Databases = await _sqlConnAuthentication.GetDBsAsync();
          //Input.SqlServer = _sqlConnAuthentication.SQLServer;
