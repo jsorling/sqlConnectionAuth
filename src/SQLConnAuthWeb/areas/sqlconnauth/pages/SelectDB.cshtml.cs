@@ -16,19 +16,28 @@ public class SelectDBModel(ISqlAuthService sqlConnAuthenticationService) : PageM
    public InputSelectDBModel Input { get; set; } = new();
 
    public async void OnGetAsync([FromRoute] string sqlauthparamtemppwd) {
-      SqlAuthenticationResult tresult = await _sqlConnAuthentication.TestAuthenticateAsync(sqlauthparamtemppwd, null);
-      if (tresult is not null && !tresult.Success) {
+      SqlAuthenticationResult tresult = await _sqlConnAuthentication.TestAuthenticateAsync(sqlauthparamtemppwd, null)
+         ?? throw new NullReferenceException($"Error in the implementation of {nameof(ISqlAuthService)} returns null");
+
+      if (!tresult.Success) {
          ModelState.AddModelError(string.Empty, tresult.Exception?.Message ?? "Unknown error occurred during authentication.");
          return;
       }
+      else
+      {
+         //Input.Databases = await _sqlConnAuthentication.GetDBsAsync();
+      }
 
-      if (tresult.Success) {
+      if (tresult.Success)
+      {
          //Input.Databases = await _sqlConnAuthentication.GetDBsAsync();
          //Input.SqlServer = _sqlConnAuthentication.SQLServer;
          //Input.UserName = _sqlConnAuthentication.UserName;
          //Input.UriEscapedPath = _sqlConnAuthentication.UriEscapedPath;
          //Input.SqlVersion = tresult.SqlVersion;
-      } else {
+      }
+      else
+      {
          ModelState.AddModelError(string.Empty, tresult.Exception?.Message ?? "Unknown error occurred during authentication.");
       }
    }

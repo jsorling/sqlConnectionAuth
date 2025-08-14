@@ -3,10 +3,18 @@
 @using Sorling.SqlConnAuthWeb
 @attribute [RazorCompiledItemMetadata("RouteTemplate", SqlAuthConsts.URLROUTETEMPLATESELECTDB)]
 @model Sorling.SqlConnAuthWeb.areas.sqlconnauth.pages.SelectDBModel
+@{
+    ViewData["Title"] = "Select Database";
+    var firstError = ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault()?.ErrorMessage;
+}
 
 <h2>Select DB</h2>
 <div class="form-box">
     <form method="post">
+        @if (!string.IsNullOrEmpty(firstError))
+        {
+            <div class="error-message">@firstError</div>
+        }
         <div class="form-group">
             <label asp-for="Input.DBName"></label>
             <input asp-for="Input.DBName" class="form-control">

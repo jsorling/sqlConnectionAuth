@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Sorling.SqlConnAuthWeb.authentication.passwords;
 using Sorling.SqlConnAuthWeb.authentication.validation;
+using Sorling.SqlConnAuthWeb.exceptions;
 using Sorling.SqlConnAuthWeb.extenstions;
 using Sorling.SqlConnAuthWeb.helpers;
 using System.Security.Claims;
@@ -81,7 +82,7 @@ public class SqlAuthService(IHttpContextAccessor httpContextAccessor, ISqlAuthRu
       return storedsecrets is null
          ? new(false, validationresult.Exception, null)
          : await SqlConnectionHelper.TryConnectWithResultAsync(
-          new(httpcontext.GetSqlAuthServer(), httpcontext.GetSqlAuthUserName(), storedsecrets));
+            new(httpcontext.GetSqlAuthServer(), httpcontext.GetSqlAuthUserName(), storedsecrets));
    }
 
    /// <inheritdoc/>
@@ -89,7 +90,7 @@ public class SqlAuthService(IHttpContextAccessor httpContextAccessor, ISqlAuthRu
       SqlAuthTempPasswordInfo? temppasswordinfo = await _pwdStore.PeekTempPasswordAsync(key);
 
       return temppasswordinfo is null
-         ? new(false, new ApplicationException("Temporary password not found."), null)
+         ? new(false, new TemporaryPasswordNotFoundException(), null)
          : await TestAuthenticateAsync(temppasswordinfo, dbName);
    }
 
