@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Routing;
 using Sorling.SqlConnAuthWeb.authentication;
+using Sorling.SqlConnAuthWeb.exceptions;
+using Sorling.SqlConnAuthWeb.extenstions;
 using Sorling.SqlConnAuthWeb.razor.models;
 
 namespace Sorling.SqlConnAuthWeb.areas.sqlconnauth.pages;
@@ -15,30 +18,31 @@ public class SelectDBModel(ISqlAuthService sqlConnAuthenticationService) : PageM
    [BindProperty]
    public InputSelectDBModel Input { get; set; } = new();
 
-   public async void OnGetAsync([FromRoute] string sqlauthparamtemppwd) {
+   public async Task<IActionResult> OnGetAsync([FromRoute] string sqlauthparamtemppwd) {
       SqlAuthenticationResult tresult = await _sqlConnAuthentication.TestAuthenticateAsync(sqlauthparamtemppwd, null)
          ?? throw new NullReferenceException($"Error in the implementation of {nameof(ISqlAuthService)} returns null");
 
-      if (!tresult.Success) {
-         ModelState.AddModelError(string.Empty, tresult.Exception?.Message ?? "Unknown error occurred during authentication.");
-         return;
-      }
-      else
+      if (tresult.Exception is TemporaryPasswordNotFoundException)
       {
-         //Input.Databases = await _sqlConnAuthentication.GetDBsAsync();
-      }
+         // redirect to reenter the temporary password
+         RouteValueDictionary routevalues = new()
+         {
+            { "area", SqlAuthConsts.SQLAUTHAREA },
+            { SqlAuthConsts.URLROUTEPARAMSRV, HttpContext.GetSqlAuthServer() },
+            { SqlAuthConsts.URLROUTEPARAMUSR, HttpContext.GetSqlAuthUserName() }
+         };
 
-      if (tresult.Success)
+         return RedirectToPage("connect", routevalues);
+      }
+      else if (!tresult.Success)
       {
-         //Input.Databases = await _sqlConnAuthentication.GetDBsAsync();
-         //Input.SqlServer = _sqlConnAuthentication.SQLServer;
-         //Input.UserName = _sqlConnAuthentication.UserName;
-         //Input.UriEscapedPath = _sqlConnAuthentication.UriEscapedPath;
-         //Input.SqlVersion = tresult.SqlVersion;
+         ModelState.AddModelError(string.Empty, tresult.Exception?.Message ?? "Unknown error occurred during authentication.");
+         return Page();
       }
       else
       {
-         ModelState.AddModelError(string.Empty, tresult.Exception?.Message ?? "Unknown error occurred during authentication.");
+         //Input.Databases = await _sqlConnAuthentication.GetDBsAsync();
+         return Page();
       }
    }
 }
