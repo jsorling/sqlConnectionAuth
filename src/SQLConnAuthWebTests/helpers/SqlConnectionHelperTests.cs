@@ -22,7 +22,7 @@ public class SqlConnectionHelperTests
    [TestMethod]
    public void ListDbs() {
       IEnumerable<ISqlDatabase> t
-         = SqlConnectionHelper.GetDbsAsync(TestsInitialize.SQLConnAuthenticationData()).Result;
+         = SqlConnectionHelper.GetDatabasesAsync(TestsInitialize.SQLConnAuthenticationData()).Result;
 
       Console.WriteLine(t.First().Name);
 

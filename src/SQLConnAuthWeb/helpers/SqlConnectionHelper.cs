@@ -14,7 +14,7 @@ public class SqlConnectionHelper
    /// </summary>
    /// <param name="sca">The SQL authentication connection string provider.</param>
    /// <returns>A task that represents the asynchronous operation. The task result contains a collection of database result objects.</returns>
-   public static async Task<IEnumerable<ISqlDatabase>> GetDbsAsync(SqlAuthConnectionstringProvider sca) {
+   public static async Task<IEnumerable<ISqlDatabase>> GetDatabasesAsync(SqlAuthConnectionstringProvider sca) {
       List<ISqlDatabase> results = [];
       string connstr = sca.ConnectionString("master");
       using (SqlConnection conn = new(connstr))
