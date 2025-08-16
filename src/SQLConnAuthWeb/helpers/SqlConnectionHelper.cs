@@ -38,7 +38,7 @@ public class SqlConnectionHelper
    /// </summary>
    /// <param name="sca">The SQL authentication connection string provider.</param>
    /// <returns>A task that represents the asynchronous operation. The task result contains the SQL Server version string, or null if not available.</returns>
-   public static async Task<string?> GetVerionAsync(SqlAuthConnectionstringProvider sca) {
+   public static async Task<string?> GetSqlServerVersionAsync(SqlAuthConnectionstringProvider sca) {
       string connstr = sca.ConnectionString();
       using SqlConnection conn = new(connstr);
       using SqlCommand cmd = new("select @@version", conn);
@@ -59,7 +59,7 @@ public class SqlConnectionHelper
 
       try
       {
-         version = await GetVerionAsync(sca);
+         version = await GetSqlServerVersionAsync(sca);
       }
       catch (Exception ex)
       {

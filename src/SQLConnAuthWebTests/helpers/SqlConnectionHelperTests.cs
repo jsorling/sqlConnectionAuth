@@ -12,7 +12,7 @@ public class SqlConnectionHelperTests
 {
    [TestMethod]
    public void GetVersion() {
-      string? t = SqlConnectionHelper.GetVerionAsync(TestsInitialize.SQLConnAuthenticationData()).Result;
+      string? t = SqlConnectionHelper.GetSqlServerVersionAsync(TestsInitialize.SQLConnAuthenticationData()).Result;
 
       Console.WriteLine(t);
 
@@ -32,7 +32,7 @@ public class SqlConnectionHelperTests
    [TestMethod]
    public void WrongServerVersion() {
       AggregateException ex = Assert.ThrowsExactly<AggregateException>(
-         () => _ = _ = SqlConnectionHelper.GetVerionAsync(TestsInitialize.SQLConnAuthenticationData(sqlServer: "xx")).Result);
+         () => _ = _ = SqlConnectionHelper.GetSqlServerVersionAsync(TestsInitialize.SQLConnAuthenticationData(sqlServer: "xx")).Result);
 
       Console.WriteLine(ex.Message);
    }
@@ -40,7 +40,7 @@ public class SqlConnectionHelperTests
    [TestMethod]
    public void WrongUserNameVersion() {
       AggregateException ex = Assert.ThrowsExactly<AggregateException>(
-         () => _ = _ = SqlConnectionHelper.GetVerionAsync(TestsInitialize.SQLConnAuthenticationData(userName: "xx")).Result);
+         () => _ = _ = SqlConnectionHelper.GetSqlServerVersionAsync(TestsInitialize.SQLConnAuthenticationData(userName: "xx")).Result);
 
       Console.WriteLine(ex.Message);
    }
@@ -48,7 +48,7 @@ public class SqlConnectionHelperTests
    [TestMethod]
    public void WrongPasswordVersion() {
       AggregateException ex = Assert.ThrowsExactly<AggregateException>(
-         () => _ = _ = SqlConnectionHelper.GetVerionAsync(TestsInitialize.SQLConnAuthenticationData(password: "xx")).Result);
+         () => _ = _ = SqlConnectionHelper.GetSqlServerVersionAsync(TestsInitialize.SQLConnAuthenticationData(password: "xx")).Result);
 
       Console.WriteLine(ex.Message);
    }
