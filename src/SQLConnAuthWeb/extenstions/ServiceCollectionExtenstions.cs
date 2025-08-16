@@ -7,6 +7,7 @@ using Sorling.SqlConnAuthWeb.authentication.passwords;
 using Sorling.SqlConnAuthWeb.authentication.validation;
 using Sorling.SqlConnAuthWeb.configuration;
 using Sorling.SqlConnAuthWeb.razor;
+using Sorling.SqlConnAuthWeb.authentication.dbaccess;
 
 namespace Sorling.SqlConnAuthWeb.extenstions;
 
@@ -45,6 +46,7 @@ public static class ServiceCollectionExtenstions
       services.TryAddSingleton<SqlAuthCookieEvents, SqlAuthCookieEvents>();
       services.TryAddSingleton(sqlAuthPaths);
       services.TryAddSingleton<ISqlAuthPageRouteModelConvention, SqlAuthPageRouteModelConvention>();
+      services.TryAddSingleton<ISqlAuthDBAccess, SqlAuthDBAccess>();
 
       // Register options from configuration and allow delegate override
       _ = services.AddOptions<SqlAuthOptions>()

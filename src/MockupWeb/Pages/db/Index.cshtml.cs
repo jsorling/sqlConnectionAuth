@@ -1,21 +1,20 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Sorling.SqlConnAuthWeb.authentication;
+using Sorling.SqlConnAuthWeb.authentication.dbaccess;
 using Sorling.SqlConnAuthWeb.extenstions;
-using Sorling.SqlConnAuthWeb.helpers;
 
 namespace MockupWeb.Pages.db;
 
-public class IndexModel(ISqlAuthService sqlConAuth) : PageModel
+public class IndexModel(ISqlAuthDBAccess sqlDBAccess) : PageModel
 {
-   private readonly ISqlAuthService _sqlconauth = sqlConAuth;
+   private readonly ISqlAuthDBAccess _sqldbaccess = sqlDBAccess;
 
    public string? SQLConnectionString => Request.HttpContext.GetSqlAuthGetConnectionString("master");
 
-   public IEnumerable<SqlConnectionHelper.DBName>? DBs;
+   public IEnumerable<ISqlDatabase>? DBs;
 
    public async Task<IActionResult> OnGetAsync([FromRoute] string? db) {
-      DBs = await _sqlconauth.GetDBsAsync();
+      DBs = await _sqldbaccess.GetDatabasesAsync(HttpContext.GetSqlAuthConnectionstringProvider());
       return Page();
    }
 }

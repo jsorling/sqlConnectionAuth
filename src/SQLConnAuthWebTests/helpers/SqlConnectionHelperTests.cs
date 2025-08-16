@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Sorling.SqlConnAuthWeb.authentication.dbaccess;
 using Sorling.SqlConnAuthWeb.helpers;
 using System;
 using System.Collections.Generic;
@@ -20,7 +21,7 @@ public class SqlConnectionHelperTests
 
    [TestMethod]
    public void ListDbs() {
-      IEnumerable<SqlConnectionHelper.DBName> t
+      IEnumerable<ISqlDatabase> t
          = SqlConnectionHelper.GetDbsAsync(TestsInitialize.SQLConnAuthenticationData()).Result;
 
       Console.WriteLine(t.First().Name);

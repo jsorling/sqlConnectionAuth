@@ -39,13 +39,11 @@ public static class HttpContextExtensions
    /// </summary>
    /// <param name="database">The name of the database, or null for the default.</param>
    /// <returns>The connection string, or null if not available.</returns>
-   public static string? GetSqlAuthGetConnectionString(this HttpContext httpContext, string? database = null) {
-      if (httpContext.GetSqlAuthStoredSecrets() is SqlAuthStoredSecrets storedsecrets)
-      {
-         SqlAuthConnectionstringProvider sca = new(httpContext.GetSqlAuthServer(), httpContext.GetSqlAuthUserName(), storedsecrets);
-         return sca.ConnectionString(database);
-      }
+   public static string? GetSqlAuthGetConnectionString(this HttpContext httpContext, string? database = null)
+      => httpContext.GetSqlAuthConnectionstringProvider().ConnectionString(database);
 
-      return null;
-   }
+   public static SqlAuthConnectionstringProvider GetSqlAuthConnectionstringProvider(this HttpContext httpContext) 
+      => httpContext.GetSqlAuthStoredSecrets() is SqlAuthStoredSecrets storedsecrets
+         ? new SqlAuthConnectionstringProvider(httpContext.GetSqlAuthServer(), httpContext.GetSqlAuthUserName(), storedsecrets)
+         : throw new ApplicationException("SQL connection string provider cannot be created without stored secrets.");
 }

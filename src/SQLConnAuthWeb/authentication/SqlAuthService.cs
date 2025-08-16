@@ -93,16 +93,4 @@ public class SqlAuthService(IHttpContextAccessor httpContextAccessor, ISqlAuthRu
          ? new(false, new TemporaryPasswordNotFoundException(), null)
          : await TestAuthenticateAsync(temppasswordinfo, dbName);
    }
-
-   /// <inheritdoc/>
-   public async Task<IEnumerable<SqlConnectionHelper.DBName>> GetDBsAsync() {
-      HttpContext? httpcontext = _httpContextAccessor.HttpContext;
-      if (httpcontext != null && httpcontext.GetSqlAuthStoredSecrets() is SqlAuthStoredSecrets storedsecrets)
-      {
-         SqlAuthConnectionstringProvider sca = new(httpcontext.GetSqlAuthServer(), httpcontext.GetSqlAuthUserName(), storedsecrets);
-         return await SqlConnectionHelper.GetDbsAsync(sca);
-      }
-
-      return [];
-   }
 }
