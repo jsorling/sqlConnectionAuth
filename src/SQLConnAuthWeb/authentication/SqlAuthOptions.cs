@@ -33,12 +33,12 @@ public partial class SqlAuthOptions
    public IPAddressRangeList AllowedIPAddresses { get; set; } = [];
 
    /// <summary>
-   /// Gets or sets the list of allowed database names. Case-insensitive, no duplicates.
+   /// Gets or sets the list of database names to include in the filter. Case-insensitive, no duplicates.
    /// </summary>
-   public CaseInsensitiveStringSet AllowDatabases { get; set; } = [];
+   public CaseInsensitiveStringSet IncludeDatabaseFilter { get; set; } = [];
 
    /// <summary>
-   /// Gets or sets the list of denied database names. Case-insensitive, no duplicates.
+   /// Gets or sets the list of database names to exclude from the filter. Case-insensitive, no duplicates.
    /// </summary>
-   public CaseInsensitiveStringSet DenyDatabases { get; set; } = [];
+   public CaseInsensitiveStringSet ExcludeDatabaseFilter { get; set; } = [];
 }

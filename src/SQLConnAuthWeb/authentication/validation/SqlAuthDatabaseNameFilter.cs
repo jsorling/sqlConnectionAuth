@@ -7,7 +7,7 @@ namespace Sorling.SqlConnAuthWeb.authentication.validation;
 /// <summary>
 /// Validates database names using allow/deny rules from SqlAuthOptions, supporting wildcards.
 /// </summary>
-public class SqlAuthDatabaseNameValidator(IOptionsMonitor<SqlAuthOptions> optionsMonitor) : ISqlAuthDatabaseNameValidator
+public class SqlAuthDatabaseNameFilter(IOptionsMonitor<SqlAuthOptions> optionsMonitor) : ISqlAuthDatabaseNameFilter
 {
    private readonly IOptionsMonitor<SqlAuthOptions> _optionsMonitor = optionsMonitor;
 
@@ -29,8 +29,8 @@ public class SqlAuthDatabaseNameValidator(IOptionsMonitor<SqlAuthOptions> option
    public IEnumerable<string> ListAllowed(IEnumerable<string> databaseNames) {
       if (databaseNames == null)
          yield break;
-      CaseInsensitiveStringSet denypatterns = Options.DenyDatabases;
-      CaseInsensitiveStringSet allowpatterns = Options.AllowDatabases;
+      CaseInsensitiveStringSet denypatterns = Options.ExcludeDatabaseFilter;
+      CaseInsensitiveStringSet allowpatterns = Options.IncludeDatabaseFilter;
       // Remove denied databases (deny always takes precedence)
       IEnumerable<string> notdenied = databaseNames;
       foreach (string denypattern in denypatterns)

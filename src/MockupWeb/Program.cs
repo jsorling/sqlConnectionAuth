@@ -2,7 +2,7 @@ using Sorling.SqlConnAuthWeb.authentication;
 using Sorling.SqlConnAuthWeb.extenstions;
 using Sorling.SqlConnAuthWeb.razor;
 
-SqlAuthAppPaths sqlauthpath = new("/db", UseDBNameRouting: true);
+SqlAuthAppPaths sqlauthpath = new("/db", UseDBNameRouting: false);
 WebApplicationBuilder? builder = WebApplication.CreateBuilder(args);
 
 // Bind SqlAuthOptions from configuration (appsettings.json) and allow override via delegate

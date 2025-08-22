@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Sorling.SqlConnAuthWeb.authentication.passwords;
 using Sorling.SqlConnAuthWeb.authentication.validation;
 using Sorling.SqlConnAuthWeb.extenstions;
+using System.Security.Claims;
 
 namespace Sorling.SqlConnAuthWeb.authentication;
 
@@ -34,61 +35,90 @@ public class SqlAuthCookieEvents(ISqlAuthPwdStore sqlConnAuthPwdStore
       return base.SigningIn(context);
    }
 
+   // Helper to extract claims from the principal
+   private static (string? server, string? user, string? passwordref, string? dbname) ExtractClaims(ClaimsPrincipal? principal) 
+      => (
+         principal?.FindFirst(SqlAuthConsts.CLAIMSQLSERVER)?.Value,
+         principal?.FindFirst(SqlAuthConsts.CLAIMSQLUSERNAME)?.Value,
+         principal?.FindFirst(SqlAuthConsts.CLAIMSQLPASSWORDREF)?.Value,
+         principal?.FindFirst(SqlAuthConsts.URLROUTEPARAMDB)?.Value
+      );
+
+   // Helper to retrieve stored secrets
+   private async Task<SqlAuthStoredSecrets?> GetStoredSecretsAsync(SqlAuthCookieClaims? scc) => scc?.SecretStoreKey is not null
+         ? await sqlConnAuthPwdStore.RetrieveAsync(scc.SecretStoreKey)
+         : null;
+
+   // Helper to check DB name routing
+   private bool ShouldRejectForDbNameRouting(string? dbname, SqlAuthStoredSecrets storedsecrets) 
+      => sqlAuthAppPaths.UseDBNameRouting && (!string.IsNullOrEmpty(dbname) || dbname != storedsecrets.DBName);
+
+   // Helper to revalidate and renew secrets if needed
+   private async Task<SqlAuthStoredSecrets?> RevalidateSecretsIfNeededAsync(string server, string user, SqlAuthStoredSecrets storedsecrets, SqlAuthCookieClaims scc)
+   {
+      if (storedsecrets.RuleReValidationAfter.HasValue && storedsecrets.RuleReValidationAfter.Value < DateTime.UtcNow)
+      {
+         SqlAuthRuleValidationResult validationresult = await ruleValidator
+            .ValidateConnectionAsync(new(server, user, storedsecrets.Password, storedsecrets.TrustServerCertificate));
+         if (validationresult.Exception is not null || validationresult.StoredSecrets is null)
+         {
+            return null;
+         }
+
+         await sqlConnAuthPwdStore.RenewAsync(scc.SecretStoreKey, validationresult.StoredSecrets);
+         return validationresult.StoredSecrets;
+      }
+
+      return storedsecrets;
+   }
+
+   // Helper to set secrets in HttpContext
+   private static void SetSecretsInHttpContext(HttpContext httpContext, SqlAuthStoredSecrets storedsecrets) 
+      => httpContext.Items[typeof(SqlAuthStoredSecrets)] = storedsecrets;
+
    /// <summary>
    /// Called to validate the principal on each request. Handles revalidation and secret renewal if necessary.
    /// </summary>
    /// <param name="context">The context for the principal validation event.</param>
    /// <returns>A task that represents the asynchronous operation.</returns>
    public override async Task ValidatePrincipal(CookieValidatePrincipalContext context) {
-      string? server = context.Principal?.FindFirst(SqlAuthConsts.CLAIMSQLSERVER)?.Value;
-      string? user = context.Principal?.FindFirst(SqlAuthConsts.CLAIMSQLUSERNAME)?.Value;
-      string? passwordref = context.Principal?.FindFirst(SqlAuthConsts.CLAIMSQLPASSWORDREF)?.Value;
-      string? dbname = context.Principal?.FindFirst(SqlAuthConsts.URLROUTEPARAMDB)?.Value;
-
+      (string server, string user, string passwordref, string dbname) = ExtractClaims(context.Principal);
       if (string.IsNullOrEmpty(server) || string.IsNullOrEmpty(user) || string.IsNullOrEmpty(passwordref))
       {
          context.RejectPrincipal();
+         return;
       }
-      else
+
+      SqlAuthCookieClaims? scc = context.Principal?.Identities.SqlConnAuthCookieClaims();
+      SqlAuthStoredSecrets? storedsecrets = await GetStoredSecretsAsync(scc);
+      if (storedsecrets is null)
       {
-         SqlAuthCookieClaims? scc = context.Principal?.Identities.SqlConnAuthCookieClaims();
-         SqlAuthStoredSecrets? storedsecrets = scc?.SecretStoreKey is not null
-             ? await sqlConnAuthPwdStore.RetrieveAsync(scc.SecretStoreKey) : null;
-         if (storedsecrets is not null)
-         {
-            if (sqlAuthAppPaths.UseDBNameRouting && (!string.IsNullOrEmpty(dbname) || dbname != storedsecrets.DBName))
-            {
-               context.RejectPrincipal();
-               context.HttpContext.Response.Redirect(
-                   sqlAuthAppPaths.UriEscapedSqlPath(server, user)
-                   + (string.IsNullOrWhiteSpace(dbname) ? "" : $"/{Uri.EscapeDataString(dbname)}"));
-            }
-            else
-            {
-               if (storedsecrets.RuleReValidationAfter.HasValue && storedsecrets.RuleReValidationAfter.Value < DateTime.UtcNow)
-               {
-                  SqlAuthRuleValidationResult validationresult = await ruleValidator
-                      .ValidateAsync(new(server, user, storedsecrets.Password, storedsecrets.TrustServerCertificate));
-                  if (validationresult.Exception is not null || validationresult.StoredSecrets is null)
-                  {
-                     context.RejectPrincipal();
-                  }
-                  else
-                  {
-                     await sqlConnAuthPwdStore.RenewAsync(scc!.SecretStoreKey, validationresult.StoredSecrets);
-                     storedsecrets = validationresult.StoredSecrets;
-                  }
-               }
+         context.RejectPrincipal();
+         return;
+      }
 
+      if (ShouldRejectForDbNameRouting(dbname, storedsecrets))
+      {
+         context.RejectPrincipal();
+         context.HttpContext.Response.Redirect(
+            sqlAuthAppPaths.UriEscapedSqlPath(server, user)
+            + (string.IsNullOrWhiteSpace(dbname) ? "" : $"/{Uri.EscapeDataString(dbname)}"));
+         return;
+      }
 
-               context.HttpContext.Items[typeof(SqlAuthStoredSecrets)] = storedsecrets;
-            }
-         }
-         else
+      if (scc is not null)
+      {
+         SqlAuthStoredSecrets? revalidatedsecrets = await RevalidateSecretsIfNeededAsync(server!, user!, storedsecrets, scc);
+         if (revalidatedsecrets is null)
          {
             context.RejectPrincipal();
+            return;
          }
+
+         storedsecrets = revalidatedsecrets;
       }
+
+      SetSecretsInHttpContext(context.HttpContext, storedsecrets);
    }
 
    /// <summary>

@@ -39,9 +39,10 @@ public class SqlAuthService(IHttpContextAccessor httpContextAccessor, ISqlAuthRu
    /// <inheritdoc/>
    public async Task<SqlAuthenticationResult> AuthenticateAsync(SQLAuthenticateRequest request) {
       HttpContext httpcontext = _httpContextAccessor.HttpContext ?? throw new NullReferenceException(nameof(_httpContextAccessor));
-      SqlAuthRuleValidationResult validationresult = await _ruleValidator.ValidateAsync(
+      SqlAuthRuleValidationResult validationresult = await _ruleValidator.ValidateConnectionAsync(
           new(httpcontext.GetSqlAuthServer(), httpcontext.GetSqlAuthUserName(), request.Password, request.TrustServerCertificate));
       SqlAuthStoredSecrets? storedsecrets = validationresult.StoredSecrets;
+
       if (storedsecrets is null)
          return new(false, validationresult.Exception, null);
 
@@ -75,7 +76,7 @@ public class SqlAuthService(IHttpContextAccessor httpContextAccessor, ISqlAuthRu
 
       HttpContext httpcontext = _httpContextAccessor.HttpContext ?? throw new NullReferenceException(nameof(_httpContextAccessor));
 
-      SqlAuthRuleValidationResult validationresult = await _ruleValidator.ValidateAsync(
+      SqlAuthRuleValidationResult validationresult = await _ruleValidator.ValidateConnectionAsync(
           new(httpcontext.GetSqlAuthServer(), httpcontext.GetSqlAuthUserName(), sqlAuthTempPasswordInfo.Password, sqlAuthTempPasswordInfo.TrustServerCertificate));
 
       SqlAuthStoredSecrets? storedsecrets = validationresult.StoredSecrets;

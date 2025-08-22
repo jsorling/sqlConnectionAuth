@@ -30,5 +30,33 @@ public sealed class SqlAuthOptionsConfigurator(IConfiguration configuration) : I
 
          options.AllowedIPAddresses = iplist;
       }
+      // Custom binding for IncludeDatabaseFilter
+      IConfigurationSection includedbsection = section.GetSection(nameof(SqlAuthOptions.IncludeDatabaseFilter));
+      if (includedbsection.Exists())
+      {
+         CaseInsensitiveStringSet includeset = [];
+         string[] entries = includedbsection.Get<string[]>() ?? [];
+         foreach (string entry in entries)
+         {
+            if (!string.IsNullOrWhiteSpace(entry))
+               _ = includeset.Add(entry);
+         }
+
+         options.IncludeDatabaseFilter = includeset;
+      }
+      // Custom binding for ExcludeDatabaseFilter
+      IConfigurationSection excludedbsection = section.GetSection(nameof(SqlAuthOptions.ExcludeDatabaseFilter));
+      if (excludedbsection.Exists())
+      {
+         CaseInsensitiveStringSet excludeset = new();
+         string[] entries = excludedbsection.Get<string[]>() ?? [];
+         foreach (string entry in entries)
+         {
+            if (!string.IsNullOrWhiteSpace(entry))
+               _ = excludeset.Add(entry);
+         }
+
+         options.ExcludeDatabaseFilter = excludeset;
+      }
    }
 }

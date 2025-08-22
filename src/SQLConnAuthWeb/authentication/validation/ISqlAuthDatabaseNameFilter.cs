@@ -2,7 +2,7 @@
 
 namespace Sorling.SqlConnAuthWeb.authentication.validation;
 
-public interface ISqlAuthDatabaseNameValidator
+public interface ISqlAuthDatabaseNameFilter
 {
     /// <summary>
     /// Determines if a database name is allowed based on allow/deny rules.

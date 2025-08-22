@@ -47,6 +47,7 @@ public static class ServiceCollectionExtenstions
       services.TryAddSingleton(sqlAuthPaths);
       services.TryAddSingleton<ISqlAuthPageRouteModelConvention, SqlAuthPageRouteModelConvention>();
       services.TryAddSingleton<ISqlAuthDBAccess, SqlAuthDBAccess>();
+      services.TryAddSingleton<ISqlAuthDatabaseNameFilter, SqlAuthDatabaseNameFilter>();
 
       // Register options from configuration and allow delegate override
       _ = services.AddOptions<SqlAuthOptions>()

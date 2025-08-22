@@ -11,13 +11,16 @@ namespace Sorling.SqlConnAuthWeb.authentication.validation;
 /// Initializes a new instance of the <see cref="SqlAuthRuleValidator"/> class.
 /// </remarks>
 /// <param name="optionsMonitor">The options monitor used to retrieve current rule validation options at runtime.</param>
-public class SqlAuthRuleValidator(IOptionsMonitor<SqlAuthOptions> optionsMonitor) : ISqlAuthRuleValidator
+public class SqlAuthRuleValidator(IOptionsMonitor<SqlAuthOptions> optionsMonitor, ISqlAuthDatabaseNameFilter databaseNameValidator) : ISqlAuthRuleValidator
 {
-   private readonly IOptionsMonitor<SqlAuthOptions> _optionsMonitor 
+   private readonly IOptionsMonitor<SqlAuthOptions> _optionsMonitor
       = optionsMonitor ?? throw new ArgumentNullException(nameof(optionsMonitor));
 
+   private readonly ISqlAuthDatabaseNameFilter _databaseNameValidator
+      = databaseNameValidator ?? throw new ArgumentNullException(nameof(databaseNameValidator));
+
    /// <inheritdoc/>
-   public async Task<SqlAuthRuleValidationResult> ValidateAsync(SqlAuthValidationRequest request) {
+   public async Task<SqlAuthRuleValidationResult> ValidateConnectionAsync(SqlAuthValidationRequest request) {
       SqlAuthOptions options = _optionsMonitor.CurrentValue;
       if (!options.AllowIntegratedSecurity && request.Password == SqlAuthConsts.WINDOWSAUTHENTICATION)
          return new SqlAuthRuleValidationResult(new ApplicationException("Windows authentication not allowed"), null);
@@ -63,6 +66,7 @@ public class SqlAuthRuleValidator(IOptionsMonitor<SqlAuthOptions> optionsMonitor
           Password: request.Password
           , TrustServerCertificate: request.TrustServerCertificate
           , RuleReValidationAfter: DateTime.UtcNow.AddMinutes(5)
+          , DBName: null
       ));
    }
 
@@ -114,5 +118,8 @@ public class SqlAuthRuleValidator(IOptionsMonitor<SqlAuthOptions> optionsMonitor
 
       return true;
    }
+
+   public Task<bool> ValidateDatabaseAsync(string databaseName) 
+      => Task.FromResult(_databaseNameValidator.IsAllowed(databaseName));
 }
 
