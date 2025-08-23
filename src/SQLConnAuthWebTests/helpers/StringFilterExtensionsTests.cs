@@ -77,4 +77,55 @@ public class StringFilterExtensionsTests
       List<string> result = [.. input.FilterWithSearchPattern("test", caseSensitive: true)];
       CollectionAssert.AreEquivalent(_exactMatch_NoWildcards_CaseSensitive, result);
    }
+
+   [TestMethod]
+   public void FilterWithSearchPatterns_MatchAnyPattern_ReturnsMatching() {
+      string[] input = ["apple", "apricot", "banana", "grape", "cat", "cot", "cut", "cart"];
+      string[] patterns = ["a*e", "c_t"];
+      List<string> result = [.. input.FilterWithSearchPatterns(patterns)];
+      string[] expected = ["apple", "cat", "cot", "cut"];
+      CollectionAssert.AreEquivalent(expected, result);
+   }
+
+   [TestMethod]
+   public void FilterWithSearchPatterns_Negative_ReturnsNonMatching() {
+      string[] input = ["apple", "apricot", "banana", "grape", "cat", "cot", "cut", "cart"];
+      string[] patterns = ["a*e", "c_t"];
+      List<string> result = [.. input.FilterWithSearchPatterns(patterns, negative: true)];
+      string[] expected = ["apricot", "banana", "grape", "cart"];
+      CollectionAssert.AreEquivalent(expected, result);
+   }
+
+   [TestMethod]
+   public void FilterWithSearchPatterns_EmptyPatterns_ReturnsAll() {
+      string[] input = ["a", "b", "c"];
+      string[] patterns = [];
+      List<string> result = [.. input.FilterWithSearchPatterns(patterns)];
+      CollectionAssert.AreEquivalent(input, result);
+   }
+
+   [TestMethod]
+   public void FilterWithSearchPatterns_NullPatterns_ThrowsArgumentNullException() {
+      string[] input = ["a", "b"];
+      string[] patterns = null!;
+      _ = Assert.ThrowsExactly<ArgumentNullException>(() => input.FilterWithSearchPatterns(patterns).ToList());
+   }
+
+   private static readonly string[] _expected = ["", "apple"];
+
+   [TestMethod]
+   public void FilterWithSearchPattern_MatchEmptyString_ReturnsMatching() {
+      string[] input = [null!, "", "apple"];
+      List<string> result = [.. input.FilterWithSearchPattern("*")];
+      // "" and "apple" should match
+      CollectionAssert.AreEquivalent(_expected, result);
+   }
+
+   [TestMethod]
+   public void FilterWithSearchPatterns_MatchEmptyString_ReturnsMatching() {
+      string[] input = [null!, "", "apple"];
+      string[] patterns = ["*"];
+      List<string> result = [.. input.FilterWithSearchPatterns(patterns)];
+      CollectionAssert.AreEquivalent(_expected, result);
+   }
 }
