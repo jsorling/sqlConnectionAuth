@@ -5,70 +5,56 @@
     this.Response.ContentType = "application/javascript";
 }
 (function () {
-@if (Model.SQLAuthOptions.UseThemeSwitcher())
+@if (Model.SqlAuthUIOptions.UseThemeSwitcher())
 {
     <text>
-        const getStoredTheme = () => localStorage.getItem('@(Model.SQLAuthOptions.ThemeSwitcherLocalStorageName)');
+        const THEME_KEY = '@(Model.SqlAuthUIOptions.ThemeSwitcherLocalStorageName)';
+        const themeSelect = document.getElementById('theme-switcher-select');
         const forcedTheme = document.documentElement.getAttribute('data-bss-forced-theme');
 
-        const getPreferredTheme = () => {
-
-        if (forcedTheme) return forcedTheme;
-
-        const storedTheme = getStoredTheme();
-        if (storedTheme) {
-        return storedTheme;
+        function getStoredTheme() {
+            return localStorage.getItem(THEME_KEY);
         }
-
-        const pageTheme = document.documentElement.getAttribute('data-bs-theme');
-
-        if (pageTheme) {
-        return pageTheme;
+        function setStoredTheme(theme) {
+            localStorage.setItem(THEME_KEY, theme);
         }
-
-        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        function getSystemTheme() {
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
         }
-
-        const setTheme = theme => {
-        if (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        document.documentElement.setAttribute('data-bs-theme', 'dark');
-        } else {
-        document.documentElement.setAttribute('data-bs-theme', theme);
+        function getPreferredTheme() {
+            if (forcedTheme) return forcedTheme;
+            const storedTheme = getStoredTheme();
+            if (storedTheme) return storedTheme;
+            return 'system';
         }
+        function applyTheme(theme) {
+            let themeToSet = theme;
+            if (theme === 'system') {
+                themeToSet = getSystemTheme();
+            }
+            document.documentElement.setAttribute('data-bs-theme', themeToSet);
+            document.documentElement.setAttribute('data-theme', themeToSet);
         }
-
-        setTheme(getPreferredTheme());
-
-        const showActiveTheme = (theme, focus = false) => {
-        const themeSwitchers = [].slice.call(document.querySelectorAll('.theme-switcher'));
-
-        if (!themeSwitchers.length) return;
-
-        document.querySelectorAll('[data-bs-theme-value]').forEach(element => {
-        element.classList.remove('active');
-        element.setAttribute('aria-pressed', 'false');
+        function setTheme(theme) {
+            setStoredTheme(theme);
+            applyTheme(theme);
+            if (themeSelect) themeSelect.value = theme;
+        }
+        if (themeSelect) {
+            themeSelect.addEventListener('change', function() {
+                setTheme(this.value);
+            });
+        }
+        // On system theme change, update if system is selected
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
+            if (getStoredTheme() === 'system' || !getStoredTheme()) {
+                applyTheme('system');
+            }
         });
-
-        for (const themeSwitcher of themeSwitchers) {
-
-        const btnToActivate = themeSwitcher.querySelector('[data-bs-theme-value="' + theme + '"]');
-
-        if (btnToActivate) {
-        btnToActivate.classList.add('active');
-        btnToActivate.setAttribute('aria-pressed', 'true');
-        }
-        }
-        }
-
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-        const storedTheme = getStoredTheme();
-        if (storedTheme !== 'light' && storedTheme !== 'dark') {
-        setTheme(getPreferredTheme());
-        }
-        });
-
-        window.addEventListener('DOMContentLoaded', () => {
-        showActiveTheme(getPreferredTheme());
+        // On page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const theme = getPreferredTheme();
+            setTheme(theme);
         });
     </text>
 }

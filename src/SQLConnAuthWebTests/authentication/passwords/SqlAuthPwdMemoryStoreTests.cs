@@ -3,7 +3,7 @@ using Sorling.SqlConnAuthWeb.authentication.passwords;
 using System;
 using System.Threading.Tasks;
 
-namespace SQLConnAuthWebTests;
+namespace SQLConnAuthWebTests.authentication.passwords;
 
 [TestClass]
 public class SqlAuthPwdMemoryStoreTests

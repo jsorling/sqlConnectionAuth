@@ -1,19 +1,74 @@
-﻿<!DOCTYPE html>
-
+﻿@using Microsoft.Extensions.Options
+@using Sorling.SqlConnAuthWeb.razor
+@inject IOptionsMonitor<SqlAuthUIOptions> UIOptions
+@{
+    var theme = UIOptions.CurrentValue;
+}
+<!DOCTYPE html>
 <html data-bs-theme="auto" lang="en">
 <head>
     <meta name="viewport" content="width=device-width" />
     <title>@ViewBag.Title</title>
-    <link rel="stylesheet" href="~/_content/sorling.sqlconnauthweb/lib/bootstrap/css/bootstrap.min.css" asp-append-version="true" />
-    <script src="@Url.Page("themeswitcherjs")" asp-append-version="true"></script>
+    <link rel="stylesheet" href="~/_content/sorling.sqlconnauthweb/css/custom-theme.css" asp-append-version="true" />
+    <style>
+        :root {
+            --background-color: @(theme.LightBackgroundColor ?? "#fff");
+            --foreground-color: @(theme.LightForegroundColor ?? "#222");
+        }
+        [data-bs-theme="light"], [data-theme="light"] {
+            --background-color: @(theme.LightBackgroundColor ?? "#fff");
+            --foreground-color: @(theme.LightForegroundColor ?? "#222");
+        }
+        [data-bs-theme="dark"], [data-theme="dark"] {
+            --background-color: @(theme.DarkBackgroundColor ?? "#181818");
+            --foreground-color: @(theme.DarkForegroundColor ?? "#f5f5f5");
+        }
+        .theme-switcher-container {
+            position: fixed;
+            top: 0.75em;
+            right: 1.5em;
+            z-index: 9999;
+            background: rgba(255,255,255,0.85);
+            border-radius: 2em;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            padding: 0.25em 1em;
+            font-size: 0.95em;
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+        }
+        [data-bs-theme="dark"] .theme-switcher-container,
+        [data-theme="dark"] .theme-switcher-container {
+            background: rgba(30,30,30,0.85);
+            color: #f5f5f5;
+        }
+        .theme-switcher-container label {
+            margin: 0;
+            font-size: 0.95em;
+        }
+        .theme-switcher-container select {
+            border-radius: 1em;
+            border: 1px solid #ccc;
+            padding: 0.2em 0.8em;
+            font-size: 0.95em;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
+    <div class="theme-switcher-container">
+        <label for="theme-switcher-select">Theme:</label>
+        <select id="theme-switcher-select">
+            <option value="system">System default</option>
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+        </select>
+    </div>
+    <div class="centered-container">
         @RenderBody()
     </div>
     <script src="~/_content/sorling.sqlconnauthweb/lib/jquery/jquery.min.js" asp-append-version="true"></script>
     <script src="~/_content/sorling.sqlconnauthweb/lib/jquery-validation/dist/jquery.validate.min.js" asp-append-version="true"></script>
     <script src="~/_content/sorling.sqlconnauthweb/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js" asp-append-version="true"></script>
-    <script src="~/_content/sorling.sqlconnauthweb/lib/bootstrap/js/bootstrap.bundle.min.js" asp-append-version="false"></script>
+    <script src="@Url.Page("themeswitcherjs")" asp-append-version="true"></script>
 </body>
 </html>

@@ -76,4 +76,9 @@ public class SqlAuthConsts
    /// Example: <c>{sqlauthparamsrv}/{sqlauthparamusr}/{sqlauthparamdb}?</c>
    /// </summary>
    public const string URLROUTETEMPLATECONNECT = $"{{{URLROUTEPARAMSRV}}}/{{{URLROUTEPARAMUSR}}}/{{{URLROUTEPARAMDB}?}}";
+
+   /// <summary>
+   /// Query parameter key for a temporary password key.
+   /// </summary>
+   public const string QUERYPARAMTMPPWDKEY = "sqlauthtmppwdkey";
 }

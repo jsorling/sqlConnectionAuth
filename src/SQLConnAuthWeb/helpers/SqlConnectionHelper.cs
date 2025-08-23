@@ -1,5 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 using Sorling.SqlConnAuthWeb.authentication;
+using Sorling.SqlConnAuthWeb.authentication.dbaccess;
 
 namespace Sorling.SqlConnAuthWeb.helpers;
 
@@ -9,27 +10,23 @@ namespace Sorling.SqlConnAuthWeb.helpers;
 public class SqlConnectionHelper
 {
    /// <summary>
-   /// Represents a result row for a listed database.
-   /// </summary>
-   /// <param name="Name">The name of the database.</param>
-   public record DBName(string Name);
-
-   /// <summary>
    /// Retrieves a list of databases from the SQL Server using the provided connection string provider.
    /// </summary>
    /// <param name="sca">The SQL authentication connection string provider.</param>
    /// <returns>A task that represents the asynchronous operation. The task result contains a collection of database result objects.</returns>
-   public static async Task<IEnumerable<DBName>> GetDbsAsync(SqlAuthConnectionstringProvider sca) {
-      List<DBName> results = [];
+   public static async Task<IEnumerable<ISqlDatabase>> GetDatabasesAsync(SqlAuthConnectionstringProvider sca) {
+      List<ISqlDatabase> results = [];
       string connstr = sca.ConnectionString("master");
       using (SqlConnection conn = new(connstr))
-      using (SqlCommand cmd = new("select name from sys.databases order by case when owner_sid = 0x01 then 1 else 2 end, name", conn))
+      using (SqlCommand cmd = new(
+         "select name from sys.databases where has_dbaccess(name) = 1 order by case when owner_sid = 0x01 then 1 else 2 end, name"
+         , conn))
       {
          await conn.OpenAsync();
          using SqlDataReader reader = await cmd.ExecuteReaderAsync();
          while (await reader.ReadAsync())
          {
-            results.Add(new DBName(reader.GetString(0)));
+            results.Add(new SqlDatabase(reader.GetString(0)));
          }
       }
 
@@ -41,7 +38,7 @@ public class SqlConnectionHelper
    /// </summary>
    /// <param name="sca">The SQL authentication connection string provider.</param>
    /// <returns>A task that represents the asynchronous operation. The task result contains the SQL Server version string, or null if not available.</returns>
-   public static async Task<string?> GetVerionAsync(SqlAuthConnectionstringProvider sca) {
+   public static async Task<string?> GetSqlServerVersionAsync(SqlAuthConnectionstringProvider sca) {
       string connstr = sca.ConnectionString();
       using SqlConnection conn = new(connstr);
       using SqlCommand cmd = new("select @@version", conn);
@@ -62,7 +59,7 @@ public class SqlConnectionHelper
 
       try
       {
-         version = await GetVerionAsync(sca);
+         version = await GetSqlServerVersionAsync(sca);
       }
       catch (Exception ex)
       {

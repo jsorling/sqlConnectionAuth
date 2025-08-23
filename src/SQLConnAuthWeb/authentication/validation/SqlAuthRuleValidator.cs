@@ -7,18 +7,22 @@ namespace Sorling.SqlConnAuthWeb.authentication.validation;
 /// <summary>
 /// Validates SQL authentication requests against configured security rules and network policies.
 /// </summary>
-/// <param name="options">The options used to configure rule validation behavior.</param>
-public class SqlAuthRuleValidator(IOptions<SqlAuthOptions> options) : ISqlAuthRuleValidator
+/// <remarks>
+/// Initializes a new instance of the <see cref="SqlAuthRuleValidator"/> class.
+/// </remarks>
+/// <param name="optionsMonitor">The options monitor used to retrieve current rule validation options at runtime.</param>
+public class SqlAuthRuleValidator(IOptionsMonitor<SqlAuthOptions> optionsMonitor, ISqlAuthDatabaseNameFilter databaseNameValidator) : ISqlAuthRuleValidator
 {
-   private readonly SqlAuthOptions _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
+   private readonly IOptionsMonitor<SqlAuthOptions> _optionsMonitor
+      = optionsMonitor ?? throw new ArgumentNullException(nameof(optionsMonitor));
 
-   /// <summary>
-   /// Validates the provided SQL authentication request against security and network rules.
-   /// </summary>
-   /// <param name="request">The validation request containing connection and credential information.</param>
-   /// <returns>A task that represents the asynchronous operation. The task result contains the rule validation result, including any exception and validated secrets.</returns>
-   public async Task<SqlAuthRuleValidationResult> ValidateAsync(SqlAuthValidationRequest request) {
-      if (!_options.AllowIntegratedSecurity && request.Password == SqlAuthConsts.WINDOWSAUTHENTICATION)
+   private readonly ISqlAuthDatabaseNameFilter _databaseNameValidator
+      = databaseNameValidator ?? throw new ArgumentNullException(nameof(databaseNameValidator));
+
+   /// <inheritdoc/>
+   public async Task<SqlAuthRuleValidationResult> ValidateConnectionAsync(SqlAuthValidationRequest request) {
+      SqlAuthOptions options = _optionsMonitor.CurrentValue;
+      if (!options.AllowIntegratedSecurity && request.Password == SqlAuthConsts.WINDOWSAUTHENTICATION)
          return new SqlAuthRuleValidationResult(new ApplicationException("Windows authentication not allowed"), null);
 
       IPAddress[] ips;
@@ -38,22 +42,22 @@ public class SqlAuthRuleValidator(IOptions<SqlAuthOptions> options) : ISqlAuthRu
          return new SqlAuthRuleValidationResult(new ApplicationException("No IP address found for SQL Server"), null);
 
       // If allowed IP addresses list is not null or empty, enforce allow-list logic
-      if (_options.AllowedIPAddresses != null && _options.AllowedIPAddresses.Count > 0)
+      if (options.AllowedIPAddresses != null && options.AllowedIPAddresses.Count > 0)
       {
-         if (!IsIpAllowed(ips, _options.AllowedIPAddresses))
+         if (!IsIpAllowed(ips, options.AllowedIPAddresses))
          {
             return new SqlAuthRuleValidationResult(new ApplicationException("IP address not allowed by allow-list"), null);
          }
       }
-      else if (!_options.AllowLoopbackConnections || !_options.AllowPrivateNetworkConnections)
+      else if (!options.AllowLoopbackConnections || !options.AllowPrivateNetworkConnections)
       {
          foreach (IPAddress ip in ips)
          {
             IPNetworkType iptype = IPReservedNetworks.GetIPNetworkType(ip);
 
-            if (iptype == IPNetworkType.Loopback && !_options.AllowLoopbackConnections)
+            if (iptype == IPNetworkType.Loopback && !options.AllowLoopbackConnections)
                return new SqlAuthRuleValidationResult(new ApplicationException("Loopback connections not allowed"), null);
-            else if (iptype != IPNetworkType.Public && !_options.AllowPrivateNetworkConnections)
+            else if (iptype != IPNetworkType.Public && !options.AllowPrivateNetworkConnections)
                return new SqlAuthRuleValidationResult(new ApplicationException("Private network connections not allowed"), null);
          }
       }
@@ -62,12 +66,16 @@ public class SqlAuthRuleValidator(IOptions<SqlAuthOptions> options) : ISqlAuthRu
           Password: request.Password
           , TrustServerCertificate: request.TrustServerCertificate
           , RuleReValidationAfter: DateTime.UtcNow.AddMinutes(5)
+          , DBName: null
       ));
    }
 
    /// <summary>
    /// Checks if any of the given IP addresses are allowed by the allow-list.
    /// </summary>
+   /// <param name="ips">The IP addresses to check.</param>
+   /// <param name="allowedList">The allow-list of IP address ranges.</param>
+   /// <returns>True if any IP is allowed; otherwise, false.</returns>
    private static bool IsIpAllowed(IPAddress[] ips, IPAddressRangeList allowedList) {
       foreach (IPAddress ip in ips)
          foreach (string cidr in allowedList)
@@ -80,6 +88,9 @@ public class SqlAuthRuleValidator(IOptions<SqlAuthOptions> options) : ISqlAuthRu
    /// <summary>
    /// Checks if an IP address is within a CIDR range.
    /// </summary>
+   /// <param name="ip">The IP address to check.</param>
+   /// <param name="cidr">The CIDR range string.</param>
+   /// <returns>True if the IP is within the range; otherwise, false.</returns>
    private static bool IsIpInCidr(IPAddress ip, string cidr) {
       string[] parts = cidr.Split('/');
       if (parts.Length != 2)
@@ -107,5 +118,8 @@ public class SqlAuthRuleValidator(IOptions<SqlAuthOptions> options) : ISqlAuthRu
 
       return true;
    }
+
+   public Task<bool> ValidateDatabaseAsync(string databaseName) 
+      => Task.FromResult(_databaseNameValidator.IsAllowed(databaseName));
 }
 

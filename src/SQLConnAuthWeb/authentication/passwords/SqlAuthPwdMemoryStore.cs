@@ -70,7 +70,7 @@ public class SqlAuthPwdMemoryStore : ISqlAuthPwdStore
    /// <param name="trustServerCertificate">Whether to trust the server certificate.</param>
    /// <returns>A task that represents the asynchronous operation. The task result contains the generated key.</returns>
    public Task<string> SetTempPasswordAsync(string userName, string serverName, string password, bool trustServerCertificate) {
-      string key = $"temp-{RandomStringHelper.UrlSafeRandomString()}";
+      string key = $"--tmp{RandomStringHelper.UrlSafeRandomString()}";
       SqlAuthTempPasswordInfo info = new(password, trustServerCertificate);
       _ = _cache.Set(key, info, new MemoryCacheEntryOptions() { SlidingExpiration = TimeSpan.FromMinutes(10) });
       return Task.FromResult(key);

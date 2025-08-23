@@ -1,4 +1,5 @@
-﻿using Sorling.SqlConnAuthWeb.helpers;
+﻿using Microsoft.Extensions.Configuration;
+using Sorling.SqlConnAuthWeb.helpers;
 
 namespace Sorling.SqlConnAuthWeb.authentication;
 
@@ -11,17 +12,6 @@ public partial class SqlAuthOptions
    /// Gets or sets a value indicating whether integrated security (Windows Authentication) is allowed for SQL connections.
    /// </summary>
    public bool AllowIntegratedSecurity { get; set; }
-
-   /// <summary>
-   /// Gets or sets the name of the local storage key used for the theme switcher. If set, enables the use of a theme switcher in the UI.
-   /// </summary>
-   public string? ThemeSwitcherLocalStorageName { get; set; }
-
-   /// <summary>
-   /// Determines whether the theme switcher should be used based on the presence of a local storage key name.
-   /// </summary>
-   /// <returns>True if <see cref="ThemeSwitcherLocalStorageName"/> is not null or empty; otherwise, false.</returns>
-   public bool UseThemeSwitcher() => !string.IsNullOrEmpty(ThemeSwitcherLocalStorageName);
 
    /// <summary>
    /// Gets or sets a value indicating whether the option to trust the SQL Server certificate is allowed.
@@ -42,4 +32,26 @@ public partial class SqlAuthOptions
    /// Gets or sets the list of allowed IP addresses or ranges (CIDR or subnet mask notation).
    /// </summary>
    public IPAddressRangeList AllowedIPAddresses { get; set; } = [];
+
+   /// <summary>
+   /// Backing store for IncludeDatabaseFilter for config binding
+   /// </summary>
+   [ConfigurationKeyName("IncludeDatabaseFilter")]
+   public List<string> IncludeDatabaseFilterRaw { get; set; } = [];
+
+   /// <summary>
+   /// Backing store for ExcludeDatabaseFilter for config binding
+   /// </summary>
+   [ConfigurationKeyName("ExcludeDatabaseFilter")]
+   public List<string> ExcludeDatabaseFilterRaw { get; set; } = [];
+
+   /// <summary>
+   /// Gets the list of database names to include in the filter. Case-insensitive, no duplicates.
+   /// </summary>
+   public CaseInsensitiveStringSet IncludeDatabaseFilter => [.. IncludeDatabaseFilterRaw];
+
+   /// <summary>
+   /// Gets the list of database names to exclude from the filter. Case-insensitive, no duplicates.
+   /// </summary>
+   public CaseInsensitiveStringSet ExcludeDatabaseFilter => [.. ExcludeDatabaseFilterRaw];
 }

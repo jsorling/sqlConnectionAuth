@@ -5,21 +5,25 @@
 @model Sorling.SqlConnAuthWeb.areas.sqlconnauth.pages.ConnectModel
 @{
     ViewData["Title"] = "Sign in";
+    var firstError = ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault()?.ErrorMessage;
 }
 
 <h2>@ViewData["Title"]</h2>
 <div class="row">
-    <div class="col-md-3">
+    <div class="form-box">
         <form method="post">
             @if (Model.IsWinAuth)
             {
-                <p>Sign in to the SQL server @Model.SQLServer using Windows authentication.</p>
+                <p class="info-message">Sign in to the SQL server @Model.SQLServer using Windows authentication.</p>
             }
             else
             {
-                <p>Sign in to the SQL server @Model.SQLServer with user name @Model.UserName</p>
+                <p class="info-message">Sign in to the SQL server @Model.SQLServer with user name <span class="nowrap">@Model.SqlUserName</span></p>
             }
-            <div asp-validation-summary="All" class="text-danger"></div>
+            @if (!string.IsNullOrEmpty(firstError))
+            {
+                <div class="error-message">@firstError</div>
+            }
             <div class="form-group">
                 @if (Model.IsWinAuth)
                 {
@@ -28,15 +32,15 @@
                 else
                 {
                     <label asp-for="Input.Password"></label>
+                    <span asp-validation-for="Input.Password" class="error-text"></span>
                     <input asp-for="Input.Password" class="form-control" autofocus>
                 }
-                <span asp-validation-for="Input.Password" class="text-danger"></span>
             </div>
-            <div>
+            <div class="form-group">
                 <label asp-for="Input.TrustServerCertificate"></label>
                 <input asp-for="Input.TrustServerCertificate">
             </div>
-            <div class="form-group">
+            <div class="form-actions">
                 <button type="submit" class="btn btn-primary">Sign in</button>
             </div>
         </form>

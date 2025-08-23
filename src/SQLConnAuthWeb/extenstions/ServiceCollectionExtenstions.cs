@@ -1,8 +1,12 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 using Sorling.SqlConnAuthWeb.authentication;
+using Sorling.SqlConnAuthWeb.authentication.dbaccess;
 using Sorling.SqlConnAuthWeb.authentication.passwords;
 using Sorling.SqlConnAuthWeb.authentication.validation;
+using Sorling.SqlConnAuthWeb.helpers;
 using Sorling.SqlConnAuthWeb.razor;
 
 namespace Sorling.SqlConnAuthWeb.extenstions;
@@ -21,7 +25,7 @@ public static class ServiceCollectionExtenstions
    /// <returns>The configured <see cref="IServiceCollection"/> instance.</returns>
    /// <exception cref="ArgumentNullException">Thrown if <paramref name="sqlAuthPaths"/> is null.</exception>
    public static IServiceCollection AddSqlConnAuthentication(this IServiceCollection services, SqlAuthAppPaths sqlAuthPaths
-       , Action<SqlAuthOptions> configureOptions) {
+       , Action<SqlAuthOptions>? configureOptions = null) {
       ArgumentNullException.ThrowIfNull(sqlAuthPaths);
 
       _ = services.AddHttpContextAccessor()
@@ -42,8 +46,33 @@ public static class ServiceCollectionExtenstions
       services.TryAddSingleton<SqlAuthCookieEvents, SqlAuthCookieEvents>();
       services.TryAddSingleton(sqlAuthPaths);
       services.TryAddSingleton<ISqlAuthPageRouteModelConvention, SqlAuthPageRouteModelConvention>();
+      services.TryAddSingleton<ISqlAuthDBAccess, SqlAuthDBAccess>();
+      services.TryAddSingleton<ISqlAuthDatabaseNameFilter, SqlAuthDatabaseNameFilter>();
 
-      return services.Configure(configureOptions);
+      // Register options from configuration and allow delegate override
+      _ = services.AddOptions<SqlAuthOptions>()
+          .Configure<IConfiguration>((opts, config) => {
+             var section = config.GetSection("SqlAuthOptions");
+             section.Bind(opts);
+             // Custom binding for AllowedIPAddresses
+             var iplistsection = section.GetSection(nameof(SqlAuthOptions.AllowedIPAddresses));
+             if (iplistsection.Exists())
+             {
+                var iplist = new IPAddressRangeList();
+                string[] entries = iplistsection.Get<string[]>() ?? [];
+                foreach (string entry in entries)
+                {
+                   if (!string.IsNullOrWhiteSpace(entry))
+                      iplist.Add(entry);
+                }
+
+                opts.AllowedIPAddresses = iplist;
+             }
+             // No custom binding for IncludeDatabaseFilter/ExcludeDatabaseFilter needed with new model
+             configureOptions?.Invoke(opts);
+          });
+
+      return services;
    }
 
    /// <summary>
@@ -53,7 +82,7 @@ public static class ServiceCollectionExtenstions
    /// <param name="sqlAuthPaths">The SQL authentication application path configuration.</param>
    /// <returns>The configured <see cref="IServiceCollection"/> instance.</returns>
    public static IServiceCollection AddSQLConnAuthentication(this IServiceCollection services, SqlAuthAppPaths sqlAuthPaths)
-       => services.AddSqlConnAuthentication(sqlAuthPaths, options => { });
+       => services.AddSqlConnAuthentication(sqlAuthPaths, null);
 
    /// <summary>
    /// Adds SQL connection authorization policy to the service collection.

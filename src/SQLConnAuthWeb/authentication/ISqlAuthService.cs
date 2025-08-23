@@ -16,12 +16,6 @@ public interface ISqlAuthService
    public Task<SqlAuthenticationResult> AuthenticateAsync(SQLAuthenticateRequest request);
 
    /// <summary>
-   /// Retrieves a list of available databases for the current SQL connection.
-   /// </summary>
-   /// <returns>A task that represents the asynchronous operation. The task result contains a collection of database information.</returns>
-   public Task<IEnumerable<SqlConnectionHelper.DBName>> GetDBsAsync();
-
-   /// <summary>
    /// Gets the SQL authentication options used by the service.
    /// </summary>
    public SqlAuthOptions Options { get; }
