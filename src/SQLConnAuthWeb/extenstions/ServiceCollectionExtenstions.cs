@@ -1,13 +1,13 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Configuration;
 using Sorling.SqlConnAuthWeb.authentication;
+using Sorling.SqlConnAuthWeb.authentication.dbaccess;
 using Sorling.SqlConnAuthWeb.authentication.passwords;
 using Sorling.SqlConnAuthWeb.authentication.validation;
-using Sorling.SqlConnAuthWeb.configuration;
+using Sorling.SqlConnAuthWeb.helpers;
 using Sorling.SqlConnAuthWeb.razor;
-using Sorling.SqlConnAuthWeb.authentication.dbaccess;
 
 namespace Sorling.SqlConnAuthWeb.extenstions;
 
@@ -51,10 +51,26 @@ public static class ServiceCollectionExtenstions
 
       // Register options from configuration and allow delegate override
       _ = services.AddOptions<SqlAuthOptions>()
-          .Configure<IConfiguration>((opts, config) =>               // This will be handled by SqlAuthOptionsConfigurator for AllowedIPAddresses
-                                                                     // But allow delegate to override
-              configureOptions?.Invoke(opts));
-      _ = services.AddSingleton<IConfigureOptions<SqlAuthOptions>, SqlAuthOptionsConfigurator>();
+          .Configure<IConfiguration>((opts, config) => {
+             var section = config.GetSection("SqlAuthOptions");
+             section.Bind(opts);
+             // Custom binding for AllowedIPAddresses
+             var iplistsection = section.GetSection(nameof(SqlAuthOptions.AllowedIPAddresses));
+             if (iplistsection.Exists())
+             {
+                var iplist = new IPAddressRangeList();
+                string[] entries = iplistsection.Get<string[]>() ?? [];
+                foreach (string entry in entries)
+                {
+                   if (!string.IsNullOrWhiteSpace(entry))
+                      iplist.Add(entry);
+                }
+
+                opts.AllowedIPAddresses = iplist;
+             }
+             // No custom binding for IncludeDatabaseFilter/ExcludeDatabaseFilter needed with new model
+             configureOptions?.Invoke(opts);
+          });
 
       return services;
    }

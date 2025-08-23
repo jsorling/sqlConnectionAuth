@@ -5,9 +5,11 @@ using Sorling.SqlConnAuthWeb.extenstions;
 
 namespace MockupWeb.Pages.db;
 
-public class IndexModel(ISqlAuthDBAccess sqlDBAccess) : PageModel
+public class IndexModel(ISqlAuthDBAccess sqlDBAccess, IHostEnvironment env) : PageModel
 {
    private readonly ISqlAuthDBAccess _sqldbaccess = sqlDBAccess;
+
+   public string AppSettingsPath => Path.Combine(env.ContentRootPath, "appsettings.json");
 
    public string? SQLConnectionString => Request.HttpContext.GetSqlAuthGetConnectionString("master");
 

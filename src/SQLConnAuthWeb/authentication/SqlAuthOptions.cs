@@ -1,4 +1,5 @@
-﻿using Sorling.SqlConnAuthWeb.helpers;
+﻿using Microsoft.Extensions.Configuration;
+using Sorling.SqlConnAuthWeb.helpers;
 
 namespace Sorling.SqlConnAuthWeb.authentication;
 
@@ -33,12 +34,24 @@ public partial class SqlAuthOptions
    public IPAddressRangeList AllowedIPAddresses { get; set; } = [];
 
    /// <summary>
-   /// Gets or sets the list of database names to include in the filter. Case-insensitive, no duplicates.
+   /// Backing store for IncludeDatabaseFilter for config binding
    /// </summary>
-   public CaseInsensitiveStringSet IncludeDatabaseFilter { get; set; } = [];
+   [ConfigurationKeyName("IncludeDatabaseFilter")]
+   public List<string> IncludeDatabaseFilterRaw { get; set; } = [];
 
    /// <summary>
-   /// Gets or sets the list of database names to exclude from the filter. Case-insensitive, no duplicates.
+   /// Backing store for ExcludeDatabaseFilter for config binding
    /// </summary>
-   public CaseInsensitiveStringSet ExcludeDatabaseFilter { get; set; } = [];
+   [ConfigurationKeyName("ExcludeDatabaseFilter")]
+   public List<string> ExcludeDatabaseFilterRaw { get; set; } = [];
+
+   /// <summary>
+   /// Gets the list of database names to include in the filter. Case-insensitive, no duplicates.
+   /// </summary>
+   public CaseInsensitiveStringSet IncludeDatabaseFilter => [.. IncludeDatabaseFilterRaw];
+
+   /// <summary>
+   /// Gets the list of database names to exclude from the filter. Case-insensitive, no duplicates.
+   /// </summary>
+   public CaseInsensitiveStringSet ExcludeDatabaseFilter => [.. ExcludeDatabaseFilterRaw];
 }

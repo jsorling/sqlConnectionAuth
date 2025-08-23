@@ -9,14 +9,14 @@ using System.Linq;
 namespace SQLConnAuthWebTests.authentication.validation;
 
 [TestClass]
-public class SqlAuthDatabaseNameValidatorTests
+public class SqlAuthDatabaseNameFilterTests
 {
    private static IOptionsMonitor<SqlAuthOptions> CreateOptions(
        IEnumerable<string>? allow = null,
        IEnumerable<string>? deny = null) {
       SqlAuthOptions options = new() {
-         IncludeDatabaseFilter = allow != null ? [.. allow] : [],
-         ExcludeDatabaseFilter = deny != null ? [.. deny] : []
+         IncludeDatabaseFilterRaw = allow != null ? new List<string>(allow) : new List<string>(),
+         ExcludeDatabaseFilterRaw = deny != null ? new List<string>(deny) : new List<string>()
       };
       return new TestOptionsMonitor(options);
    }
