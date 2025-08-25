@@ -1,4 +1,12 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+﻿<!--
+  Project: Sorling.SqlConnAuthWeb
+  Description: SQL Authentication for ASP.NET Core Razor Pages. Provides authentication and authorization services for SQL connections.
+  Authors: jsorling
+  Company: Sorling Systems
+  License: MIT
+  Repository: https://github.com/jsorling/sqlConnectionAuth
+-->
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
@@ -26,6 +34,7 @@
         <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <Summary>Provides authentication and authorization for SQL connections in ASP.NET Core Razor Pages applications.</Summary>
     </PropertyGroup>
     
     <ItemGroup>

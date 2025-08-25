@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Options;
 using Sorling.SqlConnAuthWeb.authentication;
 using Sorling.SqlConnAuthWeb.authentication.dbaccess;
 using Sorling.SqlConnAuthWeb.authentication.passwords;
@@ -49,28 +48,28 @@ public static class ServiceCollectionExtenstions
       services.TryAddSingleton<ISqlAuthDBAccess, SqlAuthDBAccess>();
       services.TryAddSingleton<ISqlAuthDatabaseNameFilter, SqlAuthDatabaseNameFilter>();
 
-      // Register options from configuration and allow delegate override
+      // Use AddOptions/Configure/PostConfigure for live reload support
       _ = services.AddOptions<SqlAuthOptions>()
-          .Configure<IConfiguration>((opts, config) => {
-             IConfigurationSection section = config.GetSection("SqlAuthOptions");
-             section.Bind(opts);
-             // Custom binding for AllowedIPAddresses
-             IConfigurationSection iplistsection = section.GetSection(nameof(SqlAuthOptions.AllowedIPAddresses));
-             if (iplistsection.Exists())
-             {
-                IPAddressRangeList iplist = [];
-                string[] entries = iplistsection.Get<string[]>() ?? [];
-                foreach (string entry in entries)
-                {
-                   if (!string.IsNullOrWhiteSpace(entry))
-                      iplist.Add(entry);
-                }
+         .BindConfiguration("SqlAuthOptions")
+         .PostConfigure(options => {
+            // Custom binding for AllowedIPAddresses
+            IConfiguration config = services.BuildServiceProvider().GetRequiredService<IConfiguration>();
+            IConfigurationSection section = config.GetSection("SqlAuthOptions").GetSection(nameof(SqlAuthOptions.AllowedIPAddresses));
+            if (section.Exists())
+            {
+               IPAddressRangeList iplist = [];
+               string[] entries = section.Get<string[]>() ?? [];
+               foreach (string entry in entries)
+               {
+                  if (!string.IsNullOrWhiteSpace(entry))
+                     iplist.Add(entry);
+               }
 
-                opts.AllowedIPAddresses = iplist;
-             }
-             
-             configureOptions?.Invoke(opts);
-          });
+               options.AllowedIPAddresses = iplist;
+            }
+
+            configureOptions?.Invoke(options);
+         });
 
       return services;
    }

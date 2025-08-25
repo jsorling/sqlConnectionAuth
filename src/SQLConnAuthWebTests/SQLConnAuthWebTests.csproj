@@ -1,4 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -6,6 +7,7 @@
     <LangVersion>13.0</LangVersion>
     <IsPackable>false</IsPackable>
     <UserSecretsId>3390ad09-78d0-4c8e-9317-2af298eb301f</UserSecretsId>
+    <Summary>Unit and integration tests for Sorling.SqlConnAuthWeb authentication and authorization features.</Summary>
   </PropertyGroup>
 
   <ItemGroup>
