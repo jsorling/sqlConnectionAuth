@@ -52,13 +52,13 @@ public static class ServiceCollectionExtenstions
       // Register options from configuration and allow delegate override
       _ = services.AddOptions<SqlAuthOptions>()
           .Configure<IConfiguration>((opts, config) => {
-             var section = config.GetSection("SqlAuthOptions");
+             IConfigurationSection section = config.GetSection("SqlAuthOptions");
              section.Bind(opts);
              // Custom binding for AllowedIPAddresses
-             var iplistsection = section.GetSection(nameof(SqlAuthOptions.AllowedIPAddresses));
+             IConfigurationSection iplistsection = section.GetSection(nameof(SqlAuthOptions.AllowedIPAddresses));
              if (iplistsection.Exists())
              {
-                var iplist = new IPAddressRangeList();
+                IPAddressRangeList iplist = [];
                 string[] entries = iplistsection.Get<string[]>() ?? [];
                 foreach (string entry in entries)
                 {
@@ -68,7 +68,7 @@ public static class ServiceCollectionExtenstions
 
                 opts.AllowedIPAddresses = iplist;
              }
-             // No custom binding for IncludeDatabaseFilter/ExcludeDatabaseFilter needed with new model
+             
              configureOptions?.Invoke(opts);
           });
 

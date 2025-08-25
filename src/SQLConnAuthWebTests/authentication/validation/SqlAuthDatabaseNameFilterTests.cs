@@ -15,8 +15,8 @@ public class SqlAuthDatabaseNameFilterTests
        IEnumerable<string>? allow = null,
        IEnumerable<string>? deny = null) {
       SqlAuthOptions options = new() {
-         IncludeDatabaseFilterRaw = allow != null ? [.. allow] : [],
-         ExcludeDatabaseFilterRaw = deny != null ? [.. deny] : []
+         IncludeDatabaseFilter = allow != null ? [.. allow] : [],
+         ExcludeDatabaseFilter = deny != null ? [.. deny] : []
       };
       return new TestOptionsMonitor(options);
    }
