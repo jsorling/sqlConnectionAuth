@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Sorling.SqlConnAuthWeb.authentication.dbaccess;
+using System.ComponentModel.DataAnnotations;
 
 namespace Sorling.SqlConnAuthWeb.razor.models;
 
@@ -12,4 +13,6 @@ public class InputSelectDBModel
    /// </summary>
    [Required]
    public string DBName { get; set; } = string.Empty;
+
+   public IEnumerable<ISqlDatabase> Databases { get; set; } = [];
 }

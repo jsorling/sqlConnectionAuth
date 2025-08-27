@@ -10,18 +10,69 @@
 
 <h2>Select DB</h2>
 <div class="form-box">
-    <form method="post">
+    <form method="post" id="selectDbForm">
         @if (!string.IsNullOrEmpty(firstError))
         {
             <div class="error-message">@firstError</div>
         }
         <div class="form-group">
             <label asp-for="Input.DBName"></label>
-            <input asp-for="Input.DBName" class="form-control">
+            <input asp-for="Input.DBName" class="form-control" id="dbNameInput" type="hidden">
             <span asp-validation-for="Input.DBName" class="error-text"></span>
         </div>
-        <div class="form-actions">
-            <button type="submit" class="btn btn-primary">Submit</button>
+        <div class="form-group">
+            <input type="text" id="dbSearchBox" class="form-control" placeholder="Search databases..." onkeyup="filterDbList()" onkeydown="searchBoxKeyDown(event)" autocomplete="off" />
+            <ul class="db-list" id="dbList">
+                @foreach (var db in Model.Input.Databases ?? Enumerable.Empty<Sorling.SqlConnAuthWeb.authentication.dbaccess.ISqlDatabase>())
+                {
+                    <li>
+                        <a href="#" onclick="selectDb('@db.Name'); return false;">@db.Name</a>
+                    </li>
+                }
+            </ul>
         </div>
+        @* <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div> *@
     </form>
 </div>
+<script>
+    function selectDb(dbName) {
+        document.getElementById('dbNameInput').value = dbName;
+        document.getElementById('selectDbForm').submit();
+    }
+    function filterDbList() {
+        var input = document.getElementById('dbSearchBox');
+        var filter = input.value.toLowerCase();
+        var ul = document.getElementById('dbList');
+        var li = ul.getElementsByTagName('li');
+        for (var i = 0; i < li.length; i++) {
+            var a = li[i].getElementsByTagName('a')[0];
+            var txtValue = a.textContent || a.innerText;
+            li[i].style.display = txtValue.toLowerCase().indexOf(filter) > -1 ? '' : 'none';
+        }
+    }
+    function searchBoxKeyDown(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            var ul = document.getElementById('dbList');
+            var li = ul.getElementsByTagName('li');
+            var visible = [];
+            for (var i = 0; i < li.length; i++) {
+                if (li[i].style.display !== 'none') {
+                    visible.push(li[i]);
+                }
+            }
+            if (visible.length === 1) {
+                var a = visible[0].getElementsByTagName('a')[0];
+                selectDb(a.textContent || a.innerText);
+            }
+        }
+    }
+    window.onload = function() {
+        var searchBox = document.getElementById('dbSearchBox');
+        if (searchBox) {
+            searchBox.focus();
+        }
+    };
+</script>

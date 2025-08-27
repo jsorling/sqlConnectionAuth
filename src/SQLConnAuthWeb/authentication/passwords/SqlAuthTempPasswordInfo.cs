@@ -5,4 +5,8 @@
 /// </summary>
 /// <param name="Password">The temporary password value.</param>
 /// <param name="TrustServerCertificate">Indicates whether to trust the server certificate.</param>
-public record SqlAuthTempPasswordInfo(string Password, bool TrustServerCertificate);
+public record SqlAuthTempPasswordInfo(string Password, bool TrustServerCertificate)
+{
+   public static implicit operator SqlAuthStoredSecrets(SqlAuthTempPasswordInfo tmppwd)
+      => new(tmppwd.Password, tmppwd.TrustServerCertificate, null);
+}

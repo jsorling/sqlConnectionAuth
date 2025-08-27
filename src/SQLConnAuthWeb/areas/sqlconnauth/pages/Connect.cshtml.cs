@@ -75,7 +75,7 @@ public class ConnectModel(ISqlAuthService sqlConnAuthenticationService, SqlAuthA
             }
             else
             {
-               string tmppwdkey 
+               string tmppwdkey
                   = await _sqlAuthPwdStore.SetTempPasswordAsync(SqlUserName, SQLServer, Input.Password, Input.TrustServerCertificate);
 
                RouteValueDictionary routevalues = new() {
