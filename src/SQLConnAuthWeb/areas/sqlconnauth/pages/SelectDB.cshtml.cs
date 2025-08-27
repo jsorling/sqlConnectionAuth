@@ -65,6 +65,9 @@ public class SelectDBModel(ISqlAuthService sqlConnAuthenticationService
       else
       {
          Input.Databases = await GetDatabasesAsync(tmppwd);
+         List<ISqlDatabase> addnotex = [.. Input.Databases];
+         addnotex.Add(new SqlDatabase("not_exist"));
+         Input.Databases = addnotex;
          return Page();
       }
    }
@@ -91,7 +94,13 @@ public class SelectDBModel(ISqlAuthService sqlConnAuthenticationService
       {
          //check db-filter
          IEnumerable<ISqlDatabase> dbs = await GetDatabasesAsync(tmppwd);
-         Input.Databases = dbs;
+         //Input.Databases = dbs;
+         if (dbs.Count(w => w.Name == Input.DBName) != 1)
+         {
+            ModelState.AddModelError(string.Empty, $"Database {Input.DBName} not found");
+            Input.Databases = dbs;
+            return Page();
+         }
 
          //SqlAuthenticationResult authresult = await _sqlConnAuthentication.AuthenticateAsync(Input);
          return Page();

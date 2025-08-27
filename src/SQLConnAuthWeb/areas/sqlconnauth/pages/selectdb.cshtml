@@ -16,12 +16,13 @@
             <div class="error-message">@firstError</div>
         }
         <div class="form-group">
-            <label asp-for="Input.DBName"></label>
+            @* <label asp-for="Input.DBName"></label> *@
+            <div>Databases</div>
             <input asp-for="Input.DBName" class="form-control" id="dbNameInput" type="hidden">
             <span asp-validation-for="Input.DBName" class="error-text"></span>
         </div>
         <div class="form-group">
-            <input type="text" id="dbSearchBox" class="form-control" placeholder="Search databases..." onkeyup="filterDbList()" onkeydown="searchBoxKeyDown(event)" autocomplete="off" />
+            <input type="text" id="dbSearchBox" class="form-control" placeholder="Search databases..." onkeyup="filterDbList()" autocomplete="off" />
             <ul class="db-list" id="dbList">
                 @foreach (var db in Model.Input.Databases ?? Enumerable.Empty<Sorling.SqlConnAuthWeb.authentication.dbaccess.ISqlDatabase>())
                 {
@@ -52,9 +53,9 @@
             li[i].style.display = txtValue.toLowerCase().indexOf(filter) > -1 ? '' : 'none';
         }
     }
-    function searchBoxKeyDown(event) {
-        if (event.key === 'Enter') {
-            event.preventDefault();
+    function searchBoxKeyDown(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
             var ul = document.getElementById('dbList');
             var li = ul.getElementsByTagName('li');
             var visible = [];
@@ -75,4 +76,10 @@
             searchBox.focus();
         }
     };
+    document.addEventListener('DOMContentLoaded', function() {
+        var searchBox = document.getElementById('dbSearchBox');
+        if (searchBox) {
+            searchBox.addEventListener('keydown', searchBoxKeyDown);
+        }
+    });
 </script>
