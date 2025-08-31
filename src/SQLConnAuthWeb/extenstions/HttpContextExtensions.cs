@@ -79,7 +79,7 @@ public static class HttpContextExtensions
       Dictionary<string, string?> dict = new(StringComparer.OrdinalIgnoreCase);
       foreach (KeyValuePair<string, StringValues> kvp in query)
          dict[kvp.Key] = kvp.Value;
-
+      
       dict[key] = value;
       string newquery = QueryHelpers.AddQueryString("", dict);
       return newquery;

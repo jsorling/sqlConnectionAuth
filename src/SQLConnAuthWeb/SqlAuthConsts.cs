@@ -81,4 +81,9 @@ public class SqlAuthConsts
    /// Query parameter key for a temporary password key.
    /// </summary>
    public const string QUERYPARAMTMPPWDKEY = "sqlauthtmppwdkey";
+
+   /// <summary>
+   /// Placeholder value used to indicate the return URL after selecting a SQL database.
+   /// </summary>
+   public const string RETURNURLSELECTDBPLACEHOLDER = "--sqlauthselecteddb";
 }
