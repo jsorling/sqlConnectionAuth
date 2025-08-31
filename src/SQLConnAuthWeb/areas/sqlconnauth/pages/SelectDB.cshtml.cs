@@ -135,19 +135,19 @@ public class SelectDBModel(ISqlAuthService sqlConnAuthenticationService
       else
       {
          Input.Databases = await GetDatabasesAsync(tmppwd);
-         List<ISqlDatabase> addnotex = [.. Input.Databases];
-         addnotex.Add(new SqlDatabase("not_exist"));
+         //List<ISqlDatabase> addnotex = [.. Input.Databases];
+         //addnotex.Add(new SqlDatabase("not_exist"));
 
-         Random random = new();
-         const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-         for (int i = 10; i < 300; i++)
-         {
-            int length = random.Next(6, 31); // random length between 6 and 30 (inclusive)
-            string result = new([.. Enumerable.Range(0, length).Select(_ => chars[random.Next(chars.Length)])]);
-            addnotex.Add(new SqlDatabase($"P{i}abc{result}"));
-         }
+         //Random random = new();
+         //const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+         //for (int i = 10; i < 300; i++)
+         //{
+         //   int length = random.Next(6, 31); // random length between 6 and 30 (inclusive)
+         //   string result = new([.. Enumerable.Range(0, length).Select(_ => chars[random.Next(chars.Length)])]);
+         //   addnotex.Add(new SqlDatabase($"P{i}abc{result}"));
+         //}
 
-         Input.Databases = addnotex;
+         //Input.Databases = addnotex;
          return Page();
       }
    }
