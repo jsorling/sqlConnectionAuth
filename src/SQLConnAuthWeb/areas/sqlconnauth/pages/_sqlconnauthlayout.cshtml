@@ -55,14 +55,17 @@
     </style>
 </head>
 <body>
-    <div class="theme-switcher-container">
-        <label for="theme-switcher-select">Theme:</label>
+    @if (theme.UseThemeSwitcher())
+    {
+        <div class="theme-switcher-container">
+            <label for="theme-switcher-select">Theme:</label>
         <select id="theme-switcher-select">
             <option value="system">System default</option>
             <option value="light">Light</option>
             <option value="dark">Dark</option>
         </select>
     </div>
+    }
     <div class="centered-container">
         @RenderBody()
     </div>

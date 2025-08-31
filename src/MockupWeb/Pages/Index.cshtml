@@ -6,6 +6,33 @@
     ViewData["Title"] = "Home page";
 }
 
+<style>
+    .endpoint-table { width: 100%; border-collapse: collapse; margin-top: 1em; }
+    .endpoint-table th, .endpoint-table td { padding: 8px 12px; border-bottom: 1px solid #eee; }
+    .endpoint-group-row { cursor: pointer; background: #fafbfc; }
+    .endpoint-group-row:hover { background: #f0f2f5; }
+    .endpoint-details-row { background: #f6f8fa; }
+    .endpoint-details-cell { padding-left: 2em; text-align: left; font-size: 0.97em; color: #333; }
+    .arrow-cell { width: 2em; text-align: right; font-size: 1.2em; }
+    .area-header { font-weight: bold; font-size: 1.1em; margin-top: 1.5em; text-align: left; }
+    .endpoint-routepattern { font-family: monospace; color: #2d4a7a; }
+    .arrow {
+        color: #222;
+        font-family: Arial, sans-serif;
+        font-weight: bold;
+        font-size: 0.6em;
+        background: none;
+        border-radius: 0;
+        padding: 0;
+    }
+    .attr-arrow { cursor: pointer; color: #444; font-size: 0.7em; font-family: Arial, sans-serif; font-weight: bold; }
+    .attr-details-row { background: #f9fafb; }
+    .attr-details-cell { padding-left: 3em; font-size: 0.93em; color: #555; }
+    .attr-table { width: 100%; border-collapse: collapse; margin: 0.5em 0; }
+    .attr-table th, .attr-table td { padding: 4px 8px; border-bottom: 1px solid #eee; font-size: 0.95em; }
+    .attr-table th { font-weight: bold; background: #f3f3f3; }
+</style>
+
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
@@ -18,4 +45,127 @@
             Login
         </a>
     </p>
+    <p>
+        <strong>Registered Endpoints:</strong>
+        @foreach (var areaGroup in Model.EndpointGroups.GroupBy(g => g.Area ?? "(no area)"))
+        {
+            <div class="area-header">Area: @areaGroup.Key</div>
+            <table class="endpoint-table">
+                <thead>
+                    <tr>
+                        <th style="text-align:left;">Display Name</th>
+                        <th style="text-align:left;"> </th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var group in areaGroup)
+                {
+                    var groupId = $"epg_{areaGroup.Key.Replace(" ", "_")}_{group.DisplayName?.Replace(" ", "_")}";
+                <tr class="endpoint-group-row" tabindex="0" data-group-id="@groupId">
+                    <td style="text-align:left;">@group.DisplayName</td>
+                    <td class="arrow-cell"><span class="arrow">&#9654;</span></td>
+                </tr>
+                <tr class="endpoint-details-row" data-details-for="@groupId" style="display:none;">
+                    <td colspan="2" class="endpoint-details-cell">
+                        <table style="width:100%; border-collapse:collapse;">
+                            <thead>
+                                <tr>
+                                    <th style="text-align:left;">Route pattern</th>
+                                    <th style="text-align:left;">Methods</th>
+                                    <th style="text-align:left;"> </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            @for (int i = 0; i < group.Endpoints.Count; i++)
+                            {
+                                var ep = group.Endpoints[i];
+                                var attrId = $"attr_{groupId}_{i}";
+                            <tr>
+                                <td class="endpoint-routepattern">@ep.RoutePattern</td>
+                                <td>@(ep.HttpMethods != null ? string.Join(", ", ep.HttpMethods) : "Any")</td>
+                                <td style="width:2em; text-align:right;">
+                                    <span class="attr-arrow" tabindex="0" data-attr-id="@attrId">&#9654;</span>
+                                </td>
+                            </tr>
+                            <tr class="attr-details-row" data-attr-for="@attrId" style="display:none;">
+                                <td colspan="3" class="attr-details-cell">
+                                    @if (ep.Attributes != null && ep.Attributes.Any())
+                                    {
+                                        <table class="attr-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Attribute</th>
+                                                    <th>Description</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            @foreach (var attr in ep.Attributes)
+                                            {
+                                                <tr>
+                                                    <td>@attr.Name</td>
+                                                    <td>@attr.Description</td>
+                                                </tr>
+                                            }
+                                            </tbody>
+                                        </table>
+                                    }
+                                    else
+                                    {
+                                        <i>No attributes found.</i>
+                                    }
+                                </td>
+                            </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                }
+                </tbody>
+            </table>
+        }
+    </p>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.endpoint-group-row').forEach(function (row) {
+            row.addEventListener('click', function () {
+                var groupId = row.getAttribute('data-group-id');
+                var detailsRow = document.querySelector('tr[data-details-for="' + groupId + '"]');
+                var arrow = row.querySelector('.arrow');
+                if (detailsRow.style.display === 'none') {
+                    detailsRow.style.display = '';
+                    arrow.innerHTML = '&#9660;'; // ▼
+                } else {
+                    detailsRow.style.display = 'none';
+                    arrow.innerHTML = '&#9654;'; // ▶
+                }
+            });
+            row.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    row.click();
+                }
+            });
+        });
+        document.querySelectorAll('.attr-arrow').forEach(function (arrow) {
+            arrow.addEventListener('click', function (e) {
+                e.stopPropagation();
+                var attrId = arrow.getAttribute('data-attr-id');
+                var detailsRow = document.querySelector('tr[data-attr-for="' + attrId + '"]');
+                if (detailsRow.style.display === 'none') {
+                    detailsRow.style.display = '';
+                    arrow.innerHTML = '&#9660;'; // ▼
+                } else {
+                    detailsRow.style.display = 'none';
+                    arrow.innerHTML = '&#9654;'; // ▶
+                }
+            });
+            arrow.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    arrow.click();
+                }
+            });
+        });
+    });
+</script>

@@ -3,13 +3,11 @@ using Sorling.SqlConnAuthWeb.authentication;
 using Sorling.SqlConnAuthWeb.extenstions;
 using Sorling.SqlConnAuthWeb.razor;
 
-SqlAuthAppPaths sqlauthpath = new("/db", UseDBNameRouting: false);
+SqlAuthAppPaths sqlauthpath = new("/db", UseDBNameRouting: true);
 WebApplicationBuilder? builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddSqlConnAuthentication(sqlauthpath);
-
-// Bind SqlAuthUIOptions from configuration for runtime updates
 builder.Services.Configure<SqlAuthUIOptions>(builder.Configuration.GetSection("SqlAuthUIOptions"));
+builder.Services.AddSqlConnAuthentication(sqlauthpath);
 
 builder.Services.AddSqlConnAuthorization()
    .AddRazorPages()

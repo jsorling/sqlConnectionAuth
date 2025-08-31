@@ -15,8 +15,8 @@ public class SqlAuthDatabaseNameFilterTests
        IEnumerable<string>? allow = null,
        IEnumerable<string>? deny = null) {
       SqlAuthOptions options = new() {
-         IncludeDatabaseFilterRaw = allow != null ? new List<string>(allow) : new List<string>(),
-         ExcludeDatabaseFilterRaw = deny != null ? new List<string>(deny) : new List<string>()
+         IncludeDatabaseFilter = allow != null ? [.. allow] : [],
+         ExcludeDatabaseFilter = deny != null ? [.. deny] : []
       };
       return new TestOptionsMonitor(options);
    }
@@ -45,23 +45,23 @@ public class SqlAuthDatabaseNameFilterTests
 
    [TestMethod]
    public void IsAllowed_AllowPatternWithWildcard() {
-      SqlAuthDatabaseNameFilter validator = new(CreateOptions(allow: new[] { "Test*" }));
+      SqlAuthDatabaseNameFilter validator = new(CreateOptions(allow: ["Test*"]));
       Assert.IsTrue(validator.IsAllowed("TestDB"));
       Assert.IsFalse(validator.IsAllowed("ProdDB"));
    }
 
    [TestMethod]
    public void IsAllowed_DenyPatternWithWildcard() {
-      SqlAuthDatabaseNameFilter validator = new(CreateOptions(allow: new[] { "*" }, deny: new[] { "Prod*" }));
+      SqlAuthDatabaseNameFilter validator = new(CreateOptions(allow: ["*"], deny: ["Prod*"]));
       Assert.IsFalse(validator.IsAllowed("ProdDB"));
       Assert.IsTrue(validator.IsAllowed("DevDB"));
    }
 
    [TestMethod]
    public void ListAllowed_FiltersCorrectly() {
-      SqlAuthDatabaseNameFilter validator = new(CreateOptions(allow: new[] { "A*" }, deny: new[] { "Admin" }));
+      SqlAuthDatabaseNameFilter validator = new(CreateOptions(allow: ["A*"], deny: ["Admin"]));
       string[] input = ["Admin", "Alpha", "Beta", "Apple"];
-      string[] allowed = validator.ListAllowed(input).ToArray();
+      string[] allowed = [.. validator.ListAllowed(input)];
       CollectionAssert.AreEquivalent(new[] { "Alpha", "Apple" }, allowed);
    }
 

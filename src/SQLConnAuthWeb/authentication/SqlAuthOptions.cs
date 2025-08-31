@@ -36,22 +36,10 @@ public partial class SqlAuthOptions
    /// <summary>
    /// Backing store for IncludeDatabaseFilter for config binding
    /// </summary>
-   [ConfigurationKeyName("IncludeDatabaseFilter")]
-   public List<string> IncludeDatabaseFilterRaw { get; set; } = [];
+   public string[] IncludeDatabaseFilter { get; set; } = [];
 
    /// <summary>
    /// Backing store for ExcludeDatabaseFilter for config binding
    /// </summary>
-   [ConfigurationKeyName("ExcludeDatabaseFilter")]
-   public List<string> ExcludeDatabaseFilterRaw { get; set; } = [];
-
-   /// <summary>
-   /// Gets the list of database names to include in the filter. Case-insensitive, no duplicates.
-   /// </summary>
-   public CaseInsensitiveStringSet IncludeDatabaseFilter => [.. IncludeDatabaseFilterRaw];
-
-   /// <summary>
-   /// Gets the list of database names to exclude from the filter. Case-insensitive, no duplicates.
-   /// </summary>
-   public CaseInsensitiveStringSet ExcludeDatabaseFilter => [.. ExcludeDatabaseFilterRaw];
+   public string[] ExcludeDatabaseFilter { get; set; } = [];
 }

@@ -5,22 +5,30 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 using Sorling.SqlConnAuthWeb.authentication;
 using Sorling.SqlConnAuthWeb.razor.models;
+using System;
 
 namespace Sorling.SqlConnAuthWeb.areas.sqlconnauth.pages;
 
 /// <summary>
 /// Page model for the SQL authentication index page, allowing users to enter a SQL Server address and user name.
 /// </summary>
-/// <param name="options">The SQL authentication options.</param>
-/// <param name="sqlAuthAppPaths">The SQL authentication application path configuration.</param>
 [AllowAnonymous]
 [RequireHttps]
-public class IndexModel(IOptionsMonitor<SqlAuthOptions> options, SqlAuthAppPaths sqlAuthAppPaths) : PageModel
+public class IndexModel : PageModel
 {
+   private readonly IOptionsMonitor<SqlAuthOptions> _options;
+   private readonly SqlAuthAppPaths _sqlAuthAppPaths;
+   
+   public IndexModel(IOptionsMonitor<SqlAuthOptions> options, SqlAuthAppPaths sqlAuthAppPaths)
+   {
+      _options = options;
+      _sqlAuthAppPaths = sqlAuthAppPaths;
+   }
+
    /// <summary>
-   /// Gets the SQL authentication options.
+   /// Gets the SQL authentication options (live-updating).
    /// </summary>
-   public SqlAuthOptions SQLAuthOptions { get; } = options.CurrentValue ?? throw new ArgumentNullException(nameof(options));
+   public SqlAuthOptions SQLAuthOptions => _options.CurrentValue;
 
    /// <summary>
    /// Gets or sets the input model for the SQL Server address and user name.
@@ -41,7 +49,7 @@ public class IndexModel(IOptionsMonitor<SqlAuthOptions> options, SqlAuthAppPaths
    public IActionResult OnPost() {
       if (ModelState.IsValid)
       {
-         if (sqlAuthAppPaths.UseDBNameRouting)
+         if (_sqlAuthAppPaths.UseDBNameRouting)
          {
             RouteValueDictionary routevalues = new()
             {
@@ -54,7 +62,7 @@ public class IndexModel(IOptionsMonitor<SqlAuthOptions> options, SqlAuthAppPaths
          }
          else
          {
-            string redir = sqlAuthAppPaths.UriEscapedSqlPath(Input.SqlServer, Input.UserName);
+            string redir = _sqlAuthAppPaths.UriEscapedSqlPath(Input.SqlServer, Input.UserName);
             return Redirect(redir);
          }
       }

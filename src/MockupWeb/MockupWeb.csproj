@@ -1,9 +1,17 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<!--
+  Project: MockupWeb
+  Description: Example ASP.NET Core Razor Pages application demonstrating integration with Sorling.SqlConnAuthWeb.
+  Authors: jsorling
+  Company: Sorling Systems
+  License: MIT
+-->
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <Summary>Example Razor Pages app showing how to use Sorling.SqlConnAuthWeb for SQL authentication.</Summary>
   </PropertyGroup>
 
   <ItemGroup>
