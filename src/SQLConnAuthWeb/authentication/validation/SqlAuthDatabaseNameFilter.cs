@@ -25,7 +25,7 @@ public class SqlAuthDatabaseNameFilter(IOptionsMonitor<SqlAuthOptions> optionsMo
    /// </summary>
    /// <param name="databaseNames">The database names to filter.</param>
    /// <returns>Allowed database names.</returns>
-   public IEnumerable<string> ListAllowed(IEnumerable<string> databaseNames) 
+   public IEnumerable<string> ListAllowed(IEnumerable<string> databaseNames)
       => databaseNames.FilterWithSearchPatterns(Options.ExcludeDatabaseFilter, negative: true)
          .FilterWithSearchPatterns(Options.IncludeDatabaseFilter);
 }

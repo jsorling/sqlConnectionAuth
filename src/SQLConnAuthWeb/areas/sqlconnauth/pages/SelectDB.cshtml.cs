@@ -108,7 +108,7 @@ public class SelectDBModel(ISqlAuthService sqlConnAuthenticationService
          routevalues.Add(SqlAuthConsts.URLROUTEPARAMDB, db);
       }
 
-      string page = $"{sqlAuthAppPaths.Root}{(sqlAuthAppPaths.Root=="/" ? "" : "/")}index";
+      string page = $"{sqlAuthAppPaths.Root}{(sqlAuthAppPaths.Root == "/" ? "" : "/")}index";
 
       return Url.Page(page, routevalues)
          ?? throw new NullReferenceException($"Failed to create return URL in select database for page {page}");
@@ -187,7 +187,7 @@ public class SelectDBModel(ISqlAuthService sqlConnAuthenticationService
             return Page();
          }
 
-         SQLAuthenticateRequest authenticaterequest = new(tmppwd.Password, tmppwd.TrustServerCertificate);
+         SQLAuthenticateRequest authenticaterequest = new(tmppwd.Password, Input.DBName, tmppwd.TrustServerCertificate);
          SqlAuthenticationResult authresult = await sqlConnAuthenticationService.AuthenticateAsync(authenticaterequest);
 
          if (!authresult.Success && authresult.Exception is not null)

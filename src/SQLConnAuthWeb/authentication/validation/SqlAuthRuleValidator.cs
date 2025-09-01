@@ -20,7 +20,7 @@ public class SqlAuthRuleValidator(IOptionsMonitor<SqlAuthOptions> optionsMonitor
       = databaseNameValidator ?? throw new ArgumentNullException(nameof(databaseNameValidator));
 
    /// <inheritdoc/>
-   public async Task<SqlAuthRuleValidationResult> ValidateConnectionAsync(SqlAuthValidationRequest request) {
+   public async Task<SqlAuthRuleValidationResult> ValidateConnectionAsync(SqlAuthValidationRequest request, string? dbName) {
       SqlAuthOptions options = _optionsMonitor.CurrentValue;
       if (!options.AllowIntegratedSecurity && request.Password == SqlAuthConsts.WINDOWSAUTHENTICATION)
          return new SqlAuthRuleValidationResult(new ApplicationException("Windows authentication not allowed"), null);
@@ -66,7 +66,7 @@ public class SqlAuthRuleValidator(IOptionsMonitor<SqlAuthOptions> optionsMonitor
           Password: request.Password
           , TrustServerCertificate: request.TrustServerCertificate
           , RuleReValidationAfter: DateTime.UtcNow.AddMinutes(5)
-          , DBName: null
+          , DBName: dbName
       ));
    }
 
@@ -119,7 +119,7 @@ public class SqlAuthRuleValidator(IOptionsMonitor<SqlAuthOptions> optionsMonitor
       return true;
    }
 
-   public Task<bool> ValidateDatabaseAsync(string databaseName) 
+   public Task<bool> ValidateDatabaseAsync(string databaseName)
       => Task.FromResult(_databaseNameValidator.IsAllowed(databaseName));
 }
 

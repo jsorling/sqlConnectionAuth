@@ -1,10 +1,10 @@
 using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using Sorling.SqlConnAuthWeb;
 using Sorling.SqlConnAuthWeb.authentication;
 using Sorling.SqlConnAuthWeb.authentication.validation;
 using System.Threading.Tasks;
-using Moq;
 
 namespace SQLConnAuthWebTests.authentication.validation;
 
@@ -21,15 +21,13 @@ public class SqlAuthRuleValidatorTests
       AllowTrustServerCertificate = true
    };
 
-   private static IOptionsMonitor<SqlAuthOptions> Monitor(SqlAuthOptions options)
-   {
+   private static IOptionsMonitor<SqlAuthOptions> Monitor(SqlAuthOptions options) {
       Mock<IOptionsMonitor<SqlAuthOptions>> mock = new();
       _ = mock.Setup(m => m.CurrentValue).Returns(options);
       return mock.Object;
    }
 
-   private static ISqlAuthDatabaseNameFilter MockDatabaseNameFilter()
-   {
+   private static ISqlAuthDatabaseNameFilter MockDatabaseNameFilter() {
       Mock<ISqlAuthDatabaseNameFilter> mock = new();
       // Setup as needed for your tests, or just return true for all
       _ = mock.Setup(f => f.IsAllowed(It.IsAny<string>())).Returns(true);
@@ -41,7 +39,7 @@ public class SqlAuthRuleValidatorTests
       SqlAuthOptions options = new() { AllowIntegratedSecurity = false };
       SqlAuthRuleValidator validator = new(Monitor(options), MockDatabaseNameFilter());
       SqlAuthValidationRequest req = CreateRequest("127.0.0.1", SqlAuthConsts.WINDOWSAUTHENTICATION);
-      SqlAuthRuleValidationResult result = await validator.ValidateConnectionAsync(req);
+      SqlAuthRuleValidationResult result = await validator.ValidateConnectionAsync(req, null);
       Assert.IsNotNull(result.Exception);
       Assert.Contains("Windows authentication not allowed", result.Exception.Message);
    }
@@ -51,7 +49,7 @@ public class SqlAuthRuleValidatorTests
       SqlAuthOptions options = DefaultOptions();
       SqlAuthRuleValidator validator = new(Monitor(options), MockDatabaseNameFilter());
       SqlAuthValidationRequest req = CreateRequest("not.a.real.host");
-      SqlAuthRuleValidationResult result = await validator.ValidateConnectionAsync(req);
+      SqlAuthRuleValidationResult result = await validator.ValidateConnectionAsync(req, null);
       Assert.IsNotNull(result.Exception);
       Assert.Contains("Unable to resolve SQL Server address", result.Exception.Message);
    }
@@ -61,7 +59,7 @@ public class SqlAuthRuleValidatorTests
       SqlAuthOptions options = DefaultOptions();
       SqlAuthRuleValidator validator = new(Monitor(options), MockDatabaseNameFilter());
       SqlAuthValidationRequest req = CreateRequest("0.0.0.0");
-      SqlAuthRuleValidationResult result = await validator.ValidateConnectionAsync(req);
+      SqlAuthRuleValidationResult result = await validator.ValidateConnectionAsync(req, null);
       Assert.IsNotNull(result.Exception);
       Assert.Contains("No IP address found", result.Exception.Message);
    }
@@ -72,7 +70,7 @@ public class SqlAuthRuleValidatorTests
       options.AllowLoopbackConnections = false;
       SqlAuthRuleValidator validator = new(Monitor(options), MockDatabaseNameFilter());
       SqlAuthValidationRequest req = CreateRequest("127.0.0.1");
-      SqlAuthRuleValidationResult result = await validator.ValidateConnectionAsync(req);
+      SqlAuthRuleValidationResult result = await validator.ValidateConnectionAsync(req, null);
       Assert.IsNotNull(result.Exception);
       Assert.Contains("Loopback connections not allowed", result.Exception.Message);
    }
@@ -83,7 +81,7 @@ public class SqlAuthRuleValidatorTests
       options.AllowPrivateNetworkConnections = false;
       SqlAuthRuleValidator validator = new(Monitor(options), MockDatabaseNameFilter());
       SqlAuthValidationRequest req = CreateRequest("192.168.1.1");
-      SqlAuthRuleValidationResult result = await validator.ValidateConnectionAsync(req);
+      SqlAuthRuleValidationResult result = await validator.ValidateConnectionAsync(req, null);
       Assert.IsNotNull(result.Exception);
       Assert.Contains("Private network connections not allowed", result.Exception.Message);
    }
@@ -94,7 +92,7 @@ public class SqlAuthRuleValidatorTests
       options.AllowedIPAddresses.Add("127.0.0.1");
       SqlAuthRuleValidator validator = new(Monitor(options), MockDatabaseNameFilter());
       SqlAuthValidationRequest req = CreateRequest("127.0.0.1");
-      SqlAuthRuleValidationResult result = await validator.ValidateConnectionAsync(req);
+      SqlAuthRuleValidationResult result = await validator.ValidateConnectionAsync(req, null);
       Assert.IsNull(result.Exception);
       Assert.IsNotNull(result.StoredSecrets);
    }
@@ -105,7 +103,7 @@ public class SqlAuthRuleValidatorTests
       options.AllowedIPAddresses.Add("10.0.0.1");
       SqlAuthRuleValidator validator = new(Monitor(options), MockDatabaseNameFilter());
       SqlAuthValidationRequest req = CreateRequest("127.0.0.1");
-      SqlAuthRuleValidationResult result = await validator.ValidateConnectionAsync(req);
+      SqlAuthRuleValidationResult result = await validator.ValidateConnectionAsync(req, null);
       Assert.IsNotNull(result.Exception);
       Assert.Contains("IP address not allowed by allow-list", result.Exception.Message);
    }
@@ -116,7 +114,7 @@ public class SqlAuthRuleValidatorTests
       options.AllowedIPAddresses.Add("192.168.1.0/24");
       SqlAuthRuleValidator validator = new(Monitor(options), MockDatabaseNameFilter());
       SqlAuthValidationRequest req = CreateRequest("192.168.1.42");
-      SqlAuthRuleValidationResult result = await validator.ValidateConnectionAsync(req);
+      SqlAuthRuleValidationResult result = await validator.ValidateConnectionAsync(req, null);
       Assert.IsNull(result.Exception);
       Assert.IsNotNull(result.StoredSecrets);
    }
@@ -127,7 +125,7 @@ public class SqlAuthRuleValidatorTests
       options.AllowedIPAddresses.Add("192.168.1.0/24");
       SqlAuthRuleValidator validator = new(Monitor(options), MockDatabaseNameFilter());
       SqlAuthValidationRequest req = CreateRequest("192.168.2.42");
-      SqlAuthRuleValidationResult result = await validator.ValidateConnectionAsync(req);
+      SqlAuthRuleValidationResult result = await validator.ValidateConnectionAsync(req, null);
       Assert.IsNotNull(result.Exception);
       Assert.Contains("IP address not allowed by allow-list", result.Exception.Message);
    }

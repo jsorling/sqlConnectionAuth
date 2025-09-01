@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Sorling.SqlConnAuthWeb.helpers;
+﻿using Sorling.SqlConnAuthWeb.helpers;
 
 namespace Sorling.SqlConnAuthWeb.authentication;
 

@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using Sorling.SqlConnAuthWeb.helpers;
-using System.Security.Cryptography;
 
 namespace Sorling.SqlConnAuthWeb.authentication.passwords;
 

@@ -29,19 +29,18 @@ public class SqlAuthCookieEvents(ISqlAuthPwdStore sqlConnAuthPwdStore
 
       context.CookieOptions.IsEssential = true;
       context.CookieOptions.Path
-          = $"/{sqlAuthAppPaths.Root.Trim('/')}/{Uri.EscapeDataString(server!)}/{Uri.EscapeDataString(user!)}";
+          = $"/{sqlAuthAppPaths.Root.Trim('/')}/{Uri.EscapeDataString(server!)}/{Uri.EscapeDataString(user!)}".Replace("//", "/");
       context.CookieOptions.SameSite = SameSiteMode.Strict;
 
       return base.SigningIn(context);
    }
 
    // Helper to extract claims from the principal
-   private static (string? server, string? user, string? passwordref, string? dbname) ExtractClaims(ClaimsPrincipal? principal) 
+   private static (string? server, string? user, string? passwordref) ExtractClaims(ClaimsPrincipal? principal)
       => (
          principal?.FindFirst(SqlAuthConsts.CLAIMSQLSERVER)?.Value,
          principal?.FindFirst(SqlAuthConsts.CLAIMSQLUSERNAME)?.Value,
-         principal?.FindFirst(SqlAuthConsts.CLAIMSQLPASSWORDREF)?.Value,
-         principal?.FindFirst(SqlAuthConsts.URLROUTEPARAMDB)?.Value
+         principal?.FindFirst(SqlAuthConsts.CLAIMSQLPASSWORDREF)?.Value
       );
 
    // Helper to retrieve stored secrets
@@ -49,17 +48,17 @@ public class SqlAuthCookieEvents(ISqlAuthPwdStore sqlConnAuthPwdStore
          ? await sqlConnAuthPwdStore.RetrieveAsync(scc.SecretStoreKey)
          : null;
 
-   // Helper to check DB name routing
-   private bool ShouldRejectForDbNameRouting(string? dbname, SqlAuthStoredSecrets storedsecrets) 
-      => sqlAuthAppPaths.UseDBNameRouting && (!string.IsNullOrEmpty(dbname) || dbname != storedsecrets.DBName);
+   // Helper to check DB name filter
+   private bool ShouldRejectForDbNameFilter(string? dbname, SqlAuthStoredSecrets storedsecrets)
+      => sqlAuthAppPaths.UseDBNameRouting && (string.IsNullOrEmpty(dbname) || dbname != storedsecrets.DBName);
 
    // Helper to revalidate and renew secrets if needed
-   private async Task<SqlAuthStoredSecrets?> RevalidateSecretsIfNeededAsync(string server, string user, SqlAuthStoredSecrets storedsecrets, SqlAuthCookieClaims scc)
-   {
+   private async Task<SqlAuthStoredSecrets?> RevalidateSecretsIfNeededAsync(string server, string user, SqlAuthStoredSecrets storedsecrets, SqlAuthCookieClaims scc) {
       if (storedsecrets.RuleReValidationAfter.HasValue && storedsecrets.RuleReValidationAfter.Value < DateTime.UtcNow)
       {
          SqlAuthRuleValidationResult validationresult = await ruleValidator
-            .ValidateConnectionAsync(new(server, user, storedsecrets.Password, storedsecrets.TrustServerCertificate));
+            .ValidateConnectionAsync(new(server, user, storedsecrets.Password, storedsecrets.TrustServerCertificate)
+               , storedsecrets.DBName);
          if (validationresult.Exception is not null || validationresult.StoredSecrets is null)
          {
             return null;
@@ -73,7 +72,7 @@ public class SqlAuthCookieEvents(ISqlAuthPwdStore sqlConnAuthPwdStore
    }
 
    // Helper to set secrets in HttpContext
-   private static void SetSecretsInHttpContext(HttpContext httpContext, SqlAuthStoredSecrets storedsecrets) 
+   private static void SetSecretsInHttpContext(HttpContext httpContext, SqlAuthStoredSecrets storedsecrets)
       => httpContext.Items[typeof(SqlAuthStoredSecrets)] = storedsecrets;
 
    /// <summary>
@@ -82,7 +81,7 @@ public class SqlAuthCookieEvents(ISqlAuthPwdStore sqlConnAuthPwdStore
    /// <param name="context">The context for the principal validation event.</param>
    /// <returns>A task that represents the asynchronous operation.</returns>
    public override async Task ValidatePrincipal(CookieValidatePrincipalContext context) {
-      (string server, string user, string passwordref, string dbname) = ExtractClaims(context.Principal);
+      (string? server, string? user, string? passwordref) = ExtractClaims(context.Principal);
       if (string.IsNullOrEmpty(server) || string.IsNullOrEmpty(user) || string.IsNullOrEmpty(passwordref))
       {
          context.RejectPrincipal();
@@ -97,18 +96,22 @@ public class SqlAuthCookieEvents(ISqlAuthPwdStore sqlConnAuthPwdStore
          return;
       }
 
-      if (ShouldRejectForDbNameRouting(dbname, storedsecrets))
+      if (sqlAuthAppPaths.UseDBNameRouting)
       {
-         context.RejectPrincipal();
-         context.HttpContext.Response.Redirect(
-            sqlAuthAppPaths.UriEscapedSqlPath(server, user)
-            + (string.IsNullOrWhiteSpace(dbname) ? "" : $"/{Uri.EscapeDataString(dbname)}"));
-         return;
+         string dbname = context.HttpContext.GetSqlAuthDBName();
+         if (ShouldRejectForDbNameFilter(dbname, storedsecrets))
+         {
+            context.RejectPrincipal();
+            context.HttpContext.Response.Redirect(
+               sqlAuthAppPaths.UriEscapedSqlPath(server, user)
+               + (string.IsNullOrWhiteSpace(dbname) ? "" : $"/{Uri.EscapeDataString(dbname)}"));
+            return;
+         }
       }
 
       if (scc is not null)
       {
-         SqlAuthStoredSecrets? revalidatedsecrets = await RevalidateSecretsIfNeededAsync(server!, user!, storedsecrets, scc);
+         SqlAuthStoredSecrets? revalidatedsecrets = await RevalidateSecretsIfNeededAsync(server, user, storedsecrets, scc);
          if (revalidatedsecrets is null)
          {
             context.RejectPrincipal();

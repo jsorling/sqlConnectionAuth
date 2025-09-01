@@ -39,12 +39,27 @@ public class SqlAuthService(IHttpContextAccessor httpContextAccessor, ISqlAuthRu
    /// <inheritdoc/>
    public async Task<SqlAuthenticationResult> AuthenticateAsync(SQLAuthenticateRequest request) {
       HttpContext httpcontext = _httpContextAccessor.HttpContext ?? throw new NullReferenceException(nameof(_httpContextAccessor));
+
       SqlAuthRuleValidationResult validationresult = await _ruleValidator.ValidateConnectionAsync(
-          new(httpcontext.GetSqlAuthServer(), httpcontext.GetSqlAuthUserName(), request.Password, request.TrustServerCertificate));
+          new(httpcontext.GetSqlAuthServer(), httpcontext.GetSqlAuthUserName(), request.Password, request.TrustServerCertificate)
+          , request.DBName);
       SqlAuthStoredSecrets? storedsecrets = validationresult.StoredSecrets;
 
       if (storedsecrets is null)
          return new(false, validationresult.Exception, null);
+
+      if (sqlAuthAppPaths.UseDBNameRouting && request.NoDataBaseFilter == false)
+      {
+         if (storedsecrets.DBName is null)
+         {
+            return new(false, new ApplicationException("Database name is null"), null);
+         }
+
+         if (!await _ruleValidator.ValidateDatabaseAsync(storedsecrets.DBName))
+         {
+            return new(false, new ApplicationException("Database name not found in database filter"), null);
+         }
+      }
 
       SqlAuthenticationResult result = await SqlConnectionHelper.TryConnectWithResultAsync(
           new(httpcontext.GetSqlAuthServer(), httpcontext.GetSqlAuthUserName(), storedsecrets));
@@ -77,7 +92,8 @@ public class SqlAuthService(IHttpContextAccessor httpContextAccessor, ISqlAuthRu
       HttpContext httpcontext = _httpContextAccessor.HttpContext ?? throw new NullReferenceException(nameof(_httpContextAccessor));
 
       SqlAuthRuleValidationResult validationresult = await _ruleValidator.ValidateConnectionAsync(
-          new(httpcontext.GetSqlAuthServer(), httpcontext.GetSqlAuthUserName(), sqlAuthTempPasswordInfo.Password, sqlAuthTempPasswordInfo.TrustServerCertificate));
+          new(httpcontext.GetSqlAuthServer(), httpcontext.GetSqlAuthUserName(), sqlAuthTempPasswordInfo.Password
+            , sqlAuthTempPasswordInfo.TrustServerCertificate), dbName);
 
       SqlAuthStoredSecrets? storedsecrets = validationresult.StoredSecrets;
       return storedsecrets is null

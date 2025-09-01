@@ -34,8 +34,8 @@ public class InputPasswordModel
    /// <param name="model">The input password model to convert.</param>
    /// <returns>A <see cref="SQLAuthenticateRequest"/> instance with values from the model.</returns>
    public static implicit operator SQLAuthenticateRequest(InputPasswordModel model)
-       => new(Password: model.Password
-           , TrustServerCertificate: model.TrustServerCertificate);
+       => new(Password: model.Password, null
+           , TrustServerCertificate: model.TrustServerCertificate, NoDataBaseFilter: true);
 
    /// <summary>
    /// Implicitly converts an <see cref="InputPasswordModel"/> to a <see cref="SqlAuthTempPasswordInfo"/>.

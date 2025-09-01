@@ -15,9 +15,9 @@ public class ThemeSwitcherJS(IOptionsMonitor<SqlAuthUIOptions> options) : PageMo
    /// </summary>
    public SqlAuthUIOptions SqlAuthUIOptions => options.CurrentValue;
 
-    /// <summary>
-    /// Handles GET requests to the ThemeSwitcherJS page.
-    /// </summary>
-    /// <returns>The page result.</returns>
-    public IActionResult OnGet() => Page();
+   /// <summary>
+   /// Handles GET requests to the ThemeSwitcherJS page.
+   /// </summary>
+   /// <returns>The page result.</returns>
+   public IActionResult OnGet() => Page();
 }

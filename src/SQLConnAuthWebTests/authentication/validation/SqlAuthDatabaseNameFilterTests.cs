@@ -4,7 +4,6 @@ using Sorling.SqlConnAuthWeb.authentication;
 using Sorling.SqlConnAuthWeb.authentication.validation;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace SQLConnAuthWebTests.authentication.validation;
 

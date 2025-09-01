@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 using Sorling.SqlConnAuthWeb.authentication;
 using Sorling.SqlConnAuthWeb.razor.models;
-using System;
 
 namespace Sorling.SqlConnAuthWeb.areas.sqlconnauth.pages;
 
@@ -18,9 +17,8 @@ public class IndexModel : PageModel
 {
    private readonly IOptionsMonitor<SqlAuthOptions> _options;
    private readonly SqlAuthAppPaths _sqlAuthAppPaths;
-   
-   public IndexModel(IOptionsMonitor<SqlAuthOptions> options, SqlAuthAppPaths sqlAuthAppPaths)
-   {
+
+   public IndexModel(IOptionsMonitor<SqlAuthOptions> options, SqlAuthAppPaths sqlAuthAppPaths) {
       _options = options;
       _sqlAuthAppPaths = sqlAuthAppPaths;
    }

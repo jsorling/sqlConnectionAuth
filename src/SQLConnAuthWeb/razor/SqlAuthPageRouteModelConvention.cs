@@ -49,7 +49,7 @@ public class SqlAuthPageRouteModelConvention(SqlAuthAppPaths path) : ISqlAuthPag
          return false;
       }
 
-      if(template.Split('/', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault()
+      if (template.Split('/', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault()
          ?.Equals(SqlAuthConsts.SQLAUTHAREA, StringComparison.InvariantCultureIgnoreCase) ?? false)
       {
          return false;
