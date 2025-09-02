@@ -19,17 +19,13 @@ namespace Sorling.SqlConnAuthWeb.authentication;
 /// <param name="options">Options for SQL authentication configuration.</param>
 /// <param name="sqlAuthAppPaths">Application path configuration for SQL authentication.</param>
 public class SqlAuthService(IHttpContextAccessor httpContextAccessor, ISqlAuthRuleValidator ruleValidator
-      , ISqlAuthPwdStore pwdStore, IOptionsMonitor<SqlAuthOptions> optionsMonitor, SqlAuthAppPaths sqlAuthAppPaths) : ISqlAuthService
+      , ISqlAuthPwdStore pwdStore, SqlAuthAppPaths sqlAuthAppPaths) : ISqlAuthService
 {
    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
    private readonly ISqlAuthRuleValidator _ruleValidator = ruleValidator ?? throw new ArgumentNullException(nameof(ruleValidator));
    private readonly ISqlAuthPwdStore _pwdStore = pwdStore ?? throw new ArgumentNullException(nameof(pwdStore));
    private readonly SqlAuthAppPaths _sqlAuthAppPaths = sqlAuthAppPaths ?? throw new ArgumentNullException(nameof(sqlAuthAppPaths));
-   private readonly IOptionsMonitor<SqlAuthOptions> _optionsMonitor = optionsMonitor ?? throw new ArgumentNullException(nameof(optionsMonitor));
-
-   /// <inheritdoc/>
-   public SqlAuthOptions Options => _optionsMonitor.CurrentValue;
-
+   
    /// <inheritdoc/>
    public string UriEscapedPath
    => _sqlAuthAppPaths.UriEscapedSqlPath(

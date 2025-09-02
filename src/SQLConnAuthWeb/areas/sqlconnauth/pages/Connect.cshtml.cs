@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Options;
 using Sorling.SqlConnAuthWeb.authentication;
 using Sorling.SqlConnAuthWeb.authentication.passwords;
 using Sorling.SqlConnAuthWeb.extenstions;
@@ -16,7 +17,7 @@ namespace Sorling.SqlConnAuthWeb.areas.sqlconnauth.pages;
 [AllowAnonymous]
 [RequireHttps]
 public class ConnectModel(ISqlAuthService sqlConnAuthenticationService, SqlAuthAppPaths sqlAuthAppPaths
-   , ISqlAuthPwdStore sqlAuthPwdStore) : PageModel
+   , ISqlAuthPwdStore sqlAuthPwdStore, IOptionsMonitor<SqlAuthOptions> options) : PageModel
 {
    /// <summary>
    /// Gets or sets the input model for password and trust server certificate.
@@ -29,6 +30,8 @@ public class ConnectModel(ISqlAuthService sqlConnAuthenticationService, SqlAuthA
    private readonly SqlAuthAppPaths _sqlAuthAppPaths = sqlAuthAppPaths;
 
    private readonly ISqlAuthPwdStore _sqlAuthPwdStore = sqlAuthPwdStore;
+
+   private readonly SqlAuthOptions _sqlAuthOptions = options.CurrentValue;
 
    /// <summary>
    /// Gets a value indicating whether Windows Authentication is enabled and allowed.
@@ -52,7 +55,7 @@ public class ConnectModel(ISqlAuthService sqlConnAuthenticationService, SqlAuthA
    /// </summary>
    public void OnGet()
       => IsWinAuth = SqlUserName == SqlAuthConsts.WINDOWSAUTHENTICATION
-         && _sqlConnAuthentication.Options.AllowIntegratedSecurity;
+         && _sqlAuthOptions.AllowIntegratedSecurity;
 
    /// <summary>
    /// Handles POST requests to the Connect page, performing authentication and redirecting or returning the page as appropriate.

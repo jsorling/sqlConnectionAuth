@@ -15,11 +15,6 @@ public interface ISqlAuthService
    public Task<SqlAuthenticationResult> AuthenticateAsync(SQLAuthenticateRequest request);
 
    /// <summary>
-   /// Gets the SQL authentication options used by the service.
-   /// </summary>
-   public SqlAuthOptions Options { get; }
-
-   /// <summary>
    /// Gets the URI-escaped path for the current SQL connection context.
    /// </summary>
    public string UriEscapedPath { get; }
