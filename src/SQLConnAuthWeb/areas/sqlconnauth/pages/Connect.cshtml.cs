@@ -17,7 +17,7 @@ namespace Sorling.SqlConnAuthWeb.areas.sqlconnauth.pages;
 [AllowAnonymous]
 [RequireHttps]
 public class ConnectModel(ISqlAuthService sqlConnAuthenticationService, SqlAuthAppPaths sqlAuthAppPaths
-   , ISqlAuthPwdStore sqlAuthPwdStore, IOptionsMonitor<SqlAuthOptions> options) : PageModel
+   , ISqlAuthPwdStore sqlAuthPwdStore, IOptionsMonitor<SqlAuthOptions> options, ISqlAuthContext sqlAuthContext) : PageModel
 {
    /// <summary>
    /// Gets or sets the input model for password and trust server certificate.
@@ -43,12 +43,12 @@ public class ConnectModel(ISqlAuthService sqlConnAuthenticationService, SqlAuthA
    /// <summary>
    /// Gets the SQL Server name from the authentication context.
    /// </summary>
-   public string SQLServer => Request.HttpContext.GetSqlAuthServer();
+   public string SQLServer => sqlAuthContext.SqlServer;
 
    /// <summary>
    /// Gets the user name from the authentication context.
    /// </summary>
-   public string SqlUserName => Request.HttpContext.GetSqlAuthUserName();
+   public string SqlUserName => sqlAuthContext.SqlUserName;
 
    /// <summary>
    /// Handles GET requests to the Connect page, setting the IsWinAuth property based on the route and options.
@@ -95,7 +95,6 @@ public class ConnectModel(ISqlAuthService sqlConnAuthenticationService, SqlAuthA
          }
          else
          {
-
             SqlAuthenticationResult result = await _sqlConnAuthentication.AuthenticateAsync(Input);
 
             if (!result.Success && result.Exception is not null)

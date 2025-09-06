@@ -25,9 +25,10 @@ namespace Sorling.SqlConnAuthWeb.areas.sqlconnauth.pages;
 [AllowAnonymous]
 [RequireHttps]
 public class SelectDBModel(ISqlAuthService sqlConnAuthenticationService
-      , ISqlAuthDBAccess sqlAuthDBAccess
-      , ISqlAuthPwdStore pwdStore
-      , SqlAuthAppPaths sqlAuthAppPaths
+   , ISqlAuthDBAccess sqlAuthDBAccess
+   , ISqlAuthPwdStore pwdStore
+   , SqlAuthAppPaths sqlAuthAppPaths
+   , ISqlAuthContext sqlAuthContext
       ) : PageModel
 {
    /// <summary>
@@ -59,7 +60,7 @@ public class SelectDBModel(ISqlAuthService sqlConnAuthenticationService
    /// <param name="tmpPwd">The temporary password info.</param>
    /// <returns>A collection of SQL databases.</returns>
    private async Task<IEnumerable<ISqlDatabase>> GetDatabasesAsync(SqlAuthTempPasswordInfo tmpPwd)
-      => await sqlAuthDBAccess.GetDatabasesAsync(new(HttpContext.GetSqlAuthServer(), HttpContext.GetSqlAuthUserName(), tmpPwd));
+      => await sqlAuthDBAccess.GetDatabasesAsync(new(sqlAuthContext.SqlServer, sqlAuthContext.SqlUserName, tmpPwd));
 
    /// <summary>
    /// Builds the route values for redirection, including query parameters.
@@ -69,8 +70,8 @@ public class SelectDBModel(ISqlAuthService sqlConnAuthenticationService
       RouteValueDictionary tor = new()
       {
          { "area", SqlAuthConsts.SQLAUTHAREA },
-         { SqlAuthConsts.URLROUTEPARAMSRV, HttpContext.GetSqlAuthServer() },
-         { SqlAuthConsts.URLROUTEPARAMUSR, HttpContext.GetSqlAuthUserName() }
+         { SqlAuthConsts.URLROUTEPARAMSRV, sqlAuthContext.SqlServer },
+         { SqlAuthConsts.URLROUTEPARAMUSR, sqlAuthContext.SqlUserName }
       };
 
       foreach (KeyValuePair<string, StringValues> q in Request.Query)
@@ -99,8 +100,8 @@ public class SelectDBModel(ISqlAuthService sqlConnAuthenticationService
    private string GetAppPathUrl(string? db = null) {
       RouteValueDictionary routevalues = new() {
          { "area", null },
-         { SqlAuthConsts.URLROUTEPARAMSRV, HttpContext.GetSqlAuthServer() },
-         { SqlAuthConsts.URLROUTEPARAMUSR, HttpContext.GetSqlAuthUserName() }
+         { SqlAuthConsts.URLROUTEPARAMSRV, sqlAuthContext.SqlServer },
+         { SqlAuthConsts.URLROUTEPARAMUSR, sqlAuthContext.SqlUserName }
       };
 
       if (sqlAuthAppPaths.UseDBNameRouting && db is not null)

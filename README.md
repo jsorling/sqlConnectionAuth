@@ -83,44 +83,51 @@ The extension method `AuthorizeSqlAuthRootPath` (see `MvcBuilderExtensions.cs`) 
 
 ## Accessing the Authenticated Connection String in Razor Pages
 
-The recommended way to access the authenticated SQL connection string and related context in Razor Pages is now via extension methods on `HttpContext`. These extensions provide direct access to the connection string, SQL Server, user name, and other authentication context from within your PageModels or views.
+The recommended way to access the authenticated SQL connection string and related context in Razor Pages is now by injecting the `ISqlAuthContext` interface. This provides direct access to the connection string, SQL Server, user name, and other authentication context from within your PageModels or views.
 
 ### Accessing the Connection String in a PageModel
 
-You can access the connection string using the `GetSqlAuthGetConnectionString()` extension method on `HttpContext`. For example:
+You can access the connection string and related context by injecting `ISqlAuthContext` into your PageModel. For example:
 
 ```csharp
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Sorling.SqlConnAuthWeb.extenstions;
+using Sorling.SqlConnAuthWeb.authentication;
 
 public class IndexModel : PageModel
 {
-    public string? ConnectionString => HttpContext.GetSqlAuthGetConnectionString();
+    private readonly ISqlAuthContext _sqlAuthContext;
 
-    public string SqlServer => HttpContext.GetSqlAuthServer();
-    public string SqlUser => HttpContext.GetSqlAuthUserName();
+    public IndexModel(ISqlAuthContext sqlAuthContext)
+    {
+        _sqlAuthContext = sqlAuthContext;
+    }
+
+    public string? ConnectionString => _sqlAuthContext.ConnectionString;
+    public string SqlServer => _sqlAuthContext.Server;
+    public string SqlUser => _sqlAuthContext.UserName;
 }
 ```
 
 ### Accessing the Connection String in a Razor View
 
-You can also use the extension methods directly in your Razor view by referencing the `Context` property:
+You can also inject `ISqlAuthContext` directly into your Razor view using the `@inject` directive:
 
 ```csharp
-@using Sorling.SqlConnAuthWeb.extenstions
+@using Sorling.SqlConnAuthWeb.authentication
+@inject ISqlAuthContext SqlAuthContext
 
-<p>Current connection string: @Context.GetSqlAuthGetConnectionString()</p>
-<p>SQL Server: @Context.GetSqlAuthServer()</p>
-<p>SQL User: @Context.GetSqlAuthUserName()</p>
+<p>Current connection string: @SqlAuthContext.ConnectionString</p>
+<p>SQL Server: @SqlAuthContext.Server</p>
+<p>SQL User: @SqlAuthContext.UserName</p>
 ```
 
 ### Additional Context
 
-- `Context.GetSqlAuthGetConnectionString()` returns the connection string for the current authenticated SQL context.
-- You can access the current SQL Server and user via `Context.GetSqlAuthServer()` and `Context.GetSqlAuthUserName()`.
-- These extension methods are available anywhere you have access to `HttpContext`, including PageModels and Razor views.
+- `ISqlAuthContext.ConnectionString` returns the connection string for the current authenticated SQL context.
+- You can access the current SQL Server and user via `ISqlAuthContext.Server` and `ISqlAuthContext.UserName`.
+- `ISqlAuthContext` can be injected anywhere dependency injection is available, including PageModels and Razor views.
 
-This approach provides a more direct and flexible way to access SQL authentication context, compared to the previous library functionality which required injecting the ISqlAuthService interface into your PageModel or view.
+This approach provides a more direct and flexible way to access SQL authentication context, compared to the previous method using HttpContext extension methods.
 
 ## Program.cs
 ```C#

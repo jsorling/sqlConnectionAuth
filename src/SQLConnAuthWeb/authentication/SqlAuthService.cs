@@ -19,7 +19,7 @@ namespace Sorling.SqlConnAuthWeb.authentication;
 /// <param name="options">Options for SQL authentication configuration.</param>
 /// <param name="sqlAuthAppPaths">Application path configuration for SQL authentication.</param>
 public class SqlAuthService(IHttpContextAccessor httpContextAccessor, ISqlAuthRuleValidator ruleValidator
-      , ISqlAuthPwdStore pwdStore, SqlAuthAppPaths sqlAuthAppPaths) : ISqlAuthService
+      , ISqlAuthPwdStore pwdStore, SqlAuthAppPaths sqlAuthAppPaths, ISqlAuthContext sqlAuthContext) : ISqlAuthService
 {
    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
    private readonly ISqlAuthRuleValidator _ruleValidator = ruleValidator ?? throw new ArgumentNullException(nameof(ruleValidator));
@@ -29,15 +29,15 @@ public class SqlAuthService(IHttpContextAccessor httpContextAccessor, ISqlAuthRu
    /// <inheritdoc/>
    public string UriEscapedPath
    => _sqlAuthAppPaths.UriEscapedSqlPath(
-         _httpContextAccessor.HttpContext?.GetSqlAuthServer() ?? string.Empty,
-         _httpContextAccessor.HttpContext?.GetSqlAuthUserName() ?? string.Empty);
+         sqlAuthContext.SqlServer ?? string.Empty,
+         sqlAuthContext.SqlUserName ?? string.Empty);
 
    /// <inheritdoc/>
    public async Task<SqlAuthenticationResult> AuthenticateAsync(SQLAuthenticateRequest request) {
       HttpContext httpcontext = _httpContextAccessor.HttpContext ?? throw new NullReferenceException(nameof(_httpContextAccessor));
 
       SqlAuthRuleValidationResult validationresult = await _ruleValidator.ValidateConnectionAsync(
-          new(httpcontext.GetSqlAuthServer(), httpcontext.GetSqlAuthUserName(), request.Password, request.TrustServerCertificate)
+          new(sqlAuthContext.SqlServer, sqlAuthContext.SqlUserName, request.Password, request.TrustServerCertificate)
           , request.DBName);
       SqlAuthStoredSecrets? storedsecrets = validationresult.StoredSecrets;
 
@@ -58,17 +58,17 @@ public class SqlAuthService(IHttpContextAccessor httpContextAccessor, ISqlAuthRu
       }
 
       SqlAuthenticationResult result = await SqlConnectionHelper.TryConnectWithResultAsync(
-          new(httpcontext.GetSqlAuthServer(), httpcontext.GetSqlAuthUserName(), storedsecrets));
+          new(sqlAuthContext.SqlServer, sqlAuthContext.SqlUserName, storedsecrets));
       if (result.Success)
       {
          await httpcontext.SignOutAsync(SqlAuthConsts.SQLAUTHSCHEME);
 
          List<Claim>? claims = [
-            new Claim(SqlAuthConsts.CLAIMSQLSERVER, httpcontext.GetSqlAuthServer(), ClaimValueTypes.String
+            new Claim(SqlAuthConsts.CLAIMSQLSERVER, sqlAuthContext.SqlServer, ClaimValueTypes.String
                , SqlAuthConsts.SQLAUTHSCHEME),
-            new Claim(SqlAuthConsts.CLAIMSQLUSERNAME, httpcontext.GetSqlAuthUserName(), ClaimValueTypes.String
+            new Claim(SqlAuthConsts.CLAIMSQLUSERNAME, sqlAuthContext.SqlUserName, ClaimValueTypes.String
                , SqlAuthConsts.SQLAUTHSCHEME),
-            new Claim(ClaimTypes.Name, $"{httpcontext.GetSqlAuthUserName()}@{httpcontext.GetSqlAuthServer()}", ClaimValueTypes.String
+            new Claim(ClaimTypes.Name, $"{sqlAuthContext.SqlUserName}@{sqlAuthContext.SqlServer}", ClaimValueTypes.String
                , SqlAuthConsts.SQLAUTHSCHEME),
             new Claim(SqlAuthConsts.CLAIMSQLPASSWORDREF, await _pwdStore.StoreAsync(storedsecrets)
                , ClaimValueTypes.String, SqlAuthConsts.SQLAUTHSCHEME)
@@ -85,17 +85,15 @@ public class SqlAuthService(IHttpContextAccessor httpContextAccessor, ISqlAuthRu
    public async Task<SqlAuthenticationResult> TestAuthenticateAsync(SqlAuthTempPasswordInfo sqlAuthTempPasswordInfo, string? dbName) {
       ArgumentNullException.ThrowIfNull(sqlAuthTempPasswordInfo, nameof(sqlAuthTempPasswordInfo));
 
-      HttpContext httpcontext = _httpContextAccessor.HttpContext ?? throw new NullReferenceException(nameof(_httpContextAccessor));
-
       SqlAuthRuleValidationResult validationresult = await _ruleValidator.ValidateConnectionAsync(
-          new(httpcontext.GetSqlAuthServer(), httpcontext.GetSqlAuthUserName(), sqlAuthTempPasswordInfo.Password
+          new(sqlAuthContext.SqlServer, sqlAuthContext.SqlUserName, sqlAuthTempPasswordInfo.Password
             , sqlAuthTempPasswordInfo.TrustServerCertificate), dbName);
 
       SqlAuthStoredSecrets? storedsecrets = validationresult.StoredSecrets;
       return storedsecrets is null
          ? new(false, validationresult.Exception, null)
          : await SqlConnectionHelper.TryConnectWithResultAsync(
-            new(httpcontext.GetSqlAuthServer(), httpcontext.GetSqlAuthUserName(), storedsecrets));
+            new(sqlAuthContext.SqlServer, sqlAuthContext.SqlUserName, storedsecrets));
    }
 
    /// <inheritdoc/>
