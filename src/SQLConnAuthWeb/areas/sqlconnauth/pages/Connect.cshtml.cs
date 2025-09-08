@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 using Sorling.SqlConnAuthWeb.authentication;
 using Sorling.SqlConnAuthWeb.authentication.passwords;
-using Sorling.SqlConnAuthWeb.extenstions;
 using Sorling.SqlConnAuthWeb.razor.models;
 
 namespace Sorling.SqlConnAuthWeb.areas.sqlconnauth.pages;

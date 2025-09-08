@@ -48,14 +48,18 @@ public static class ServiceCollectionExtenstions
       services.TryAddScoped<ISqlAuthContext>(provider => {
          IHttpContextAccessor httpcontextaccessor = provider.GetRequiredService<IHttpContextAccessor>();
          IUrlHelperFactory urlhelperfactory = provider.GetRequiredService<IUrlHelperFactory>();
+         ISqlAuthPwdStore pwdstore = provider.GetRequiredService<ISqlAuthPwdStore>();
+
          HttpContext httpcontext = httpcontextaccessor.HttpContext ?? throw new InvalidOperationException("No active HttpContext");
+
          ActionContext actioncontext = new(
             httpcontext,
             httpcontext.GetRouteData(),
             new ActionDescriptor()
          );
+
          IUrlHelper urlhelper = urlhelperfactory.GetUrlHelper(actioncontext);
-         return new SqlAuthContext(urlhelper);
+         return new SqlAuthContext(urlhelper, pwdstore, sqlAuthPaths);
       });
 
       services.TryAddSingleton<ISqlAuthPwdStore, SqlAuthPwdMemoryStore>();

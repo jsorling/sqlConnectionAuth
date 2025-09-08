@@ -6,7 +6,6 @@ using Microsoft.Extensions.Primitives;
 using Sorling.SqlConnAuthWeb.authentication;
 using Sorling.SqlConnAuthWeb.authentication.dbaccess;
 using Sorling.SqlConnAuthWeb.authentication.passwords;
-using Sorling.SqlConnAuthWeb.extenstions;
 using Sorling.SqlConnAuthWeb.razor.models;
 
 namespace Sorling.SqlConnAuthWeb.areas.sqlconnauth.pages;
@@ -29,7 +28,7 @@ public class SelectDBModel(ISqlAuthService sqlConnAuthenticationService
    , ISqlAuthPwdStore pwdStore
    , SqlAuthAppPaths sqlAuthAppPaths
    , ISqlAuthContext sqlAuthContext
-      ) : PageModel
+) : PageModel
 {
    /// <summary>
    /// Gets or sets the input model for database selection.
@@ -50,7 +49,7 @@ public class SelectDBModel(ISqlAuthService sqlConnAuthenticationService
    /// </summary>
    /// <returns>The temporary password info, or null if not found.</returns>
    private async Task<SqlAuthTempPasswordInfo?> GetTempPasswordInfoAsync() {
-      string? tmppwdkey = Request.RouteValues[SqlAuthConsts.URLROUTEPARAMTEMPPWD] as string;
+      string? tmppwdkey = sqlAuthContext.TempPwdKey;
       return string.IsNullOrEmpty(tmppwdkey) ? null : await pwdStore.PeekTempPasswordAsync(tmppwdkey);
    }
 
@@ -111,8 +110,8 @@ public class SelectDBModel(ISqlAuthService sqlConnAuthenticationService
 
       string page = $"{sqlAuthAppPaths.Root}{(sqlAuthAppPaths.Root == "/" ? "" : "/")}index";
 
-      return Url.Page(page, routevalues)
-         ?? throw new NullReferenceException($"Failed to create return URL in select database for page {page}");
+      return (Url.Page(page, routevalues)
+         ?? throw new NullReferenceException($"Failed to create return URL in select database for page {page}")) + "/";
    }
 
    /// <summary>
@@ -196,10 +195,16 @@ public class SelectDBModel(ISqlAuthService sqlConnAuthenticationService
             ModelState.AddModelError(string.Empty, authresult.Exception.Message);
          }
 
-         string dbreturn = GetReturnURLSelectedDB(returnUrl, Input.DBName)
-            ?? GetAppPathUrl(Input.DBName);
-         return authresult.Success ? Redirect(dbreturn)
-            : Page();
+         if (authresult.Success)
+         {
+            // remove temporary password
+            await pwdStore.RemoveAsync(sqlAuthContext.TempPwdKey ?? string.Empty);
+            string dbreturn = GetReturnURLSelectedDB(returnUrl, Input.DBName)
+               ?? GetAppPathUrl(Input.DBName);
+            return Redirect(dbreturn);
+         }
+
+         return Page();
       }
    }
 }
