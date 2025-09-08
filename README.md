@@ -62,11 +62,27 @@ https://localhost:7061/db/192.168.1.233/sa/srv
 - `sa` is the SQL Server username (also a route parameter).
 - `/srv` is an optional tail segment, as defined in `SqlAuthAppPaths`.
 
+#### UseDBNameRouting
+
+If the `UseDBNameRouting` property is set to `true` in your `SqlAuthAppPaths` configuration, the route pattern is extended to include the database name as an additional route parameter. This allows URLs to uniquely identify not only the server and user, but also the target database for the authentication session. For example:
+
+```
+https://localhost:7061/db/192.168.1.233/sa/mydatabase/srv
+```
+
+- `mydatabase` is the SQL Server database name (added as a route parameter when `UseDBNameRouting` is enabled).
+
+When `UseDBNameRouting` is enabled, the custom route convention injects the database name into the route template, and Razor Pages can access it directly from the route data. This is useful for scenarios where authentication or authorization depends on the specific database context, not just the server and user.
+
+To enable this, set `UseDBNameRouting = true` in your `SqlAuthAppPaths` instance.
+
 The route parameters are injected by the custom convention, so Razor Pages can access them directly from the route data.
 
 ### How SqlAuthAppPaths Works
 
 `SqlAuthAppPaths` is a configuration object that defines the root and tail segments for all SQL authentication-related routes. The `Root` property sets the base path (e.g., `/db`), and the `Tail` property can add an additional segment (e.g., `/srv`). These values are used by the route convention to generate the full URL structure for authentication pages.
+
+The `UseDBNameRouting` property on `SqlAuthAppPaths` controls whether the database name is included as a route parameter in authentication URLs.
 
 ### Custom Route Convention: AddSqlAuthRazorPageRouteConventions
 
