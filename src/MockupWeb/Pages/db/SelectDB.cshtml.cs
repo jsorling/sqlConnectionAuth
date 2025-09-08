@@ -6,5 +6,5 @@ namespace MockupWeb.Pages.db;
 
 public class SelectDBModel(ISqlAuthContext context) : PageModel
 {
-   public IActionResult OnGet() => context.GetRedirectToSelectDBActionResult();
+   public IActionResult OnGet() => context.GetRedirectToSelectDBActionResult(null);
 }

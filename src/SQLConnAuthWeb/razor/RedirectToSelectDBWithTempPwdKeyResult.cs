@@ -12,10 +12,12 @@ public class RedirectToSelectDBWithTempPwdKeyResult : ActionResult
 {
    internal RedirectToSelectDBWithTempPwdKeyResult(ISqlAuthContext context
       , ISqlAuthPwdStore pwdStore
-      , IUrlHelper urlHelper) {
+      , IUrlHelper urlHelper
+      , string? returnUrl) {
       _context = context;
       _pwdStore = pwdStore;
-      _urlHelper = urlHelper;      
+      _urlHelper = urlHelper;
+      _returnUrl = returnUrl;
    }
 
    private readonly ISqlAuthContext _context;
@@ -23,6 +25,8 @@ public class RedirectToSelectDBWithTempPwdKeyResult : ActionResult
    private readonly ISqlAuthPwdStore _pwdStore;
 
    private readonly IUrlHelper _urlHelper;
+
+   private readonly string? _returnUrl;
 
    public override async Task ExecuteResultAsync(ActionContext context) {
       SqlAuthStoredSecrets storedsecrets = _context.StoredSecrets ?? throw new ApplicationException("Stored secrets not set");
@@ -38,6 +42,11 @@ public class RedirectToSelectDBWithTempPwdKeyResult : ActionResult
              { SqlAuthConsts.URLROUTEPARAMUSR, _context.SqlUserName },
              { SqlAuthConsts.URLROUTEPARAMTEMPPWD, temppwdkey }
       };
+
+      if (!string.IsNullOrEmpty(_returnUrl))
+      {
+         routevalues.Add("returnUrl", _returnUrl);
+      }
 
       string url = _urlHelper.Page("/selectdb", routevalues)
          ?? throw new ApplicationException("Failed to generate SelectDB URL");

@@ -55,7 +55,11 @@ public interface ISqlAuthContext
    /// Gets an <see cref="ActionResult"/> that redirects to the SelectDB page with a generated temporary password key in the route.
    /// This allows unauthenticated users to select a database in a secure, temporary context.
    /// </summary>
-   RedirectToSelectDBWithTempPwdKeyResult GetRedirectToSelectDBActionResult();
+   /// <remarks>
+   /// If the <paramref name="returnUrl"/> contains <see cref="SqlAuthConsts.RETURNURLSELECTDBPLACEHOLDER"/>,
+   /// it will be replaced with the selected database name if present.
+   /// </remarks>
+   RedirectToSelectDBWithTempPwdKeyResult GetRedirectToSelectDBActionResult(string? returnUrl);
 
    /// <summary>
    /// Gets the application path configuration for SQL authentication, including root and tail segments.

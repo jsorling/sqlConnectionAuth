@@ -49,8 +49,8 @@ public class SqlAuthContext(IUrlHelper urlHelper, ISqlAuthPwdStore sqlAuthPwdSto
       => urlHelper.ActionContext.HttpContext.Request.RouteValues[SqlAuthConsts.URLROUTEPARAMTEMPPWD] as string;
 
    /// <inheritdoc/>
-   public RedirectToSelectDBWithTempPwdKeyResult GetRedirectToSelectDBActionResult() =>
-      new(this, sqlAuthPwdStore, urlHelper);
+   public RedirectToSelectDBWithTempPwdKeyResult GetRedirectToSelectDBActionResult(string? returnUrl) =>
+      new(this, sqlAuthPwdStore, urlHelper, returnUrl);
 
    /// <inheritdoc/>
    public SqlAuthAppPaths AppPaths => appPaths;
