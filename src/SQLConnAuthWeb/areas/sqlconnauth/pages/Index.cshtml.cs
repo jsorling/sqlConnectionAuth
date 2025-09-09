@@ -13,20 +13,13 @@ namespace Sorling.SqlConnAuthWeb.areas.sqlconnauth.pages;
 /// </summary>
 [AllowAnonymous]
 [RequireHttps]
-public class IndexModel : PageModel
+public class IndexModel(IOptionsMonitor<SqlAuthOptions> options, SqlAuthAppPaths sqlAuthAppPaths) : PageModel
 {
-   private readonly IOptionsMonitor<SqlAuthOptions> _options;
-   private readonly SqlAuthAppPaths _sqlAuthAppPaths;
-
-   public IndexModel(IOptionsMonitor<SqlAuthOptions> options, SqlAuthAppPaths sqlAuthAppPaths) {
-      _options = options;
-      _sqlAuthAppPaths = sqlAuthAppPaths;
-   }
 
    /// <summary>
    /// Gets the SQL authentication options (live-updating).
    /// </summary>
-   public SqlAuthOptions SQLAuthOptions => _options.CurrentValue;
+   public SqlAuthOptions SQLAuthOptions => options.CurrentValue;
 
    /// <summary>
    /// Gets or sets the input model for the SQL Server address and user name.
@@ -47,7 +40,7 @@ public class IndexModel : PageModel
    public IActionResult OnPost() {
       if (ModelState.IsValid)
       {
-         if (_sqlAuthAppPaths.UseDBNameRouting)
+         if (sqlAuthAppPaths.UseDBNameRouting)
          {
             RouteValueDictionary routevalues = new()
             {
@@ -60,7 +53,7 @@ public class IndexModel : PageModel
          }
          else
          {
-            string redir = _sqlAuthAppPaths.UriEscapedSqlPath(Input.SqlServer, Input.UserName);
+            string redir = sqlAuthAppPaths.UriEscapedSqlPath(Input.SqlServer, Input.UserName);
             return Redirect(redir);
          }
       }

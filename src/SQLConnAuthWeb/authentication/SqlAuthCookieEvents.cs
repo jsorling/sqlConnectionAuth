@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Sorling.SqlConnAuthWeb.authentication.passwords;
 using Sorling.SqlConnAuthWeb.authentication.validation;
 using Sorling.SqlConnAuthWeb.extenstions;
+using System.Net.Http;
 using System.Security.Claims;
 
 namespace Sorling.SqlConnAuthWeb.authentication;
@@ -98,7 +99,8 @@ public class SqlAuthCookieEvents(ISqlAuthPwdStore sqlConnAuthPwdStore
 
       if (sqlAuthAppPaths.UseDBNameRouting)
       {
-         string dbname = context.HttpContext.GetSqlAuthDBName();
+         string dbname = context.HttpContext.Request.RouteValues[SqlAuthConsts.URLROUTEPARAMDB] as string
+            ?? throw new ApplicationException("Sql database name not defined");
          if (ShouldRejectForDbNameFilter(dbname, storedsecrets))
          {
             context.RejectPrincipal();

@@ -29,6 +29,16 @@ public class SqlAuthPwdMemoryStoreTests
    }
 
    [TestMethod]
+   public async Task RemoveSecrets_NonExistSuccessfullyAsync() {
+      SqlAuthPwdMemoryStore store = new();
+      SqlAuthStoredSecrets secrets = new("pwd", false, null, "server");
+      string key = await store.StoreAsync(secrets);
+      await store.RemoveAsync(key + "8");
+      SqlAuthStoredSecrets? retrieved = await store.RetrieveAsync(key);
+      Assert.IsNotNull(retrieved);
+   }
+
+   [TestMethod]
    public async Task SetTempPasswordAsync_And_GetTempPasswordAsync_WorksCorrectlyAsync() {
       SqlAuthPwdMemoryStore store = new();
       string key = await store.SetTempPasswordAsync("user", "server", "pwd", true);

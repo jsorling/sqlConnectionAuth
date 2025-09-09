@@ -62,11 +62,27 @@ https://localhost:7061/db/192.168.1.233/sa/srv
 - `sa` is the SQL Server username (also a route parameter).
 - `/srv` is an optional tail segment, as defined in `SqlAuthAppPaths`.
 
+#### UseDBNameRouting
+
+If the `UseDBNameRouting` property is set to `true` in your `SqlAuthAppPaths` configuration, the route pattern is extended to include the database name as an additional route parameter. This allows URLs to uniquely identify not only the server and user, but also the target database for the authentication session. For example:
+
+```
+https://localhost:7061/db/192.168.1.233/sa/mydatabase/srv
+```
+
+- `mydatabase` is the SQL Server database name (added as a route parameter when `UseDBNameRouting` is enabled).
+
+When `UseDBNameRouting` is enabled, the custom route convention injects the database name into the route template, and Razor Pages can access it directly from the route data. This is useful for scenarios where authentication or authorization depends on the specific database context, not just the server and user.
+
+To enable this, set `UseDBNameRouting = true` in your `SqlAuthAppPaths` instance.
+
 The route parameters are injected by the custom convention, so Razor Pages can access them directly from the route data.
 
 ### How SqlAuthAppPaths Works
 
 `SqlAuthAppPaths` is a configuration object that defines the root and tail segments for all SQL authentication-related routes. The `Root` property sets the base path (e.g., `/db`), and the `Tail` property can add an additional segment (e.g., `/srv`). These values are used by the route convention to generate the full URL structure for authentication pages.
+
+The `UseDBNameRouting` property on `SqlAuthAppPaths` controls whether the database name is included as a route parameter in authentication URLs.
 
 ### Custom Route Convention: AddSqlAuthRazorPageRouteConventions
 
@@ -83,11 +99,11 @@ The extension method `AuthorizeSqlAuthRootPath` (see `MvcBuilderExtensions.cs`) 
 
 ## Accessing the Authenticated Connection String in Razor Pages
 
-To access the authenticated SQL connection string within your Razor PageModels or views, you can inject the `ISqlAuthService` interface. This service provides methods to retrieve the current connection string, user, and server context for the authenticated session.
+The recommended way to access the authenticated SQL connection string and related context in Razor Pages is now by injecting the `ISqlAuthContext` interface. This provides direct access to the connection string, SQL Server, user name, and other authentication context from within your PageModels or views.
 
-### Injecting ISqlAuthService in a PageModel
+### Accessing the Connection String in a PageModel
 
-You can inject `ISqlAuthService` via constructor injection in your PageModel:
+You can access the connection string and related context by injecting `ISqlAuthContext` into your PageModel. For example:
 
 ```csharp
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -95,31 +111,39 @@ using Sorling.SqlConnAuthWeb.authentication;
 
 public class IndexModel : PageModel
 {
-    private readonly ISqlAuthService _sqlAuthService;
+    private readonly ISqlAuthContext _sqlAuthContext;
 
-    public IndexModel(ISqlAuthService sqlAuthService)
+    public IndexModel(ISqlAuthContext sqlAuthContext)
     {
-        _sqlAuthService = sqlAuthService;
+        _sqlAuthContext = sqlAuthContext;
     }
 
-    public string? ConnectionString => _sqlAuthService.GetConnectionString();
+    public string? ConnectionString => _sqlAuthContext.ConnectionString;
+    public string SqlServer => _sqlAuthContext.Server;
+    public string SqlUser => _sqlAuthContext.UserName;
 }
 ```
 
 ### Accessing the Connection String in a Razor View
 
-You can also inject `ISqlAuthService` directly into a Razor view using the `@inject` directive:
+You can also inject `ISqlAuthContext` directly into your Razor view using the `@inject` directive:
 
 ```csharp
-@inject Sorling.SqlConnAuthWeb.authentication.ISqlAuthService SqlAuthService
+@using Sorling.SqlConnAuthWeb.authentication
+@inject ISqlAuthContext SqlAuthContext
 
-<p>Current connection string: @SqlAuthService.GetConnectionString()</p>
+<p>Current connection string: @SqlAuthContext.ConnectionString</p>
+<p>SQL Server: @SqlAuthContext.Server</p>
+<p>SQL User: @SqlAuthContext.UserName</p>
 ```
 
 ### Additional Context
-- `ISqlAuthService.GetConnectionString()` returns the connection string for the current authenticated SQL context.
-- You can also access the current SQL Server and user via `ISqlAuthService.SQLServer` and `ISqlAuthService.UserName`.
-- The service is available for injection in both PageModels and Razor views, making it easy to use the authenticated connection throughout your application.
+
+- `ISqlAuthContext.ConnectionString` returns the connection string for the current authenticated SQL context.
+- You can access the current SQL Server and user via `ISqlAuthContext.Server` and `ISqlAuthContext.UserName`.
+- `ISqlAuthContext` can be injected anywhere dependency injection is available, including PageModels and Razor views.
+
+This approach provides a more direct and flexible way to access SQL authentication context, compared to the previous method using HttpContext extension methods.
 
 ## Program.cs
 ```C#

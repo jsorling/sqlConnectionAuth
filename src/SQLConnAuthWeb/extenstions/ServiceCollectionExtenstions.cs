@@ -1,4 +1,9 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Abstractions;
+using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Sorling.SqlConnAuthWeb.authentication;
@@ -39,6 +44,23 @@ public static class ServiceCollectionExtenstions
              options.EventsType = typeof(SqlAuthCookieEvents);
              options.Validate();
           });
+
+      services.TryAddScoped<ISqlAuthContext>(provider => {
+         IHttpContextAccessor httpcontextaccessor = provider.GetRequiredService<IHttpContextAccessor>();
+         IUrlHelperFactory urlhelperfactory = provider.GetRequiredService<IUrlHelperFactory>();
+         ISqlAuthPwdStore pwdstore = provider.GetRequiredService<ISqlAuthPwdStore>();
+
+         HttpContext httpcontext = httpcontextaccessor.HttpContext ?? throw new InvalidOperationException("No active HttpContext");
+
+         ActionContext actioncontext = new(
+            httpcontext,
+            httpcontext.GetRouteData(),
+            new ActionDescriptor()
+         );
+
+         IUrlHelper urlhelper = urlhelperfactory.GetUrlHelper(actioncontext);
+         return new SqlAuthContext(urlhelper, pwdstore, sqlAuthPaths);
+      });
 
       services.TryAddSingleton<ISqlAuthPwdStore, SqlAuthPwdMemoryStore>();
       services.TryAddSingleton<ISqlAuthRuleValidator, SqlAuthRuleValidator>();

@@ -22,8 +22,8 @@ public record SqlAuthAppPaths(string Root = "/db", string Tail = "", bool UseDBN
          + $"/{Uri.EscapeDataString(server)}"
          + $"/{Uri.EscapeDataString(user)}"
          + (string.IsNullOrWhiteSpace(Tail.Trim('/'))
-               ? ""
-               : "/" + Tail.Trim('/')
+               ? "/"
+               : "/" + Tail.Trim('/') + "/"
            );
    }
 }
