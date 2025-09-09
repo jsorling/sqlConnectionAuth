@@ -15,11 +15,6 @@ public interface ISqlAuthService
    public Task<SqlAuthenticationResult> AuthenticateAsync(SQLAuthenticateRequest request);
 
    /// <summary>
-   /// Gets the URI-escaped path for the current SQL connection context.
-   /// </summary>
-   public string UriEscapedPath { get; }
-
-   /// <summary>
    /// Tests SQL authentication using a temporary password and optional database name, without affecting the current authentication state.
    /// </summary>
    /// <param name="sqlAuthTempPasswordInfo">The temporary password information for SQL authentication.</param>
