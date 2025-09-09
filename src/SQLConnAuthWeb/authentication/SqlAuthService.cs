@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Options;
 using Sorling.SqlConnAuthWeb.authentication.passwords;
 using Sorling.SqlConnAuthWeb.authentication.validation;
 using Sorling.SqlConnAuthWeb.exceptions;
-using Sorling.SqlConnAuthWeb.extenstions;
 using Sorling.SqlConnAuthWeb.helpers;
 using System.Security.Claims;
 
@@ -18,14 +16,20 @@ namespace Sorling.SqlConnAuthWeb.authentication;
 /// <param name="pwdStore">Store for SQL authentication secrets.</param>
 /// <param name="options">Options for SQL authentication configuration.</param>
 /// <param name="sqlAuthAppPaths">Application path configuration for SQL authentication.</param>
-public class SqlAuthService(IHttpContextAccessor httpContextAccessor, ISqlAuthRuleValidator ruleValidator
-      , ISqlAuthPwdStore pwdStore, SqlAuthAppPaths sqlAuthAppPaths, ISqlAuthContext sqlAuthContext) : ISqlAuthService
+public class SqlAuthService(IHttpContextAccessor httpContextAccessor
+   , ISqlAuthRuleValidator ruleValidator
+   , ISqlAuthPwdStore pwdStore
+   , SqlAuthAppPaths sqlAuthAppPaths
+   , ISqlAuthContext sqlAuthContext) : ISqlAuthService
 {
    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
+
    private readonly ISqlAuthRuleValidator _ruleValidator = ruleValidator ?? throw new ArgumentNullException(nameof(ruleValidator));
+
    private readonly ISqlAuthPwdStore _pwdStore = pwdStore ?? throw new ArgumentNullException(nameof(pwdStore));
+
    private readonly SqlAuthAppPaths _sqlAuthAppPaths = sqlAuthAppPaths ?? throw new ArgumentNullException(nameof(sqlAuthAppPaths));
-   
+
    /// <inheritdoc/>
    public string UriEscapedPath
    => _sqlAuthAppPaths.UriEscapedSqlPath(
