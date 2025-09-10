@@ -1,6 +1,6 @@
 # Sorling.SqlConnAuthWeb
 
-Sorling.SqlConnAuthWeb is a library for ASP.NET Core Razor Pages that enables authentication and authorization using SQL Server connections. It allows you to secure your web applications by leveraging SQL Server credentials and connection properties, providing a flexible alternative to traditional identity systems. The library can also serve as a starting point for building management-type applications for SQL Server, enabling you to quickly create secure admin or management interfaces.
+Sorling.SqlConnAuthWeb is a library for ASP.NET Core Razor Pages that provides a SQL Server connection manager tailored for administrative and management applications targeting SQL Server. This library enables you to build secure interfaces where users authenticate and manage SQL Server connections directly, making it ideal for tools and dashboards used by database administrators or power users.
 
 ## What can Sorling.SqlConnAuthWeb do?
 - Authenticate users based on SQL Server connection credentials, supporting both SQL authentication and integrated security.
@@ -32,12 +32,12 @@ Sorling.SqlConnAuthWeb provides flexible network access control for SQL authenti
 
 If both options are set to `true` and the allow-list is empty, authentication requests against all network locations are allowed. If either is set to `false`, requests to those address types are blocked unless explicitly allowed in the allow-list.
 
+The allow-list takes precedence: if it is not empty, only those SQL Server IPs/ranges can be authenticated against, regardless of the other settings.
+
 **Example usage:**
 - To allow authentication only against specific SQL Server IPs or ranges, populate `AllowedIPAddresses`.
 - To allow authentication against all private and loopback SQL Server addresses, leave the allow-list empty and set both options to `true`.
 - To block authentication against private or loopback SQL Server addresses, set the corresponding option to `false`.
-
-The allow-list takes precedence: if it is not empty, only those SQL Server IPs/ranges can be authenticated against, regardless of the other settings.
 
 ## Routing
 
