@@ -11,7 +11,7 @@
 <h2>@ViewData["Title"]</h2>
 <div class="row">
     <div class="form-box">
-        <form method="post">
+        <form method="post" onsubmit="document.getElementById('submitBtn').disabled = true;">
             @if (Model.IsWinAuth)
             {
                 <p class="info-message">Sign in to the SQL server @Model.SQLServer using Windows authentication.</p>
@@ -41,7 +41,7 @@
                 <input asp-for="Input.TrustServerCertificate">
             </div>
             <div class="form-actions">
-                <button type="submit" class="btn btn-primary">Sign in</button>
+                <button id="submitBtn" type="submit" class="btn btn-primary">Sign in</button>
             </div>
         </form>
     </div>

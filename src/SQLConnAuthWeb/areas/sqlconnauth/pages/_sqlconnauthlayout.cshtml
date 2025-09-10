@@ -23,48 +23,50 @@
             --background-color: @(theme.DarkBackgroundColor ?? "#181818");
             --foreground-color: @(theme.DarkForegroundColor ?? "#f5f5f5");
         }
-        .theme-switcher-container {
+        .theme-switcher-icon-container {
             position: fixed;
-            top: 0.75em;
-            right: 1.5em;
+            top: 0.5em;
+            right: 1em;
             z-index: 9999;
-            background: rgba(255,255,255,0.85);
-            border-radius: 2em;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-            padding: 0.25em 1em;
-            font-size: 0.95em;
+            background: none;
+            border-radius: 0;
+            box-shadow: none;
+            padding: 0;
+            font-size: 1em;
             display: flex;
             align-items: center;
-            gap: 0.5em;
+            cursor: pointer;
+            transition: none;
         }
-        [data-bs-theme="dark"] .theme-switcher-container,
-        [data-theme="dark"] .theme-switcher-container {
-            background: rgba(30,30,30,0.85);
-            color: #f5f5f5;
+        .theme-switcher-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.1em;
+            height: 1.1em;
+            filter: grayscale(1) contrast(0.7);
         }
-        .theme-switcher-container label {
-            margin: 0;
-            font-size: 0.95em;
+        .theme-switcher-icon svg {
+            width: 1.1em;
+            height: 1.1em;
+            display: block;
+            fill: #222;
         }
-        .theme-switcher-container select {
-            border-radius: 1em;
-            border: 1px solid #ccc;
-            padding: 0.2em 0.8em;
-            font-size: 0.95em;
+        [data-bs-theme="dark"] .theme-switcher-icon svg,
+        [data-theme="dark"] .theme-switcher-icon svg {
+            fill: #f5f5f5;
         }
     </style>
 </head>
 <body>
     @if (theme.UseThemeSwitcher())
     {
-        <div class="theme-switcher-container">
-            <label for="theme-switcher-select">Theme:</label>
-        <select id="theme-switcher-select">
-            <option value="system">System default</option>
-            <option value="light">Light</option>
-            <option value="dark">Dark</option>
-        </select>
-    </div>
+        <div class="theme-switcher-icon-container" id="theme-switcher-icon-container" title="Switch theme">
+            <span class="theme-switcher-icon" id="theme-switcher-icon">
+                <!-- Default: system icon (monitor) -->
+                <svg id="theme-icon-system" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display:inline;"><rect x="3" y="5" width="18" height="12" rx="2" fill="currentColor"/><rect x="7" y="19" width="10" height="2" rx="1" fill="currentColor"/></svg>
+            </span>
+        </div>
     }
     <div class="centered-container">
         @RenderBody()

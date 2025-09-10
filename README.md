@@ -175,7 +175,7 @@ app.UseHttpsRedirection()
 app.MapRazorPages();
 app.Run();
 ```
-### What does the sqlConnectionAuth code do?
+### What does the SqlConnAuth code do?
 The code in `Program.cs` demonstrates how to integrate SQL connection-based authentication and authorization into a Razor Pages application using the sqlConnectionAuth library. The key features added by sqlConnectionAuth are:
 
 - **SQL Connection Authentication:**
