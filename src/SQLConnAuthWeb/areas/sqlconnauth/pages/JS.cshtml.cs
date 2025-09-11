@@ -8,7 +8,7 @@ namespace Sorling.SqlConnAuthWeb.areas.sqlconnauth.pages;
 /// <summary>
 /// Page model for serving the theme switcher JavaScript, using SQL UI options.
 /// </summary>
-public class ThemeSwitcherJS(IOptionsMonitor<SqlAuthUIOptions> options) : PageModel
+public class JSModel(IOptionsMonitor<SqlAuthUIOptions> options) : PageModel
 {
    /// <summary>
    /// Gets the SQL UI options.
