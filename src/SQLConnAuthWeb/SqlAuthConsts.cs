@@ -86,4 +86,14 @@ public class SqlAuthConsts
    /// Placeholder value used to indicate the return URL after selecting a SQL database.
    /// </summary>
    public const string RETURNURLSELECTDBPLACEHOLDER = "--sqlauthselecteddb";
+
+   /// <summary>
+   /// The local storage key used to persist the recent items array.
+   /// The array is two-dimensional: the first dimension tracks server/user pairs (last used),
+   /// and the second dimension tracks databases selected for each pair. When forms such as
+   /// <c>index.cshtml</c> or <c>selectdb.cshtml</c> are submitted, the recent items list is updated,
+   /// sorted by recency, and truncated to the maximum number of items as specified by
+   /// <see cref="Sorling.SqlConnAuthWeb.razor.SqlAuthUIOptions.MaxRecentItems"/>.
+   /// </summary>
+   public const string RECENTITEMSLOCALSTORAGE = "sqlauthrecentitems";
 }
