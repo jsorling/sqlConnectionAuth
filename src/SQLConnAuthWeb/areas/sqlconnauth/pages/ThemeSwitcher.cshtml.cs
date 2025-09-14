@@ -6,10 +6,7 @@ using Sorling.SqlConnAuthWeb.razor;
 
 namespace Sorling.SqlConnAuthWeb.areas.sqlconnauth.pages;
 
-/// <summary>
-/// Page model for serving the theme switcher JavaScript, using SQL UI options.
-/// </summary>
-public class JSModel(IOptionsMonitor<SqlAuthUIOptions> uiOptions
+public class ThemeSwitcherModel(IOptionsMonitor<SqlAuthUIOptions> uiOptions
    , IOptionsMonitor<SqlAuthOptions> authOptions
    , OptionsVersionProvider versionProvider) : PageModel
 {
@@ -29,7 +26,7 @@ public class JSModel(IOptionsMonitor<SqlAuthUIOptions> uiOptions
    public string Version => versionProvider.Version;
 
    /// <summary>
-   /// Handles GET requests to the JS page.
+   /// Handles GET requests to the ThemeSwitcherJS page.
    /// Sets cache headers for browser caching.
    /// </summary>
    /// <returns>The page result.</returns>
