@@ -40,6 +40,7 @@
 <script>
     function selectDb(dbName) {
         document.getElementById('dbNameInput').value = dbName;
+        if(window.SqlAuthRecent) window.SqlAuthRecent.addRecentDatabase(dbName);
         document.getElementById('selectDbForm').submit();
     }
     function filterDbList() {

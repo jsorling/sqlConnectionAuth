@@ -11,14 +11,14 @@
 <h2>@ViewData["Title"]</h2>
 <div class="row">
     <div class="form-box">
-        <form method="post" onsubmit="document.getElementById('submitBtn').disabled = true;">
+        <form method="post" onsubmit="document.getElementById('submitBtn').disabled = true; if(window.SqlAuthRecent) window.SqlAuthRecent.addRecentServerUser();">
             @if (Model.IsWinAuth)
             {
-                <p class="info-message">Sign in to the SQL server @Model.SQLServer using Windows authentication.</p>
+                <p class="info-message">Sign in to the SQL server @Model.SqlServer using Windows authentication.</p>
             }
             else
             {
-                <p class="info-message">Sign in to the SQL server @Model.SQLServer with user name <span class="nowrap">@Model.SqlUserName</span></p>
+                <p class="info-message">Sign in to the SQL server @Model.SqlServer with user name <span class="nowrap">@Model.SqlUserName</span></p>
             }
             @if (!string.IsNullOrEmpty(firstError))
             {
@@ -33,7 +33,7 @@
                 {
                     <label asp-for="Input.Password"></label>
                     <span asp-validation-for="Input.Password" class="error-text"></span>
-                    <input asp-for="Input.Password" class="form-control" autofocus>
+                    <input asp-for="Input.Password" autocomplete="current-password" class="form-control" autofocus>
                 }
             </div>
             <div class="form-group">

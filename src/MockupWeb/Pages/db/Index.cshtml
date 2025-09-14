@@ -40,3 +40,34 @@ DB
 <div>
     <a href="selectdb">Select DB</a>
 </div>
+<div>
+    <table id="recentItemsTable" border="1">
+        <thead>
+            <tr><th>Server</th><th>User</th><th>Databases</th></tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+<script>
+    function renderRecentItems() {
+        if (!window.SqlAuthRecent) return;
+        var items = window.SqlAuthRecent.getRecentItems();
+        var tbody = document.getElementById('recentItemsTable').getElementsByTagName('tbody')[0];
+        tbody.innerHTML = '';
+        for (var i = 0; i < items.length; i++) {
+            var row = document.createElement('tr');
+            var server = document.createElement('td');
+            server.textContent = items[i].server;
+            var user = document.createElement('td');
+            user.textContent = items[i].user;
+            var dbs = document.createElement('td');
+            dbs.textContent = (items[i].databases || []).join(', ');
+            row.appendChild(server);
+            row.appendChild(user);
+            row.appendChild(dbs);
+            tbody.appendChild(row);
+        }
+    }
+    document.addEventListener('DOMContentLoaded', renderRecentItems);
+</script>

@@ -84,6 +84,13 @@
     const RECENT_ITEMS_KEY = '@(Sorling.SqlConnAuthWeb.SqlAuthConsts.RECENTITEMSLOCALSTORAGE)';
     const MAX_RECENT_ITEMS = @(Model.SqlAuthUIOptions.MaxRecentItems);
 
+    function getSqlAuthContext() {
+        if (!window.SqlAuthContext) return null;
+        const { SqlServer, SqlUserName, SqlDBName } = window.SqlAuthContext;
+        if (!SqlServer || !SqlUserName) return null;
+        return { SqlServer, SqlUserName, SqlDBName };
+    }
+
     // Gets the recent items array from local storage.
     function getRecentItems() {
         const json = localStorage.getItem(RECENT_ITEMS_KEY);
@@ -101,16 +108,18 @@
     }
 
     // Adds or updates a recent server/user pair, sorts by recency, and truncates if needed.
-    // Call this on index.cshtml form submit.
-    function addRecentServerUser(server, user) {
+    // Uses window.SqlAuthContext for server/user.
+    function addRecentServerUser() {
+        const ctx = getSqlAuthContext();
+        if (!ctx) return;
         let items = getRecentItems();
-        const idx = items.findIndex(x => x.server === server && x.user === user);
+        const idx = items.findIndex(x => x.server === ctx.SqlServer && x.user === ctx.SqlUserName);
         if (idx !== -1) {
             // Move to front
             const [item] = items.splice(idx, 1);
             items.unshift(item);
         } else {
-            items.unshift({ server, user, databases: [] });
+            items.unshift({ server: ctx.SqlServer, user: ctx.SqlUserName, databases: [] });
         }
         if (items.length > MAX_RECENT_ITEMS) {
             items = items.slice(0, MAX_RECENT_ITEMS);
@@ -119,12 +128,14 @@
     }
 
     // Adds or updates a recent database for a server/user, sorts by recency, and truncates if needed.
-    // Call this on selectdb.cshtml form submit.
-    function addRecentDatabase(server, user, database) {
+    // Uses window.SqlAuthContext for server/user.
+    function addRecentDatabase(database) {
+        const ctx = getSqlAuthContext();
+        if (!ctx) return;
         let items = getRecentItems();
-        let item = items.find(x => x.server === server && x.user === user);
+        let item = items.find(x => x.server === ctx.SqlServer && x.user === ctx.SqlUserName);
         if (!item) {
-            item = { server, user, databases: [] };
+            item = { server: ctx.SqlServer, user: ctx.SqlUserName, databases: [] };
             items.unshift(item);
         }
         const dbIdx = item.databases.indexOf(database);
@@ -136,7 +147,7 @@
             item.databases = item.databases.slice(0, MAX_RECENT_ITEMS);
         }
         // Move this server/user to front
-        const idx = items.findIndex(x => x.server === server && x.user === user);
+        const idx = items.findIndex(x => x.server === ctx.SqlServer && x.user === ctx.SqlUserName);
         if (idx !== 0) {
             items.splice(idx, 1);
             items.unshift(item);
@@ -148,16 +159,22 @@
     }
 
     // Removes a recent server/user pair (and its databases) from the list.
-    function removeRecentServerUser(server, user) {
+    // Uses window.SqlAuthContext for server/user.
+    function removeRecentServerUser() {
+        const ctx = getSqlAuthContext();
+        if (!ctx) return;
         let items = getRecentItems();
-        items = items.filter(x => !(x.server === server && x.user === user));
+        items = items.filter(x => !(x.server === ctx.SqlServer && x.user === ctx.SqlUserName));
         saveRecentItems(items);
     }
 
     // Removes a database from a server/user pair's database list.
-    function removeRecentDatabase(server, user, database) {
+    // Uses window.SqlAuthContext for server/user.
+    function removeRecentDatabase(database) {
+        const ctx = getSqlAuthContext();
+        if (!ctx) return;
         let items = getRecentItems();
-        let item = items.find(x => x.server === server && x.user === user);
+        let item = items.find(x => x.server === ctx.SqlServer && x.user === ctx.SqlUserName);
         if (item) {
             item.databases = item.databases.filter(db => db !== database);
             saveRecentItems(items);

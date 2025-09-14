@@ -16,15 +16,16 @@ public class SqlAuthContext(IUrlHelper urlHelper, ISqlAuthPwdStore sqlAuthPwdSto
       };
 
    /// <inheritdoc/>
-   public string SqlServer => urlHelper.ActionContext.HttpContext.Request.RouteValues[SqlAuthConsts.URLROUTEPARAMSRV]
-      as string ?? throw new ApplicationException("SQL server cannot be null or empty on route.");
+   public string? SqlServer
+      => urlHelper.ActionContext.HttpContext.Request.RouteValues[SqlAuthConsts.URLROUTEPARAMSRV] as string;
 
    /// <inheritdoc/>
-   public string SqlUserName => urlHelper.ActionContext.HttpContext.Request.RouteValues[SqlAuthConsts.URLROUTEPARAMUSR] as string
-      ?? throw new ApplicationException("SQL username cannot be null or empty on route.");
+   public string? SqlUserName
+      => urlHelper.ActionContext.HttpContext.Request.RouteValues[SqlAuthConsts.URLROUTEPARAMUSR] as string;
 
    /// <inheritdoc/>
-   public string? SqlDBName => urlHelper.ActionContext.HttpContext.Request.RouteValues[SqlAuthConsts.URLROUTEPARAMDB] as string;
+   public string? SqlDBName
+      => urlHelper.ActionContext.HttpContext.Request.RouteValues[SqlAuthConsts.URLROUTEPARAMDB] as string;
 
    /// <inheritdoc/>
    public SqlAuthStoredSecrets? StoredSecrets
