@@ -1,0 +1,54 @@
+@page
+@using Sorling.SqlConnAuthWeb.razor
+@inject Microsoft.Extensions.Options.IOptionsMonitor<SqlAuthUIOptions> UIOptions
+@{
+    Layout = null;
+    this.Response.ContentType = "text/css";
+    this.Response.Headers["Cache-Control"] = "public, max-age=31536000, immutable";
+    var theme = UIOptions.CurrentValue;
+}
+:root {
+    --background-color: @(theme.LightBackgroundColor ?? "#fff");
+    --foreground-color: @(theme.LightForegroundColor ?? "#222");
+}
+[data-bs-theme="light"], [data-theme="light"] {
+    --background-color: @(theme.LightBackgroundColor ?? "#fff");
+    --foreground-color: @(theme.LightForegroundColor ?? "#222");
+}
+[data-bs-theme="dark"], [data-theme="dark"] {
+    --background-color: @(theme.DarkBackgroundColor ?? "#181818");
+    --foreground-color: @(theme.DarkForegroundColor ?? "#f5f5f5");
+}
+.theme-switcher-icon-container {
+    position: fixed;
+    top: 0.5em;
+    right: 1em;
+    z-index: 9999;
+    background: none;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0;
+    font-size: 1em;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: none;
+}
+.theme-switcher-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.1em;
+    height: 1.1em;
+    filter: grayscale(1) contrast(0.7);
+}
+.theme-switcher-icon svg {
+    width: 1.1em;
+    height: 1.1em;
+    display: block;
+    fill: #222;
+}
+[data-bs-theme="dark"] .theme-switcher-icon svg,
+[data-theme="dark"] .theme-switcher-icon svg {
+    fill: #f5f5f5;
+}
