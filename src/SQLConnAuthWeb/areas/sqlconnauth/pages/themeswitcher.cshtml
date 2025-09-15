@@ -51,8 +51,10 @@
         if (!iconSpan) return;
         iconSpan.innerHTML = ICONS[theme] || ICONS['system'];
         iconContainer.title =
-        theme === 'system' ? 'System default' :
-        theme.charAt(0).toUpperCase() + theme.slice(1) + ' mode';
+            theme === 'system' ? 'System default' :
+            theme === 'light' ? 'Light mode' :
+            theme === 'dark' ? 'Dark mode' :
+            '';
         }
         function cycleTheme() {
         const current = getPreferredTheme();
