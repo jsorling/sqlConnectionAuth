@@ -153,3 +153,11 @@ label, .form-label {
             background: #e9ecef;
             color: #0056b3;
         }
+
+/* Single-column db-list for index page only */
+body.sqlconnauth-index-page .db-list {
+    display: block;
+}
+body.sqlconnauth-index-page .db-list li {
+    margin-bottom: 0.25rem;
+}

@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Http;
 using Sorling.SqlConnAuthWeb.authentication.passwords;
 using Sorling.SqlConnAuthWeb.authentication.validation;
 using Sorling.SqlConnAuthWeb.extenstions;
-using System.Net.Http;
 using System.Security.Claims;
 
 namespace Sorling.SqlConnAuthWeb.authentication;
