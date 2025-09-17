@@ -12,7 +12,7 @@
             <div class="form-group">
                 <label asp-for="Input.SqlServer"></label>
                 <span asp-validation-for="Input.SqlServer" class="error-text"></span>
-                <input asp-for="Input.SqlServer" class="form-control">
+                <input asp-for="Input.SqlServer" class="form-control" autofocus>
             </div>
             @if (Model.SQLAuthOptions.AllowIntegratedSecurity)
             {
@@ -33,7 +33,7 @@
             </div>
             <div id="recentListContainer" style="display:none; margin-top:10px;">
                 <div class="form-group">
-                    <ul class="db-list" id="recentList" style="margin-top:5px;"></ul>
+                    <ul class="db-list one-column-db-list" id="recentList" style="margin-top:5px;"></ul>
                 </div>
             </div>
         </form>
@@ -56,8 +56,6 @@
     </script>
 }
 <script>
-    // Add page-specific body class for single-column recent list
-    document.body.classList.add('sqlconnauth-index-page');
     // Use SqlAuthRecent from shared js.cshtml
     function toggleRecentList() {
         const cont = document.getElementById('recentListContainer');
@@ -123,25 +121,3 @@
         });
     });
 </script>
-<style>
-.recent-remove-btn {
-    color: #c00;
-    background: none;
-    border: none;
-    font-size: 1.1em;
-    margin-left: 0.5em;
-    cursor: pointer;
-    vertical-align: middle;
-    line-height: 1;
-}
-.recent-remove-btn:hover {
-    color: #fff;
-    background: #c00;
-    border-radius: 50%;
-}
-body.sqlconnauth-index-page .db-list li {
-    display: flex;
-    align-items: center;
-    margin-bottom: 0.25rem;
-}
-</style>

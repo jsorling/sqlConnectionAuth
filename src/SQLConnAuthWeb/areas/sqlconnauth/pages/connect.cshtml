@@ -11,7 +11,7 @@
 <h2>@ViewData["Title"]</h2>
 <div class="row">
     <div class="form-box">
-        <form method="post" onsubmit="document.getElementById('submitBtn').disabled = true; if(window.SqlAuthRecent) window.SqlAuthRecent.addRecentServerUser();">
+        <form method="post" onsubmit="document.getElementById('submitBtn').disabled = true; document.getElementById('spinner').style.display = 'inline-block'; if(window.SqlAuthRecent) window.SqlAuthRecent.addRecentServerUser();">
             @if (Model.IsWinAuth)
             {
                 <p class="info-message">Sign in to the SQL server @Model.SqlServer using Windows authentication.</p>
@@ -42,6 +42,7 @@
             </div>
             <div class="form-actions">
                 <button id="submitBtn" type="submit" class="btn btn-primary">Sign in</button>
+                <span id="spinner" class="custom-spinner" style="display:none;"></span>
             </div>
         </form>
     </div>

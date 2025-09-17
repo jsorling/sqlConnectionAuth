@@ -161,3 +161,47 @@ body.sqlconnauth-index-page .db-list {
 body.sqlconnauth-index-page .db-list li {
     margin-bottom: 0.25rem;
 }
+
+.one-column-db-list li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.25rem;
+}
+
+.recent-remove-btn {
+    color: #c00;
+    background: none;
+    border: none;
+    font-size: 1.1em;
+    margin-left: 0.5em;
+    cursor: pointer;
+    vertical-align: middle;
+    line-height: 1;
+}
+.recent-remove-btn:hover {
+    color: #fff;
+    background: #c00;
+    border-radius: 50%;
+}
+
+.db-list.one-column-db-list {
+    display: block;
+}
+
+/* Custom spinner for sign-in button */
+.custom-spinner {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    border: 2px solid #ccc;
+    border-top: 2px solid #333;
+    border-radius: 50%;
+    animation: custom-spin 0.7s linear infinite;
+    vertical-align: middle;
+    margin-left: 8px;
+}
+
+@keyframes custom-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
