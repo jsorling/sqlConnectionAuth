@@ -32,6 +32,9 @@ public static class ServiceCollectionExtenstions
        , Action<SqlAuthOptions>? configureOptions = null) {
       ArgumentNullException.ThrowIfNull(sqlAuthPaths);
 
+      // Register OptionsVersionProvider for global versioning/cache busting
+      services.TryAddSingleton<OptionsVersionProvider>();
+
       _ = services.AddHttpContextAccessor()
           .AddTransient<ISqlAuthService, SqlAuthService>()
           .AddAuthentication()

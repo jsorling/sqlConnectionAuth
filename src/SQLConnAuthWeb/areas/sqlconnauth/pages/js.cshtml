@@ -1,0 +1,119 @@
+@page
+@model Sorling.SqlConnAuthWeb.areas.sqlconnauth.pages.JSModel
+@{
+    Layout = null;
+    this.Response.ContentType = "application/javascript";
+}
+(function () {
+// --- Recent Items Management ---
+    const RECENT_ITEMS_KEY = '@(Sorling.SqlConnAuthWeb.SqlAuthConsts.RECENTITEMSLOCALSTORAGE)';
+    const MAX_RECENT_ITEMS = @(Model.SqlAuthUIOptions.MaxRecentItems);
+
+    function getSqlAuthContext() {
+        if (!window.SqlAuthContext) return null;
+        const { SqlServer, SqlUserName, SqlDBName } = window.SqlAuthContext;
+        if (!SqlServer || !SqlUserName) return null;
+        return { SqlServer, SqlUserName, SqlDBName };
+    }
+
+    // Gets the recent items array from local storage.
+    function getRecentItems() {
+        const json = localStorage.getItem(RECENT_ITEMS_KEY);
+        if (!json) return [];
+        try {
+            return JSON.parse(json);
+        } catch {
+            return [];
+        }
+    }
+
+    // Saves the recent items array to local storage.
+    function saveRecentItems(items) {
+        localStorage.setItem(RECENT_ITEMS_KEY, JSON.stringify(items));
+    }
+
+    // Adds or updates a recent server/user pair, sorts by recency, and truncates if needed.
+    // Uses window.SqlAuthContext for server/user.
+    function addRecentServerUser() {
+        const ctx = getSqlAuthContext();
+        if (!ctx) return;
+        let items = getRecentItems();
+        const idx = items.findIndex(x => x.server === ctx.SqlServer && x.user === ctx.SqlUserName);
+        if (idx !== -1) {
+            // Move to front
+            const [item] = items.splice(idx, 1);
+            items.unshift(item);
+        } else {
+            items.unshift({ server: ctx.SqlServer, user: ctx.SqlUserName, databases: [] });
+        }
+        if (items.length > MAX_RECENT_ITEMS) {
+            items = items.slice(0, MAX_RECENT_ITEMS);
+        }
+        saveRecentItems(items);
+    }
+
+    // Adds or updates a recent database for a server/user, sorts by recency, and truncates if needed.
+    // Uses window.SqlAuthContext for server/user.
+    function addRecentDatabase(database) {
+        const ctx = getSqlAuthContext();
+        if (!ctx) return;
+        let items = getRecentItems();
+        let item = items.find(x => x.server === ctx.SqlServer && x.user === ctx.SqlUserName);
+        if (!item) {
+            item = { server: ctx.SqlServer, user: ctx.SqlUserName, databases: [] };
+            items.unshift(item);
+        }
+        const dbIdx = item.databases.indexOf(database);
+        if (dbIdx !== -1) {
+            item.databases.splice(dbIdx, 1);
+        }
+        item.databases.unshift(database);
+        if (item.databases.length > MAX_RECENT_ITEMS) {
+            item.databases = item.databases.slice(0, MAX_RECENT_ITEMS);
+        }
+        // Move this server/user to front
+        const idx = items.findIndex(x => x.server === ctx.SqlServer && x.user === ctx.SqlUserName);
+        if (idx !== 0) {
+            items.splice(idx, 1);
+            items.unshift(item);
+        }
+        if (items.length > MAX_RECENT_ITEMS) {
+            items = items.slice(0, MAX_RECENT_ITEMS);
+        }
+        saveRecentItems(items);
+    }
+
+    // Removes a recent server/user pair (and its databases) from the list.
+    // Uses window.SqlAuthContext for server/user.
+    function removeRecentServerUser() {
+        const ctx = getSqlAuthContext();
+        if (!ctx) return;
+        let items = getRecentItems();
+        items = items.filter(x => !(x.server === ctx.SqlServer && x.user === ctx.SqlUserName));
+        saveRecentItems(items);
+    }
+
+    // Removes a database from a server/user pair's database list.
+    // Uses window.SqlAuthContext for server/user.
+    function removeRecentDatabase(database) {
+        const ctx = getSqlAuthContext();
+        if (!ctx) return;
+        let items = getRecentItems();
+        let item = items.find(x => x.server === ctx.SqlServer && x.user === ctx.SqlUserName);
+        if (item) {
+            item.databases = item.databases.filter(db => db !== database);
+            saveRecentItems(items);
+        }
+    }
+
+    // Expose for use in form handlers
+    window.SqlAuthRecent = {
+        getRecentItems,
+        saveRecentItems,
+        addRecentServerUser,
+        addRecentDatabase,
+        removeRecentServerUser,
+        removeRecentDatabase
+    };
+    // --- End Recent Items Management ---
+})();

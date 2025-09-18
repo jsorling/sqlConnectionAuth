@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Http;
 using Sorling.SqlConnAuthWeb.authentication.passwords;
 using Sorling.SqlConnAuthWeb.authentication.validation;
 using Sorling.SqlConnAuthWeb.extenstions;
-using System.Net.Http;
 using System.Security.Claims;
 
 namespace Sorling.SqlConnAuthWeb.authentication;
@@ -82,6 +81,13 @@ public class SqlAuthCookieEvents(ISqlAuthPwdStore sqlConnAuthPwdStore
    /// <param name="context">The context for the principal validation event.</param>
    /// <returns>A task that represents the asynchronous operation.</returns>
    public override async Task ValidatePrincipal(CookieValidatePrincipalContext context) {
+      if(context.HttpContext.Request.RouteValues.Count < 1)
+      {
+         // most likely a 404, we will not be able to handle, reject
+         context.RejectPrincipal();
+         return;
+      }
+
       (string? server, string? user, string? passwordref) = ExtractClaims(context.Principal);
       if (string.IsNullOrEmpty(server) || string.IsNullOrEmpty(user) || string.IsNullOrEmpty(passwordref))
       {

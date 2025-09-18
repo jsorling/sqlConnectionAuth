@@ -1,6 +1,7 @@
 ﻿@using Microsoft.Extensions.Options
 @using Sorling.SqlConnAuthWeb.razor
 @inject IOptionsMonitor<SqlAuthUIOptions> UIOptions
+@inject OptionsVersionProvider VersionProvider
 @{
     var theme = UIOptions.CurrentValue;
 }
@@ -10,61 +11,18 @@
     <meta name="viewport" content="width=device-width" />
     <title>@ViewBag.Title</title>
     <link rel="stylesheet" href="~/_content/sorling.sqlconnauthweb/css/custom-theme.css" asp-append-version="true" />
-    <style>
-        :root {
-            --background-color: @(theme.LightBackgroundColor ?? "#fff");
-            --foreground-color: @(theme.LightForegroundColor ?? "#222");
-        }
-        [data-bs-theme="light"], [data-theme="light"] {
-            --background-color: @(theme.LightBackgroundColor ?? "#fff");
-            --foreground-color: @(theme.LightForegroundColor ?? "#222");
-        }
-        [data-bs-theme="dark"], [data-theme="dark"] {
-            --background-color: @(theme.DarkBackgroundColor ?? "#181818");
-            --foreground-color: @(theme.DarkForegroundColor ?? "#f5f5f5");
-        }
-        .theme-switcher-container {
-            position: fixed;
-            top: 0.75em;
-            right: 1.5em;
-            z-index: 9999;
-            background: rgba(255,255,255,0.85);
-            border-radius: 2em;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-            padding: 0.25em 1em;
-            font-size: 0.95em;
-            display: flex;
-            align-items: center;
-            gap: 0.5em;
-        }
-        [data-bs-theme="dark"] .theme-switcher-container,
-        [data-theme="dark"] .theme-switcher-container {
-            background: rgba(30,30,30,0.85);
-            color: #f5f5f5;
-        }
-        .theme-switcher-container label {
-            margin: 0;
-            font-size: 0.95em;
-        }
-        .theme-switcher-container select {
-            border-radius: 1em;
-            border: 1px solid #ccc;
-            padding: 0.2em 0.8em;
-            font-size: 0.95em;
-        }
-    </style>
+    <sql-auth-themeswitcher-css />
+    <sql-auth-context-script />
 </head>
 <body>
     @if (theme.UseThemeSwitcher())
     {
-        <div class="theme-switcher-container">
-            <label for="theme-switcher-select">Theme:</label>
-        <select id="theme-switcher-select">
-            <option value="system">System default</option>
-            <option value="light">Light</option>
-            <option value="dark">Dark</option>
-        </select>
-    </div>
+        <div class="theme-switcher-icon-container" id="theme-switcher-icon-container" title="Switch theme">
+            <span class="theme-switcher-icon" id="theme-switcher-icon">
+                <!-- Default: system icon (monitor) -->
+                <svg id="theme-icon-system" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display:inline;"><rect x="3" y="5" width="18" height="12" rx="2" fill="currentColor"/><rect x="7" y="19" width="10" height="2" rx="1" fill="currentColor"/></svg>
+            </span>
+        </div>
     }
     <div class="centered-container">
         @RenderBody()
@@ -72,6 +30,8 @@
     <script src="~/_content/sorling.sqlconnauthweb/lib/jquery/jquery.min.js" asp-append-version="true"></script>
     <script src="~/_content/sorling.sqlconnauthweb/lib/jquery-validation/dist/jquery.validate.min.js" asp-append-version="true"></script>
     <script src="~/_content/sorling.sqlconnauthweb/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js" asp-append-version="true"></script>
-    <script src="@Url.Page("themeswitcherjs")" asp-append-version="true"></script>
+    <sql-auth-js-script />
+    <sql-auth-themeswitcher-script />
+    <script src="@Url.Page("js")?v=@VersionProvider.Version" asp-append-version="false"></script>
 </body>
 </html>

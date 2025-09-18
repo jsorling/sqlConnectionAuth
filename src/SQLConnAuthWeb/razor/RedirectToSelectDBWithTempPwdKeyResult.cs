@@ -10,14 +10,19 @@ namespace Sorling.SqlConnAuthWeb.razor;
 /// </summary>
 public class RedirectToSelectDBWithTempPwdKeyResult : ActionResult
 {
-   internal RedirectToSelectDBWithTempPwdKeyResult(ISqlAuthContext context
+   internal RedirectToSelectDBWithTempPwdKeyResult(ISqlAuthContext sqlAuthContext
       , ISqlAuthPwdStore pwdStore
       , IUrlHelper urlHelper
       , string? returnUrl) {
-      _context = context;
+      _context = sqlAuthContext;
       _pwdStore = pwdStore;
       _urlHelper = urlHelper;
       _returnUrl = returnUrl;
+
+      _sqlUserName = sqlAuthContext.SqlUserName
+         ?? throw new ArgumentNullException(nameof(sqlAuthContext), "No active sqlauth context");
+      _sqlServer = sqlAuthContext.SqlServer
+         ?? throw new ArgumentNullException(nameof(sqlAuthContext), "No active sqlauth context");
    }
 
    private readonly ISqlAuthContext _context;
@@ -28,18 +33,22 @@ public class RedirectToSelectDBWithTempPwdKeyResult : ActionResult
 
    private readonly string? _returnUrl;
 
+   private readonly string _sqlUserName;
+
+   private readonly string _sqlServer;
+
    public override async Task ExecuteResultAsync(ActionContext context) {
       SqlAuthStoredSecrets storedsecrets = _context.StoredSecrets ?? throw new ApplicationException("Stored secrets not set");
       string temppwdkey = await _pwdStore.SetTempPasswordAsync(
-          _context.SqlUserName,
-          _context.SqlServer,
+          _sqlUserName,
+          _sqlServer,
           storedsecrets.Password,
           storedsecrets.TrustServerCertificate);
 
       RouteValueDictionary routevalues = new() {
              { "area", SqlAuthConsts.SQLAUTHAREA },
-             { SqlAuthConsts.URLROUTEPARAMSRV, _context.SqlServer },
-             { SqlAuthConsts.URLROUTEPARAMUSR, _context.SqlUserName },
+             { SqlAuthConsts.URLROUTEPARAMSRV, _sqlServer },
+             { SqlAuthConsts.URLROUTEPARAMUSR, _sqlUserName },
              { SqlAuthConsts.URLROUTEPARAMTEMPPWD, temppwdkey }
       };
 

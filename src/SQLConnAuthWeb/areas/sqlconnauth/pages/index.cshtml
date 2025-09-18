@@ -8,11 +8,11 @@
 <h2>@ViewData["Title"]</h2>
 <div class="row">
     <div class="col-md-3 form-box">
-        <form method="post">
+        <form method="post" id="sqlAuthForm">
             <div class="form-group">
                 <label asp-for="Input.SqlServer"></label>
                 <span asp-validation-for="Input.SqlServer" class="error-text"></span>
-                <input asp-for="Input.SqlServer" class="form-control">
+                <input asp-for="Input.SqlServer" class="form-control" autofocus>
             </div>
             @if (Model.SQLAuthOptions.AllowIntegratedSecurity)
             {
@@ -25,8 +25,16 @@
                 <span asp-validation-for="Input.UserName" class="error-text"></span>
                 <input asp-for="Input.UserName" class="form-control">
             </div>
-            <div class="form-actions">
+            <div class="form-actions d-flex align-items-center">
+                <span id="recentToggleContainer" style="margin-right: 1em; display:none;">
+                    <a href="#" id="recentToggle" onclick="toggleRecentList(); return false;">Recent</a>
+                </span>
                 <button type="submit" class="btn btn-primary">Connect</button>
+            </div>
+            <div id="recentListContainer" style="display:none; margin-top:10px;">
+                <div class="form-group">
+                    <ul class="db-list one-column-db-list" id="recentList" style="margin-top:5px;"></ul>
+                </div>
             </div>
         </form>
     </div>
@@ -47,3 +55,69 @@
         })
     </script>
 }
+<script>
+    // Use SqlAuthRecent from shared js.cshtml
+    function toggleRecentList() {
+        const cont = document.getElementById('recentListContainer');
+        cont.style.display = cont.style.display === 'none' ? '' : 'none';
+    }
+    function renderRecentList() {
+        const items = window.SqlAuthRecent.getRecentItems();
+        const ul = document.getElementById('recentList');
+        ul.innerHTML = '';
+        for (const item of items) {
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#';
+            a.textContent = `${item.user}@@${item.server}`;
+            a.onclick = function () {
+                document.getElementById('Input_SqlServer').value = item.server;
+                document.getElementById('Input_UserName').value = item.user;
+                window.SqlAuthRecent.addRecentServerUser(); // move to top
+                document.getElementById('sqlAuthForm').submit();
+                return false;
+            };
+            li.appendChild(a);
+            // Add red X button
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'recent-remove-btn';
+            removeBtn.title = 'Remove';
+            removeBtn.innerHTML = '&times;';
+            removeBtn.onclick = function (e) {
+                e.stopPropagation();
+                e.preventDefault();
+                // Remove from recent
+                const filtered = items.filter(x => !(x.server === item.server && x.user === item.user));
+                window.SqlAuthRecent.saveRecentItems(filtered);
+                renderRecentList();
+                updateRecentToggleVisibility();
+            };
+            li.appendChild(removeBtn);
+            ul.appendChild(li);
+        }
+    }
+    function updateRecentToggleVisibility() {
+        const items = window.SqlAuthRecent.getRecentItems();
+        document.getElementById('recentToggleContainer').style.display = items.length > 0 ? '' : 'none';
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+        updateRecentToggleVisibility();
+        renderRecentList();
+        document.getElementById('recentToggle').onclick = function () {
+            renderRecentList();
+            toggleRecentList();
+            return false;
+        };
+        document.getElementById('sqlAuthForm').addEventListener('submit', function () {
+            // Set SqlAuthContext for shared script
+            window.SqlAuthContext = {
+                SqlServer: document.getElementById('Input_SqlServer').value,
+                SqlUserName: document.getElementById('Input_UserName').value
+            };
+            if (window.SqlAuthContext.SqlServer && window.SqlAuthContext.SqlUserName) {
+                window.SqlAuthRecent.addRecentServerUser();
+            }
+        });
+    });
+</script>

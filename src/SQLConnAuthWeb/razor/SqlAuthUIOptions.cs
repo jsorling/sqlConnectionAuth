@@ -32,4 +32,25 @@ public class SqlAuthUIOptions
    /// </summary>
    /// <returns>True if <see cref="ThemeSwitcherLocalStorageName"/> is not null or empty; otherwise, false.</returns>
    public bool UseThemeSwitcher() => !string.IsNullOrEmpty(ThemeSwitcherLocalStorageName);
+
+   /// <summary>
+   /// Gets or sets the maximum number of recent items to keep in local storage.
+   /// This value determines the maximum number of server/user pairs (first dimension)
+   /// and the maximum number of databases per server/user (second dimension) to track.
+   /// When the limit is exceeded, the least recently used items are removed. Used for
+   /// managing the recent items array in local storage, which is updated and truncated
+   /// as needed when submitting forms such as <c>index.cshtml</c> and <c>selectdb.cshtml</c>.
+   /// </summary>
+   public int MaxRecentItems { get; set; }
+
+   /// <summary>
+   /// Determines whether the recent items feature is enabled.
+   /// Returns <c>true</c> if <see cref="MaxRecentItems"/> is greater than zero, allowing
+   /// the UI to track and display recent server/user/database selections in a two-dimensional array.
+   /// The first dimension tracks server/user pairs, and the second dimension tracks databases for each pair.
+   /// </summary>
+   /// <returns>
+   /// <c>true</c> if recent items should be tracked; otherwise, <c>false</c>.
+   /// </returns>
+   public bool UseRecentItems() => MaxRecentItems > 0;
 }

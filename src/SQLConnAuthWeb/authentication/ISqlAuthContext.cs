@@ -12,12 +12,12 @@ public interface ISqlAuthContext
    /// <summary>
    /// Gets the SQL Server name or address.
    /// </summary>
-   string SqlServer { get; }
+   string? SqlServer { get; }
 
    /// <summary>
    /// Gets the SQL user name for authentication.
    /// </summary>
-   string SqlUserName { get; }
+   string? SqlUserName { get; }
 
    /// <summary>
    /// Gets the SQL database name.
