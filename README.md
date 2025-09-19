@@ -145,22 +145,26 @@ You can also inject `ISqlAuthContext` directly into your Razor view using the `@
 
 This approach provides a more direct and flexible way to access SQL authentication context, compared to the previous method using HttpContext extension methods.
 
-## Program.cs
-```C#
+## Getting Started
+
+To quickly get up and running, use the following minimal example. This demonstrates how to configure and launch a Razor Pages app with SQL connection authentication using Sorling.SqlConnAuthWeb.
+
+**Note:** You must have a Razor Pages directory called `/db` in your project. This is required because the example configures the SQL authentication area to use `/db` as the root path for authentication-related pages.
+
+### Program.cs
+
+```csharp
 using Sorling.SqlConnAuthWeb.authentication;
 using Sorling.SqlConnAuthWeb.extenstions;
+using Sorling.SqlConnAuthWeb.razor;
 
-SqlAuthAppPaths sqlauthpath = new("/db", "srv");
+SqlAuthAppPaths sqlauthpath = new("/db", UseDBNameRouting: true);
 WebApplicationBuilder? builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddSqlConnAuthentication(sqlauthpath, o => {
-   o.AllowIntegratedSecurity = true;
-   o.ThemeSwitcherLocalStorageName = "theme";
-   o.AllowTrustServerCertificate = true;
-   o.AllowLoopbackConnections = true;
-   o.AllowPrivateNetworkConnections = true;
-})
-   .AddSqlConnAuthorization()
+builder.Services.Configure<SqlAuthUIOptions>(builder.Configuration.GetSection("SqlAuthUIOptions"));
+builder.Services.AddSqlConnAuthentication(sqlauthpath);
+
+builder.Services.AddSqlConnAuthorization()
    .AddRazorPages()
    .AddSqlAuthRazorPageRouteConventions()
    .AuthorizeSqlAuthRootPath();
@@ -173,21 +177,52 @@ app.UseHttpsRedirection()
    .UseAuthorization();
 
 app.MapRazorPages();
+
 app.Run();
 ```
-### What does the SqlConnAuth code do?
-The code in `Program.cs` demonstrates how to integrate SQL connection-based authentication and authorization into a Razor Pages application using the sqlConnectionAuth library. The key features added by sqlConnectionAuth are:
 
-- **SQL Connection Authentication:**
-  - Adds authentication based on SQL Server connections, supporting integrated security and trusted server certificates.
-  - Allows configuration of network access rules (loopback, private network).
-  - Supports a theme switcher stored in local storage.
+### appsettings.json
 
-- **SQL Connection Authorization:**
-  - Enables authorization policies based on SQL authentication.
+```json
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "SqlAuthOptions": {
+    "AllowTrustServerCertificate": true,
+    "AllowLoopbackConnections": true,
+    "AllowPrivateNetworkConnections": true,
+    "AllowedIPAddresses": [
+      "127.0.0.1/32",
+      "192.168.1.0/24"
+    ],
+    "ExcludeDatabaseFilter": [
+      "mAst*"
+    ],
+    "IncludeDatabaseFilter": [
+      "*"
+    ]
+  },
+  "SqlAuthUIOptions": {
+    "ThemeSwitcherLocalStorageName": "sqlauththeme",
+    "MaxRecentItems":  20
+  }
+}
+```
 
-- **Custom Routing for SQL Auth:**
-  - Applies custom route conventions and root path authorization specific to SQL authentication.
+## How the Example Works
 
-These features extend a standard Razor Pages app to support secure, SQL-authenticated access and custom authorization logic.
+The code above shows how to integrate SQL connection-based authentication and authorization into a Razor Pages application using Sorling.SqlConnAuthWeb. The key features demonstrated are:
+
+- SQL Connection Authentication (with trusted server certificates)
+- Network access rules (loopback, private network)
+- Theme switcher support
+- SQL Connection Authorization
+- Custom routing and root path authorization for SQL authentication
+
+---
 
