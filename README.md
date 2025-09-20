@@ -118,9 +118,9 @@ public class IndexModel : PageModel
         _sqlAuthContext = sqlAuthContext;
     }
 
-    public string? ConnectionString => _sqlAuthContext.ConnectionString;
-    public string SqlServer => _sqlAuthContext.Server;
-    public string SqlUser => _sqlAuthContext.UserName;
+    public string? ConnectionString => _sqlAuthContext.GetConnectionString();
+    public string? SqlServer => _sqlAuthContext.SqlServer;
+    public string? SqlUser => _sqlAuthContext.SqlUserName;
 }
 ```
 
@@ -132,9 +132,9 @@ You can also inject `ISqlAuthContext` directly into your Razor view using the `@
 @using Sorling.SqlConnAuthWeb.authentication
 @inject ISqlAuthContext SqlAuthContext
 
-<p>Current connection string: @SqlAuthContext.ConnectionString</p>
-<p>SQL Server: @SqlAuthContext.Server</p>
-<p>SQL User: @SqlAuthContext.UserName</p>
+<p>Current connection string: @SqlAuthContext.GetConnectionString()</p>
+<p>SQL Server: @SqlAuthContext.SqlServer</p>
+<p>SQL User: @SqlAuthContext.SqlUserName</p>
 ```
 
 ### Additional Context
