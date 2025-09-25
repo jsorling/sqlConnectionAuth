@@ -8,6 +8,7 @@
 <!DOCTYPE html>
 <html data-bs-theme="auto" lang="en">
 <head>
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width" />
     <title>@ViewBag.Title</title>
     <link rel="stylesheet" href="~/_content/sorling.sqlconnauthweb/css/custom-theme.css" asp-append-version="true" />
@@ -15,15 +16,7 @@
     <sql-auth-context-script />
 </head>
 <body>
-    @if (theme.UseThemeSwitcher())
-    {
-        <div class="theme-switcher-icon-container" id="theme-switcher-icon-container" title="Switch theme">
-            <span class="theme-switcher-icon" id="theme-switcher-icon">
-                <!-- Default: system icon (monitor) -->
-                <svg id="theme-icon-system" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display:inline;"><rect x="3" y="5" width="18" height="12" rx="2" fill="currentColor"/><rect x="7" y="19" width="10" height="2" rx="1" fill="currentColor"/></svg>
-            </span>
-        </div>
-    }
+    <sql-auth-themeswitcher-body />
     <div class="centered-container">
         @RenderBody()
     </div>
@@ -32,6 +25,5 @@
     <script src="~/_content/sorling.sqlconnauthweb/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js" asp-append-version="true"></script>
     <sql-auth-js-script />
     <sql-auth-themeswitcher-script />
-    <script src="@Url.Page("js")?v=@VersionProvider.Version" asp-append-version="false"></script>
 </body>
 </html>

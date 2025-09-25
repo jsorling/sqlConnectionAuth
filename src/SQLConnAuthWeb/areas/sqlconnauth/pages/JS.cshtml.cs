@@ -35,6 +35,7 @@ public class JSModel(IOptionsMonitor<SqlAuthUIOptions> uiOptions
    /// <returns>The page result.</returns>
    public IActionResult OnGet() {
       Response.Headers.CacheControl = "public, max-age=31536000, immutable";
+      Response.ContentType = "text/javascript; charset=utf-8";
       return Page();
    }
 }
