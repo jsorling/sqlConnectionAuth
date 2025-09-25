@@ -3,7 +3,7 @@
 @inject Microsoft.Extensions.Options.IOptionsMonitor<SqlAuthUIOptions> UIOptions
 @{
     Layout = null;
-    this.Response.ContentType = "text/css";
+    this.Response.ContentType = "text/css;charset=utf-8";
     this.Response.Headers["Cache-Control"] = "public, max-age=31536000, immutable";
     var theme = UIOptions.CurrentValue;
 }
