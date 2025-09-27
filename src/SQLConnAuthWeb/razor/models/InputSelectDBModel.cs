@@ -14,5 +14,8 @@ public class InputSelectDBModel
    [Required]
    public string DBName { get; set; } = string.Empty;
 
+   /// <summary>
+   /// Gets or sets the list of databases to display for selection.
+   /// </summary>
    public IEnumerable<ISqlDatabase> Databases { get; set; } = [];
 }

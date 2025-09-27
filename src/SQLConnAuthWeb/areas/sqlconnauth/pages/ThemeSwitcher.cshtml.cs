@@ -6,6 +6,9 @@ using Sorling.SqlConnAuthWeb.razor;
 
 namespace Sorling.SqlConnAuthWeb.areas.sqlconnauth.pages;
 
+/// <summary>
+/// Page model that serves the Theme Switcher JavaScript endpoint with cache-busting support.
+/// </summary>
 public class ThemeSwitcherModel(IOptionsMonitor<SqlAuthUIOptions> uiOptions
    , IOptionsMonitor<SqlAuthOptions> authOptions
    , OptionsVersionProvider versionProvider) : PageModel

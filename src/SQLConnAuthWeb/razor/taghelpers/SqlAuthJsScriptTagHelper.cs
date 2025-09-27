@@ -8,6 +8,11 @@ namespace Sorling.SqlConnAuthWeb.razor.taghelpers;
 [HtmlTargetElement("sql-auth-js-script", TagStructure = TagStructure.WithoutEndTag)]
 public class SqlAuthJsScriptTagHelper(OptionsVersionProvider versionProvider) : TagHelper
 {
+   /// <summary>
+   /// Processes the tag helper and writes a script tag referencing the SQL Auth JS endpoint with a version query string.
+   /// </summary>
+   /// <param name="context">Contextual information about the tag helper.</param>
+   /// <param name="output">The target element output to write to.</param>
    //@addTagHelper *, Sorling.SqlConnAuthWeb
    //<sql-auth-js-script />
    public override void Process(TagHelperContext context, TagHelperOutput output) {

@@ -12,6 +12,7 @@ namespace Sorling.SqlConnAuthWeb.authentication.validation;
 /// Initializes a new instance of the <see cref="SqlAuthRuleValidator"/> class.
 /// </remarks>
 /// <param name="optionsMonitor">The options monitor used to retrieve current rule validation options at runtime.</param>
+/// <param name="databaseNameValidator">The database name allow/deny filter used to validate requested database names.</param>
 public class SqlAuthRuleValidator(IOptionsMonitor<SqlAuthOptions> optionsMonitor, ISqlAuthDatabaseNameFilter databaseNameValidator) : ISqlAuthRuleValidator
 {
    private readonly IOptionsMonitor<SqlAuthOptions> _optionsMonitor
@@ -152,6 +153,7 @@ public class SqlAuthRuleValidator(IOptionsMonitor<SqlAuthOptions> optionsMonitor
       return true;
    }
 
+   /// <inheritdoc/>
    public Task<bool> ValidateDatabaseAsync(string databaseName)
       => Task.FromResult(_databaseNameValidator.IsAllowed(databaseName));
 }

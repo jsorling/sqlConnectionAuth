@@ -8,6 +8,11 @@ namespace Sorling.SqlConnAuthWeb.razor.taghelpers;
 [HtmlTargetElement("sql-auth-themeswitcher-css", TagStructure = TagStructure.WithoutEndTag)]
 public class SqlAuthThemeSwitcherCssTagHelper(OptionsVersionProvider versionProvider) : TagHelper
 {
+   /// <summary>
+   /// Processes the tag helper and writes a link tag referencing the Theme Switcher CSS endpoint with a version query string.
+   /// </summary>
+   /// <param name="context">Contextual information about the tag helper.</param>
+   /// <param name="output">The target element output to write to.</param>
    public override void Process(TagHelperContext context, TagHelperOutput output) {
       output.TagName = "link";
       output.TagMode = TagMode.SelfClosing;

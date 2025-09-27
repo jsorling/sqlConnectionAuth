@@ -11,6 +11,11 @@ public class SqlAuthContextScriptTagHelper(ISqlAuthContext context) : TagHelper
 {
    private readonly ISqlAuthContext _context = context;
 
+   /// <summary>
+   /// Processes the tag helper and writes a script tag to the output that sets <c>window.SqlAuthContext</c>.
+   /// </summary>
+   /// <param name="context">Contextual information about the tag helper.</param>
+   /// <param name="output">The target element output to write to.</param>
    //@addTagHelper *, Sorling.SqlConnAuthWeb
    //<sql-auth-context-script />
    public override void Process(TagHelperContext context, TagHelperOutput output) {

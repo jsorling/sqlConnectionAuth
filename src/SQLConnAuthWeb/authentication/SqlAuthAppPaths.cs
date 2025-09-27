@@ -4,7 +4,8 @@
 /// Represents application path configuration for SQL authentication, including root and tail segments.
 /// </summary>
 /// <param name="Root">The root segment of the path (default is "/db").</param>
-/// <param name="Tail">The tail segment of the path (default is "srv").</param>
+/// <param name="Tail">The tail segment of the path (default is "").</param>
+/// <param name="UseDBNameRouting">If true, the database name is included in routes and validated; otherwise the DB name is omitted from the route.</param>
 public record SqlAuthAppPaths(string Root = "/db", string Tail = "", bool UseDBNameRouting = true)
 {
    /// <summary>

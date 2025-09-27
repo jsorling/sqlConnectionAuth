@@ -37,6 +37,12 @@ public class RedirectToSelectDBWithTempPwdKeyResult : ActionResult
 
    private readonly string _sqlServer;
 
+   /// <summary>
+   /// Executes the action result by generating a temporary password key, constructing the SelectDB page URL, and issuing a redirect response.
+   /// </summary>
+   /// <param name="context">The action context used to access the current HTTP context.</param>
+   /// <returns>A task that represents the asynchronous operation.</returns>
+   /// <exception cref="ApplicationException">Thrown if the SelectDB URL cannot be generated.</exception>
    public override async Task ExecuteResultAsync(ActionContext context) {
       SqlAuthStoredSecrets storedsecrets = _context.StoredSecrets ?? throw new ApplicationException("Stored secrets not set");
       string temppwdkey = await _pwdStore.SetTempPasswordAsync(

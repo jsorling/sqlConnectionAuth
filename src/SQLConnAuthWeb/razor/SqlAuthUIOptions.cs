@@ -1,5 +1,9 @@
 ﻿namespace Sorling.SqlConnAuthWeb.razor;
 
+/// <summary>
+/// UI configuration options for the SQL Connection Authentication Razor Pages UI, such as theme colors,
+/// theme switcher behavior, and recent-items behavior used by client-side scripts and tag helpers.
+/// </summary>
 public class SqlAuthUIOptions
 {
    /// <summary>

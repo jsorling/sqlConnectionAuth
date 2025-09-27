@@ -9,6 +9,11 @@ namespace Sorling.SqlConnAuthWeb.razor.taghelpers;
 [HtmlTargetElement("sql-auth-themeswitcher-body", TagStructure = TagStructure.WithoutEndTag)]
 public class SqlAuthThemeSwitcherBodyTagHelper(IOptionsMonitor<SqlAuthUIOptions> uiOptions) : TagHelper
 {
+   /// <summary>
+   /// Processes the tag helper and writes the theme switcher markup if enabled; otherwise suppresses output.
+   /// </summary>
+   /// <param name="context">Contextual information about the tag helper.</param>
+   /// <param name="output">The target element output to write to.</param>
    public override void Process(TagHelperContext context, TagHelperOutput output) {
       SqlAuthUIOptions opts = uiOptions.CurrentValue;
       if (!opts.UseThemeSwitcher())
