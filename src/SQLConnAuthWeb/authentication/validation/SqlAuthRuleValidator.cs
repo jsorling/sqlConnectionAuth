@@ -49,7 +49,7 @@ public class SqlAuthRuleValidator(IOptionsMonitor<SqlAuthOptions> optionsMonitor
          {
             return new SqlAuthRuleValidationResult(
                new ApplicationException(
-                  $"IP address not allowed by allow-list {string.Join(',', ips.Select(s => s.ToString()))}"), null);
+                  $"IP address not allowed by allow-list ({string.Join(',', ips.Select(s => s.ToString()))})"), null);
          }
       }
       else if (!options.AllowLoopbackConnections || !options.AllowPrivateNetworkConnections)
