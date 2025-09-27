@@ -14,7 +14,7 @@ public static class MvcBuilderExtensions
    /// </summary>
    /// <param name="builder">The MVC builder to configure.</param>
    /// <returns>The configured <see cref="IMvcBuilder"/> instance.</returns>
-   /// <exception cref="ArgumentNullException">Thrown if <paramref name="builder"/></exception>
+   /// <exception cref="ArgumentNullException">Thrown if <paramref name="builder"/> is null.</exception>
    public static IMvcBuilder AddSqlAuthRazorPageRouteConventions(this IMvcBuilder builder) {
       ArgumentNullException.ThrowIfNull(builder);
 
@@ -30,7 +30,7 @@ public static class MvcBuilderExtensions
    /// </summary>
    /// <param name="builder">The MVC builder to configure.</param>
    /// <returns>The configured <see cref="IMvcBuilder"/> instance.</returns>
-   /// <exception cref="ArgumentNullException">Thrown if <paramref name="builder"/> is null or SqlAuthAppPaths is not registered in DI.</exception>
+   /// <exception cref="ArgumentNullException">Thrown if <paramref name="builder"/> is null or <see cref="SqlAuthAppPaths"/> is not registered in DI.</exception>
    public static IMvcBuilder AuthorizeSqlAuthRootPath(this IMvcBuilder builder) {
       ArgumentNullException.ThrowIfNull(builder);
       ServiceProvider provider = builder.Services.BuildServiceProvider();

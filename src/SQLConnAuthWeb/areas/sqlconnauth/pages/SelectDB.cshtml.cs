@@ -16,7 +16,7 @@ namespace Sorling.SqlConnAuthWeb.areas.sqlconnauth.pages;
 /// <remarks>
 /// This page allows users to select a database after authenticating with a temporary password.
 /// </remarks>
-/// <param name="sqlConnAuthenticationService">The SQL authentication service for validating credentials and authenticating users.</param>
+/// <param name="sqlConnAuthenticationService">The SQL authentication service for validatingCredentials and authenticating users.</param>
 /// <param name="sqlAuthDBAccess">The SQL database access service for retrieving available databases.</param>
 /// <param name="pwdStore">The password store service for managing temporary passwords.</param>
 /// <param name="sqlAuthContext">The authentication context providing connection and user details.</param>
@@ -59,7 +59,8 @@ public class SelectDBModel(
    /// </summary>
    /// <param name="tmpPwd">The temporary password info used for database access.</param>
    /// <returns>
-   /// A <see cref="Task{IEnumerable{ISqlDatabase}}"/> representing the asynchronous operation. The result contains a collection of SQL databases.
+   /// A <see cref="System.Threading.Tasks.Task"/> representing the asynchronous operation that yields
+   /// an <see cref="System.Collections.Generic.IEnumerable{ISqlDatabase}"/>.
    /// </returns>
    private async Task<IEnumerable<ISqlDatabase>> GetDatabasesAsync(SqlAuthTempPasswordInfo tmpPwd)
        => await sqlAuthDBAccess.GetDatabasesAsync(new(sqlAuthContext.SqlServer, sqlAuthContext.SqlUserName, tmpPwd));
@@ -94,7 +95,7 @@ public class SelectDBModel(
    /// Gets the application path URL for the selected database, constructing the route as needed.
    /// </summary>
    /// <param name="db">The selected database name, or null for the default.</param>
-   /// <returns>The application path URL as a string.</returns>
+   /// <returns>The application path URL, as a string.</returns>
    /// <exception cref="NullReferenceException">Thrown if the URL cannot be created.</exception>
    private string GetAppPathUrl(string? db = null) {
       RouteValueDictionary routevalues = new()

@@ -1,5 +1,9 @@
 ﻿namespace Sorling.SqlConnAuthWeb.authentication.validation;
 
+/// <summary>
+/// Provides an abstraction for validating and filtering SQL database names according to configured allow/deny rules.
+/// Implementations are used by <see cref="SqlAuthRuleValidator"/> and <see cref="dbaccess.SqlAuthDBAccess"/> to enforce UI and security constraints.
+/// </summary>
 public interface ISqlAuthDatabaseNameFilter
 {
    /// <summary>
