@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using Sorling.SqlConnAuthWeb.helpers;
 using System.Net;
+using System.Net.Sockets;
 
 namespace Sorling.SqlConnAuthWeb.authentication.validation;
 
@@ -46,7 +47,9 @@ public class SqlAuthRuleValidator(IOptionsMonitor<SqlAuthOptions> optionsMonitor
       {
          if (!IsIpAllowed(ips, options.AllowedIPAddresses))
          {
-            return new SqlAuthRuleValidationResult(new ApplicationException("IP address not allowed by allow-list"), null);
+            return new SqlAuthRuleValidationResult(
+               new ApplicationException(
+                  $"IP address not allowed by allow-list {string.Join(',', ips.Select(s => s.ToString()))}"), null);
          }
       }
       else if (!options.AllowLoopbackConnections || !options.AllowPrivateNetworkConnections)
@@ -92,7 +95,10 @@ public class SqlAuthRuleValidator(IOptionsMonitor<SqlAuthOptions> optionsMonitor
    /// <param name="cidr">The CIDR range string.</param>
    /// <returns>True if the IP is within the range; otherwise, false.</returns>
    private static bool IsIpInCidr(IPAddress ip, string cidr) {
-      string[] parts = cidr.Split('/');
+      if (string.IsNullOrWhiteSpace(cidr))
+         return false;
+
+      string[] parts = cidr.Trim().Split('/');
       if (parts.Length != 2)
          return false;
       if (!IPAddress.TryParse(parts[0], out IPAddress? networkip))
@@ -100,20 +106,47 @@ public class SqlAuthRuleValidator(IOptionsMonitor<SqlAuthOptions> optionsMonitor
       if (!int.TryParse(parts[1], out int prefixlength))
          return false;
 
+      // Validate prefix length according to address family
+      if (networkip.AddressFamily == AddressFamily.InterNetwork)
+      {
+         if (prefixlength is < 0 or > 32)
+            return false;
+      }
+      else if (networkip.AddressFamily == AddressFamily.InterNetworkV6)
+      {
+         if (prefixlength is < 0 or > 128)
+            return false;
+      }
+      else
+      {
+         return false;
+      }
+
+      // Normalize address families (handle IPv4-mapped IPv6)
+      if (networkip.AddressFamily == AddressFamily.InterNetwork && ip.AddressFamily == AddressFamily.InterNetworkV6 && ip.IsIPv4MappedToIPv6)
+      {
+         ip = ip.MapToIPv4();
+      }
+
       byte[] ipbytes = ip.GetAddressBytes();
       byte[] networkbytes = networkip.GetAddressBytes();
+
       if (ipbytes.Length != networkbytes.Length)
          return false;
 
+      static byte MaskByte(int remainingBits) => remainingBits >= 8
+         ? (byte)0xFF
+         : remainingBits <= 0
+            ? (byte)0x00
+            : (byte)(0xFF << (8 - remainingBits));
+
       int bits = prefixlength;
-      for (int i = 0; i < ipbytes.Length; i++)
+      for (int i = 0; i < ipbytes.Length && bits > 0; i++)
       {
-         int mask = bits >= 8 ? 255 : bits > 0 ? (byte)~(255 >> bits) : 0;
+         byte mask = MaskByte(bits);
          if ((ipbytes[i] & mask) != (networkbytes[i] & mask))
             return false;
          bits -= 8;
-         if (bits <= 0)
-            break;
       }
 
       return true;
