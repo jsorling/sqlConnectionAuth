@@ -35,9 +35,12 @@ public class IndexModel(IOptionsMonitor<SqlAuthOptions> options, SqlAuthAppPaths
 
    /// <summary>
    /// Handles POST requests to the index page, redirecting to the SQL authentication path if the model is valid.
+   /// Accepts optional trust flag and forwards it to the connect page as a query parameter when provided/true.
    /// </summary>
    /// <returns>An <see cref="IActionResult"/> representing the result of the operation.</returns>
-   public IActionResult OnPost() {
+   public IActionResult OnPost(
+ [FromForm(Name = "trustservercerificate")] bool? trustservercerificate = null)
+ {
       if (ModelState.IsValid)
       {
          if (sqlAuthAppPaths.UseDBNameRouting)
@@ -49,11 +52,22 @@ public class IndexModel(IOptionsMonitor<SqlAuthOptions> options, SqlAuthAppPaths
                { SqlAuthConsts.URLROUTEPARAMUSR, Input.UserName }
             };
 
+            // Only include query when true (false is default on connect).
+            if (trustservercerificate == true)
+            {
+               routevalues["trustservercerificate"] = true;
+            }
+
             return RedirectToPage("connect", routevalues);
          }
          else
          {
             string redir = sqlAuthAppPaths.UriEscapedSqlPath(Input.SqlServer, Input.UserName);
+            if (trustservercerificate == true)
+            {
+               // Append query string to carry trust flag
+               redir += (redir.Contains('?') ? "&" : "?") + "trustservercerificate=true";
+            }
             return Redirect(redir);
          }
       }

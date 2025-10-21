@@ -25,6 +25,7 @@
                 <span asp-validation-for="Input.UserName" class="error-text"></span>
                 <input asp-for="Input.UserName" class="form-control">
             </div>
+            <input type="hidden" id="trustservercerificate" name="trustservercerificate" value="false" />
             <div class="form-actions d-flex align-items-center">
                 <span id="recentToggleContainer" style="margin-right: 1em; display:none;">
                     <a href="#" id="recentToggle" onclick="toggleRecentList(); return false;">Recent</a>
@@ -73,7 +74,8 @@
             a.onclick = function () {
                 document.getElementById('Input_SqlServer').value = item.server;
                 document.getElementById('Input_UserName').value = item.user;
-                window.SqlAuthRecent.addRecentServerUser(); // move to top
+                document.getElementById('trustservercerificate').value = (item.trustservercerificate === true).toString();
+                window.SqlAuthRecent.addRecentServerUser(item.trustservercerificate); // move to top and keep trust
                 document.getElementById('sqlAuthForm').submit();
                 return false;
             };
@@ -99,7 +101,7 @@
     }
     function updateRecentToggleVisibility() {
         const items = window.SqlAuthRecent.getRecentItems();
-        document.getElementById('recentToggleContainer').style.display = items.length > 0 ? '' : 'none';
+        document.getElementById('recentToggleContainer').style.display = items.length >0 ? '' : 'none';
     }
     document.addEventListener('DOMContentLoaded', function () {
         updateRecentToggleVisibility();

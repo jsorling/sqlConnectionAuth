@@ -23,108 +23,114 @@ namespace Sorling.SqlConnAuthWeb.areas.sqlconnauth.pages;
 [AllowAnonymous]
 [RequireHttps]
 public class ConnectModel(
-    ISqlAuthService sqlConnAuthService,
-    ISqlAuthPwdStore sqlAuthPwdStore,
-    IOptionsMonitor<SqlAuthOptions> options,
-    ISqlAuthContext sqlAuthContext
+ ISqlAuthService sqlConnAuthService,
+ ISqlAuthPwdStore sqlAuthPwdStore,
+ IOptionsMonitor<SqlAuthOptions> options,
+ ISqlAuthContext sqlAuthContext
 ) : PageModel
 {
-   /// <summary>
-   /// Gets or sets the input model for password and trust server certificate options.
-   /// </summary>
-   [BindProperty]
-   public InputPasswordModel Input { get; set; } = new();
+ /// <summary>
+ /// Gets or sets the input model for password and trust server certificate options.
+ /// </summary>
+ [BindProperty]
+ public InputPasswordModel Input { get; set; } = new();
 
-   private readonly SqlAuthOptions _sqlAuthOptions = options.CurrentValue;
+ private readonly SqlAuthOptions _sqlAuthOptions = options.CurrentValue;
 
-   /// <summary>
-   /// Gets a value indicating whether Windows Authentication is enabled and allowed for the current context.
-   /// </summary>
-   public bool IsWinAuth { get; private set; }
+ /// <summary>
+ /// Gets a value indicating whether Windows Authentication is enabled and allowed for the current context.
+ /// </summary>
+ public bool IsWinAuth { get; private set; }
 
-   /// <summary>
-   /// Gets the database route parameter from the current request, if present.
-   /// </summary>
-   public string? RouteParamDb => Request.RouteValues[SqlAuthConsts.URLROUTEPARAMDB]?.ToString();
+ /// <summary>
+ /// Gets the database route parameter from the current request, if present.
+ /// </summary>
+ public string? RouteParamDb => Request.RouteValues[SqlAuthConsts.URLROUTEPARAMDB]?.ToString();
 
-   /// <summary>
-   /// Gets the SQL Server name from the authentication context.
-   /// </summary>
-   public string SqlServer => sqlAuthContext.SqlServer!;
+ /// <summary>
+ /// Gets the SQL Server name from the authentication context.
+ /// </summary>
+ public string SqlServer => sqlAuthContext.SqlServer!;
 
-   /// <summary>
-   /// Gets the user name from the authentication context.
-   /// </summary>
-   public string SqlUserName => sqlAuthContext.SqlUserName!;
+ /// <summary>
+ /// Gets the user name from the authentication context.
+ /// </summary>
+ public string SqlUserName => sqlAuthContext.SqlUserName!;
 
-   /// <summary>
-   /// Handles GET requests to the Connect page. Sets the <see cref="IsWinAuth"/> property based on the user and configuration.
-   /// </summary>
-   public void OnGet()
-       => IsWinAuth = SqlUserName == SqlAuthConsts.WINDOWSAUTHENTICATION
-           && _sqlAuthOptions.AllowIntegratedSecurity;
+ /// <summary>
+ /// Handles GET requests to the Connect page. Sets the <see cref="IsWinAuth"/> property based on the user and configuration.
+ /// Accepts optional query parameter 'trustservercerificate' and applies it to the input model (defaults to false when not provided).
+ /// </summary>
+ public void OnGet([FromQuery(Name = "trustservercerificate")] bool? trustservercerificate = null)
+ {
+ // Apply query parameter to model, defaulting to false when omitted or invalid
+ Input.TrustServerCertificate = trustservercerificate ?? false;
 
-   /// <summary>
-   /// Handles POST requests to the Connect page. Performs authentication and redirects or returns the page as appropriate.
-   /// </summary>
-   /// <param name="sqlauthparamdb">The database name from the route parameter, if using DB name routing.</param>
-   /// <param name="returnUrl">The URL to redirect to on successful authentication, or null to use the default.</param>
-   /// <returns>
-   /// An <see cref="IActionResult"/> representing the result of the operation: a redirect on success, or the page with errors on failure.
-   /// </returns>
-   public async Task<IActionResult> OnPostAsync(
-       [FromRoute] string? sqlauthparamdb,
-       [FromQuery] string? returnUrl = null) {
-      if (ModelState.IsValid)
-      {
-         if (sqlAuthContext.AppPaths.UseDBNameRouting)
-         {
-            // Test authentication with temporary password and DB name routing
-            SqlAuthenticationResult testauthenticateresult =
-                await sqlConnAuthService.TestAuthenticateAsync(Input, sqlauthparamdb);
+ IsWinAuth = SqlUserName == SqlAuthConsts.WINDOWSAUTHENTICATION
+ && _sqlAuthOptions.AllowIntegratedSecurity;
+ }
 
-            if (!testauthenticateresult.Success && testauthenticateresult.Exception is not null)
-            {
-               ModelState.AddModelError("Password", testauthenticateresult.Exception.Message);
-               return Page();
-            }
-            else
-            {
-               // Store temporary password and redirect to selectdb page
-               string tmppwdkey = await sqlAuthPwdStore.SetTempPasswordAsync(
-                   SqlUserName, SqlServer, Input.Password, Input.TrustServerCertificate);
+ /// <summary>
+ /// Handles POST requests to the Connect page. Performs authentication and redirects or returns the page as appropriate.
+ /// </summary>
+ /// <param name="sqlauthparamdb">The database name from the route parameter, if using DB name routing.</param>
+ /// <param name="returnUrl">The URL to redirect to on successful authentication, or null to use the default.</param>
+ /// <returns>
+ /// An <see cref="IActionResult"/> representing the result of the operation: a redirect on success, or the page with errors on failure.
+ /// </returns>
+ public async Task<IActionResult> OnPostAsync(
+ [FromRoute] string? sqlauthparamdb,
+ [FromQuery] string? returnUrl = null) {
+ if (ModelState.IsValid)
+ {
+ if (sqlAuthContext.AppPaths.UseDBNameRouting)
+ {
+ // Test authentication with temporary password and DB name routing
+ SqlAuthenticationResult testauthenticateresult =
+ await sqlConnAuthService.TestAuthenticateAsync(Input, sqlauthparamdb);
 
-               RouteValueDictionary routevalues = new()
-               {
-                        { "area", SqlAuthConsts.SQLAUTHAREA },
-                        { SqlAuthConsts.URLROUTEPARAMSRV, SqlServer },
-                        { SqlAuthConsts.URLROUTEPARAMUSR, SqlUserName },
-                        { SqlAuthConsts.URLROUTEPARAMTEMPPWD, tmppwdkey }
-                    };
-               if (returnUrl != null)
-                  routevalues["returnUrl"] = returnUrl;
+ if (!testauthenticateresult.Success && testauthenticateresult.Exception is not null)
+ {
+ ModelState.AddModelError("Password", testauthenticateresult.Exception.Message);
+ return Page();
+ }
+ else
+ {
+ // Store temporary password and redirect to selectdb page
+ string tmppwdkey = await sqlAuthPwdStore.SetTempPasswordAsync(
+ SqlUserName, SqlServer, Input.Password, Input.TrustServerCertificate);
 
-               return RedirectToPage("selectdb", routevalues);
-            }
-         }
-         else
-         {
-            // Authenticate using standard SQL authentication
-            SqlAuthenticationResult result = await sqlConnAuthService.AuthenticateAsync(Input);
+ RouteValueDictionary routevalues = new()
+ {
+ { "area", SqlAuthConsts.SQLAUTHAREA },
+ { SqlAuthConsts.URLROUTEPARAMSRV, SqlServer },
+ { SqlAuthConsts.URLROUTEPARAMUSR, SqlUserName },
+ { SqlAuthConsts.URLROUTEPARAMTEMPPWD, tmppwdkey }
+ };
+ if (returnUrl != null)
+ routevalues["returnUrl"] = returnUrl;
 
-            if (!result.Success && result.Exception is not null)
-            {
-               ModelState.AddModelError("Password", result.Exception.Message);
-            }
+ return RedirectToPage("selectdb", routevalues);
+ }
+ }
+ else
+ {
+ // Authenticate using standard SQL authentication
+ SqlAuthenticationResult result = await sqlConnAuthService.AuthenticateAsync(Input);
 
-            return result.Success
-              ? Redirect(returnUrl
-                 ?? sqlAuthContext.AppPaths.UriEscapedSqlPath(SqlServer, SqlUserName!))
-              : Page();
-         }
-      }
+ if (!result.Success && result.Exception is not null)
+ {
+ ModelState.AddModelError("Password", result.Exception.Message);
+ }
 
-      // Model state is invalid or authentication failed
-      return Page();
-   }
+ return result.Success
+ ? Redirect(returnUrl
+ ?? sqlAuthContext.AppPaths.UriEscapedSqlPath(SqlServer, SqlUserName!))
+ : Page();
+ }
+ }
+
+ // Model state is invalid or authentication failed
+ return Page();
+ }
 }
