@@ -93,24 +93,6 @@ The extension method `AddSqlAuthRazorPageRouteConventions` (see `MvcBuilderExten
 - If the route starts with the configured root path, it rewrites the template to include `/{server}/{user}/[tail]`.
 - This enables URLs to carry the SQL Server and user context, which can be used for authentication and authorization logic within the page handlers.
 
-### Link and Redirect Helpers: `SqlAuthPageLinkExtensions`
-
-When routes are rewritten to include `server/user[/db]`, link generation must include those route values. To make this convenient, the library exposes helpers in `SqlAuthPageLinkExtensions` that automatically preserve the ambient SQL auth route values (and area) when generating URLs or redirects.
-
-- Preserve ambient area:
- - PageModel: `return this.RedirectToPageWithSqlAuth("./upload");`
- - IUrlHelper: `Url.PageWithSqlAuth("./upload");`
-- Force non-area (area = null):
- - PageModel: `return this.RedirectToAppPageWithSqlAuth("/db/index");`
- - IUrlHelper: `Url.PageAppWithSqlAuth("/db/index");`
-- Force a specific area:
- - PageModel: `return this.RedirectToAreaPageWithSqlAuth("sqlconnauth", "/selectdb");`
- - IUrlHelper: `Url.PageInAreaWithSqlAuth("sqlconnauth", "/selectdb");`
-- Manual route values (third pattern):
- - PageModel: `return RedirectToPage("upload", this.GetSqlAuthRouteValues());`
-
-These helpers avoid InvalidOperationException from missing route parameters and remove the need to manually copy `sqlauthparamsrv`, `sqlauthparamusr`, and `sqlauthparamdb` across redirects.
-
 ### Root Path Authorization: AuthorizeSqlAuthRootPath
 
 The extension method `AuthorizeSqlAuthRootPath` (see `MvcBuilderExtensions.cs`) configures Razor Pages to require a specific authorization policy for all pages under the SQL authentication root path. It does this by calling `options.Conventions.AuthorizeFolder` with the root path and a custom policy name. This ensures that all authentication-related pages are protected by the appropriate authorization logic, and only accessible to users who have passed SQL authentication.
@@ -185,6 +167,7 @@ builder.Services.AddSqlConnAuthentication(sqlauthpath);
 builder.Services.AddSqlConnAuthorization()
    .AddRazorPages()
    .AddSqlAuthRazorPageRouteConventions()
+   .AddSqlAuthFilters()
    .AuthorizeSqlAuthRootPath();
 
 WebApplication app = builder.Build();

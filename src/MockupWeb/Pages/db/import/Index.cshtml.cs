@@ -7,7 +7,7 @@ namespace MockupWeb.Pages.db.import;
 
 public class IndexModel : PageModel
 {
-   public IActionResult OnGet() {
+   public IActionResult OnGet() =>
       //RouteValueDictionary rv = new() {
       //   ["area"] = null
       //};
@@ -28,6 +28,5 @@ public class IndexModel : PageModel
       //return RedirectToPage("./upload", rv);
       //return RedirectToPage("./upload");
       //return this.RedirectToPageWithSqlAuth("./upload");
-      return this.RedirectToPage("./upload");
-   }
+      RedirectToPage("upload");
 }

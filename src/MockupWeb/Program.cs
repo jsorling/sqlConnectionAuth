@@ -9,16 +9,17 @@ builder.Services.Configure<SqlAuthUIOptions>(builder.Configuration.GetSection("S
 builder.Services.AddSqlConnAuthentication(sqlauthpath);
 
 builder.Services.AddSqlConnAuthorization()
-   .AddRazorPages()
-   .AddSqlAuthRazorPageRouteConventions()
-   .AuthorizeSqlAuthRootPath();
+ .AddRazorPages()
+ .AddSqlAuthRazorPageRouteConventions()
+ .AddSqlAuthFilters()
+ .AuthorizeSqlAuthRootPath();
 
 WebApplication app = builder.Build();
 app.UseHttpsRedirection()
-   .UseStaticFiles()
-   .UseRouting()
-   .UseAuthentication()
-   .UseAuthorization();
+ .UseStaticFiles()
+ .UseRouting()
+ .UseAuthentication()
+ .UseAuthorization();
 
 app.MapRazorPages();
 
