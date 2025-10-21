@@ -22,10 +22,10 @@ public class SqlAuthService(
     ISqlAuthContext sqlAuthContext
 ) : ISqlAuthService
 {
-   private readonly string _sqlserver = sqlAuthContext.SqlServer 
+   private readonly string _sqlserver = sqlAuthContext.SqlServer
       ?? throw new ArgumentNullException(nameof(sqlAuthContext.SqlServer));
 
-   private readonly string _sqlusername = sqlAuthContext.SqlUserName 
+   private readonly string _sqlusername = sqlAuthContext.SqlUserName
       ?? throw new ArgumentNullException(nameof(sqlAuthContext.SqlUserName));
 
    /// <summary>
