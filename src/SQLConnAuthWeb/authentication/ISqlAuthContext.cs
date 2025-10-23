@@ -1,5 +1,5 @@
-﻿using Sorling.SqlConnAuthWeb.authentication.passwords;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Sorling.SqlConnAuthWeb.authentication.passwords;
 using Sorling.SqlConnAuthWeb.razor;
 
 namespace Sorling.SqlConnAuthWeb.authentication;

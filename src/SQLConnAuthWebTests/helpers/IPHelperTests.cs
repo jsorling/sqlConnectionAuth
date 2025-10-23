@@ -90,7 +90,7 @@ public class IPHelperTests
       {
          IPAddress[] result = await IPHelper.ResolveSqlIPAddressAsync(data);
 
-         Assert.IsTrue(result.Length > 0);
+         Assert.IsNotEmpty(result);
       }
    }
 
@@ -106,7 +106,7 @@ public class IPHelperTests
       foreach (string data in datasource)
       {
          IPAddress[] result = IPHelper.ResolveSqlIPAddressAsync(data).Result;
-         Assert.IsTrue(result.Length > 0);
+         Assert.IsNotEmpty(result);
 
          foreach (IPAddress ip in result)
          {
@@ -126,7 +126,7 @@ public class IPHelperTests
       foreach (string data in datasource)
       {
          IPAddress[] result = IPHelper.ResolveSqlIPAddressAsync(data).Result;
-         Assert.IsTrue(result.Length > 0);
+         Assert.IsNotEmpty(result);
 
          foreach (IPAddress ip in result)
          {
@@ -144,7 +144,7 @@ public class IPHelperTests
       foreach (string data in datasource)
       {
          IPAddress[] result = IPHelper.ResolveSqlIPAddressAsync(data).Result;
-         Assert.IsTrue(result.Length > 0);
+         Assert.IsNotEmpty(result);
 
          foreach (IPAddress ip in result)
          {

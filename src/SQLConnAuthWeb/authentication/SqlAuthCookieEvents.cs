@@ -81,7 +81,7 @@ public class SqlAuthCookieEvents(ISqlAuthPwdStore sqlConnAuthPwdStore
    /// <param name="context">The context for the principal validation event.</param>
    /// <returns>A task that represents the asynchronous operation.</returns>
    public override async Task ValidatePrincipal(CookieValidatePrincipalContext context) {
-      if(context.HttpContext.Request.RouteValues.Count < 1)
+      if (context.HttpContext.Request.RouteValues.Count < 1)
       {
          // most likely a 404, we will not be able to handle, reject
          context.RejectPrincipal();

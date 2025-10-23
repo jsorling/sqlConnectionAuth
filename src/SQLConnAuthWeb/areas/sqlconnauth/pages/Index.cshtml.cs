@@ -39,8 +39,7 @@ public class IndexModel(IOptionsMonitor<SqlAuthOptions> options, SqlAuthAppPaths
    /// </summary>
    /// <returns>An <see cref="IActionResult"/> representing the result of the operation.</returns>
    public IActionResult OnPost(
- [FromForm(Name = "trustservercerificate")] bool? trustservercerificate = null)
- {
+ [FromForm(Name = "trustservercerificate")] bool? trustservercerificate = null) {
       if (ModelState.IsValid)
       {
          if (sqlAuthAppPaths.UseDBNameRouting)
@@ -68,6 +67,7 @@ public class IndexModel(IOptionsMonitor<SqlAuthOptions> options, SqlAuthAppPaths
                // Append query string to carry trust flag
                redir += (redir.Contains('?') ? "&" : "?") + "trustservercerificate=true";
             }
+
             return Redirect(redir);
          }
       }

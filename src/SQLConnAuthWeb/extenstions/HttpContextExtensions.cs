@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Primitives;
-using Sorling.SqlConnAuthWeb.authentication;
-using Sorling.SqlConnAuthWeb.authentication.passwords;
 
 namespace Sorling.SqlConnAuthWeb.extenstions;
 
@@ -19,7 +17,7 @@ public static class HttpContextExtensions
    /// <returns>A task that represents the asynchronous operation.</returns>
    public static async Task SqlAuthSignoutAsync(this HttpContext httpContext)
        => await httpContext.SignOutAsync(SqlAuthConsts.SQLAUTHSCHEME);
-   
+
    /// <summary>
    /// Returns a new query string with the specified key and value added or updated, based on the current request's query string.
    /// </summary>

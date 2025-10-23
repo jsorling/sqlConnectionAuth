@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Sorling.SqlConnAuthWeb;
-using Sorling.SqlConnAuthWeb.razor;
 
 namespace MockupWeb.Pages.db.import;
 
