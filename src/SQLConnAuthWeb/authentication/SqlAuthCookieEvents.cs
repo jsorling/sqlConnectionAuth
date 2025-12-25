@@ -89,7 +89,7 @@ public class SqlAuthCookieEvents(ISqlAuthPwdStore sqlConnAuthPwdStore
       }
 
       (string? server, string? user, string? passwordref) = ExtractClaims(context.Principal);
-      if (string.IsNullOrEmpty(server) || string.IsNullOrEmpty(user) || string.IsNullOrEmpty(passwordref))
+      if (string.IsNullOrWhiteSpace(server) || string.IsNullOrWhiteSpace(user) || string.IsNullOrWhiteSpace(passwordref))
       {
          context.RejectPrincipal();
          return;
@@ -145,20 +145,20 @@ public class SqlAuthCookieEvents(ISqlAuthPwdStore sqlConnAuthPwdStore
    /// <param name="context">The context for the redirect to login event.</param>
    /// <returns>A task that represents the asynchronous operation.</returns>
    public override Task RedirectToLogin(RedirectContext<CookieAuthenticationOptions> context) {
-      string? dbsrv = context.HttpContext.Request.RouteValues[SqlAuthConsts.URLROUTEPARAMSRV] as string;
-      string? username = context.HttpContext.Request.RouteValues[SqlAuthConsts.URLROUTEPARAMUSR] as string;
-
-      if (!string.IsNullOrEmpty(dbsrv) && !string.IsNullOrEmpty(username))
+      if (context.HttpContext.Request.RouteValues[SqlAuthConsts.URLROUTEPARAMSRV] is not string dbsrv
+          || context.HttpContext.Request.RouteValues[SqlAuthConsts.URLROUTEPARAMUSR] is not string username
+          || string.IsNullOrWhiteSpace(dbsrv)
+          || string.IsNullOrWhiteSpace(username))
       {
-         Uri uri = new(context.RedirectUri);
-         string? newredirecturi = uri.GetComponents(UriComponents.Scheme | UriComponents.Host | UriComponents.Port, UriFormat.UriEscaped)
-             + $"{context.Options.LoginPath}/{Uri.EscapeDataString(dbsrv)}/{Uri.EscapeDataString(username)}?"
-             + uri.GetComponents(UriComponents.Query, UriFormat.UriEscaped);
-
-         context.Response.Redirect(newredirecturi);
-         return Task.CompletedTask;
+         return base.RedirectToLogin(context);
       }
 
-      return base.RedirectToLogin(context);
+      Uri uri = new(context.RedirectUri);
+      string newredirecturi = uri.GetComponents(UriComponents.Scheme | UriComponents.Host | UriComponents.Port, UriFormat.UriEscaped)
+          + $"{context.Options.LoginPath}/{Uri.EscapeDataString(dbsrv)}/{Uri.EscapeDataString(username)}?"
+          + uri.GetComponents(UriComponents.Query, UriFormat.UriEscaped);
+
+      context.Response.Redirect(newredirecturi);
+      return Task.CompletedTask;
    }
 }
