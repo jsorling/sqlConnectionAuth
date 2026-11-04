@@ -29,6 +29,8 @@ public class ConnectModel(
  ISqlAuthContext sqlAuthContext
 ) : PageModel
 {
+   private static readonly char[] _urlSplitChars = ['?', '#'];
+
    /// <summary>
    /// Gets or sets the input model for password and trust server certificate options.
    /// </summary>
@@ -57,6 +59,68 @@ public class ConnectModel(
    /// </summary>
    public string SqlUserName => sqlAuthContext.SqlUserName!;
 
+   private string? ResolveDbNameFromReturnUrl(string? returnUrl) {
+      if (string.IsNullOrWhiteSpace(returnUrl))
+      {
+         return null;
+      }
+
+      string rawPath = Uri.TryCreate(returnUrl, UriKind.RelativeOrAbsolute, out Uri? uri)
+         ? (uri.IsAbsoluteUri ? uri.AbsolutePath : uri.OriginalString.Split(_urlSplitChars, 2)[0])
+         : returnUrl.Split(_urlSplitChars, 2)[0];
+
+      string[] segments = rawPath
+         .Trim('/')
+         .Split('/', StringSplitOptions.RemoveEmptyEntries)
+         .Select(Uri.UnescapeDataString)
+         .ToArray();
+
+      string[] rootParts = sqlAuthContext.AppPaths.Root
+         .Trim('/')
+         .Split('/', StringSplitOptions.RemoveEmptyEntries)
+         .Select(Uri.UnescapeDataString)
+         .ToArray();
+
+      string[] tailParts = sqlAuthContext.AppPaths.Tail
+         .Trim('/')
+         .Split('/', StringSplitOptions.RemoveEmptyEntries)
+         .Select(Uri.UnescapeDataString)
+         .ToArray();
+
+      int baseIndex = rootParts.Length;
+      if (segments.Length < baseIndex + 3)
+      {
+         return null;
+      }
+
+      if (!rootParts.SequenceEqual(segments[..baseIndex], StringComparer.OrdinalIgnoreCase))
+      {
+         return null;
+      }
+
+      if (!string.Equals(segments[baseIndex], SqlServer, StringComparison.OrdinalIgnoreCase)
+         || !string.Equals(segments[baseIndex + 1], SqlUserName, StringComparison.OrdinalIgnoreCase))
+      {
+         return null;
+      }
+
+      int tailStart = baseIndex + 3;
+      if (tailParts.Length > 0)
+      {
+         if (segments.Length < tailStart + tailParts.Length)
+         {
+            return null;
+         }
+
+         if (!tailParts.SequenceEqual(segments[tailStart..(tailStart + tailParts.Length)], StringComparer.OrdinalIgnoreCase))
+         {
+            return null;
+         }
+      }
+
+      return string.IsNullOrWhiteSpace(segments[baseIndex + 2]) ? null : segments[baseIndex + 2];
+   }
+
    /// <summary>
    /// Handles GET requests to the Connect page. Sets the <see cref="IsWinAuth"/> property based on the user and configuration.
    /// Accepts optional query parameter 'trustservercerificate' and applies it to the input model (defaults to false when not provided).
@@ -84,9 +148,27 @@ public class ConnectModel(
       {
          if (sqlAuthContext.AppPaths.UseDBNameRouting)
          {
-            // Test authentication with temporary password and DB name routing
+            string? dbName = sqlauthparamdb ?? ResolveDbNameFromReturnUrl(returnUrl);
+
+            if (!string.IsNullOrWhiteSpace(dbName))
+            {
+               SqlAuthenticationResult authresult = await sqlConnAuthService.AuthenticateAsync(
+                  new SQLAuthenticateRequest(Input.Password, dbName, Input.TrustServerCertificate));
+
+               if (!authresult.Success && authresult.Exception is not null)
+               {
+                  ModelState.AddModelError("Password", authresult.Exception.Message);
+                  return Page();
+               }
+
+               return authresult.Success
+                  ? Redirect(returnUrl ?? sqlAuthContext.AppPaths.UriEscapedSqlPath(SqlServer, SqlUserName))
+                  : Page();
+            }
+
+            // No DB resolved from route/returnUrl: continue with temporary password and SelectDB flow
             SqlAuthenticationResult testauthenticateresult =
-            await sqlConnAuthService.TestAuthenticateAsync(Input, sqlauthparamdb);
+            await sqlConnAuthService.TestAuthenticateAsync(Input, null);
 
             if (!testauthenticateresult.Success && testauthenticateresult.Exception is not null)
             {
