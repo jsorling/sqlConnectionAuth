@@ -26,7 +26,7 @@ public class SqlConnectionHelperTests
 
       Console.WriteLine(t.First().Name);
 
-      Assert.IsTrue(t.Any());
+      Assert.IsNotEmpty(t);
    }
 
    [TestMethod]
