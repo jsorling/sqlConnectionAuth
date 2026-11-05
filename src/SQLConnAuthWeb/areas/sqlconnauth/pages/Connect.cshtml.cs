@@ -65,60 +65,57 @@ public class ConnectModel(
          return null;
       }
 
-      string rawPath = Uri.TryCreate(returnUrl, UriKind.RelativeOrAbsolute, out Uri? uri)
+      string rawpath = Uri.TryCreate(returnUrl, UriKind.RelativeOrAbsolute, out Uri? uri)
          ? (uri.IsAbsoluteUri ? uri.AbsolutePath : uri.OriginalString.Split(_urlSplitChars, 2)[0])
          : returnUrl.Split(_urlSplitChars, 2)[0];
 
-      string[] segments = rawPath
+      string[] segments = [.. rawpath
          .Trim('/')
          .Split('/', StringSplitOptions.RemoveEmptyEntries)
-         .Select(Uri.UnescapeDataString)
-         .ToArray();
+         .Select(Uri.UnescapeDataString)];
 
-      string[] rootParts = sqlAuthContext.AppPaths.Root
+      string[] rootparts = [.. sqlAuthContext.AppPaths.Root
          .Trim('/')
          .Split('/', StringSplitOptions.RemoveEmptyEntries)
-         .Select(Uri.UnescapeDataString)
-         .ToArray();
+         .Select(Uri.UnescapeDataString)];
 
-      string[] tailParts = sqlAuthContext.AppPaths.Tail
+      string[] tailparts = [.. sqlAuthContext.AppPaths.Tail
          .Trim('/')
          .Split('/', StringSplitOptions.RemoveEmptyEntries)
-         .Select(Uri.UnescapeDataString)
-         .ToArray();
+         .Select(Uri.UnescapeDataString)];
 
-      int baseIndex = rootParts.Length;
-      if (segments.Length < baseIndex + 3)
+      int baseindex = rootparts.Length;
+      if (segments.Length < baseindex + 3)
       {
          return null;
       }
 
-      if (!rootParts.SequenceEqual(segments[..baseIndex], StringComparer.OrdinalIgnoreCase))
+      if (!rootparts.SequenceEqual(segments.AsSpan()[..baseindex], StringComparer.OrdinalIgnoreCase))
       {
          return null;
       }
 
-      if (!string.Equals(segments[baseIndex], SqlServer, StringComparison.OrdinalIgnoreCase)
-         || !string.Equals(segments[baseIndex + 1], SqlUserName, StringComparison.OrdinalIgnoreCase))
+      if (!string.Equals(segments[baseindex], SqlServer, StringComparison.OrdinalIgnoreCase)
+         || !string.Equals(segments[baseindex + 1], SqlUserName, StringComparison.OrdinalIgnoreCase))
       {
          return null;
       }
 
-      int tailStart = baseIndex + 3;
-      if (tailParts.Length > 0)
+      int tailstart = baseindex + 3;
+      if (tailparts.Length > 0)
       {
-         if (segments.Length < tailStart + tailParts.Length)
+         if (segments.Length < tailstart + tailparts.Length)
          {
             return null;
          }
 
-         if (!tailParts.SequenceEqual(segments[tailStart..(tailStart + tailParts.Length)], StringComparer.OrdinalIgnoreCase))
+         if (!tailparts.SequenceEqual(segments.AsSpan()[tailstart..(tailstart + tailparts.Length)], StringComparer.OrdinalIgnoreCase))
          {
             return null;
          }
       }
 
-      return string.IsNullOrWhiteSpace(segments[baseIndex + 2]) ? null : segments[baseIndex + 2];
+      return string.IsNullOrWhiteSpace(segments[baseindex + 2]) ? null : segments[baseindex + 2];
    }
 
    /// <summary>
@@ -148,12 +145,12 @@ public class ConnectModel(
       {
          if (sqlAuthContext.AppPaths.UseDBNameRouting)
          {
-            string? dbName = sqlauthparamdb ?? ResolveDbNameFromReturnUrl(returnUrl);
+            string? dbname = sqlauthparamdb ?? ResolveDbNameFromReturnUrl(returnUrl);
 
-            if (!string.IsNullOrWhiteSpace(dbName))
+            if (!string.IsNullOrWhiteSpace(dbname))
             {
                SqlAuthenticationResult authresult = await sqlConnAuthService.AuthenticateAsync(
-                  new SQLAuthenticateRequest(Input.Password, dbName, Input.TrustServerCertificate));
+                  new SQLAuthenticateRequest(Input.Password, dbname, Input.TrustServerCertificate));
 
                if (!authresult.Success && authresult.Exception is not null)
                {
