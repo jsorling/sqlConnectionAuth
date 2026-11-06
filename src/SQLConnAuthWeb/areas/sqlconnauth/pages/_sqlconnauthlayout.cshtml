@@ -11,6 +11,30 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width" />
     <title>@ViewBag.Title</title>
+    @if (theme.UseThemeSwitcher())
+    {
+        <script>
+            (function () {
+                const themeKey = '@theme.ThemeSwitcherLocalStorageName';
+                const forcedTheme = document.documentElement.getAttribute('data-bss-forced-theme');
+                let storedTheme = null;
+                if (themeKey) {
+                    try {
+                        storedTheme = localStorage.getItem(themeKey);
+                    } catch {
+                        storedTheme = null;
+                    }
+                }
+                const preferredTheme = forcedTheme || storedTheme || 'system';
+                const resolvedTheme = preferredTheme === 'system'
+                    ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+                    : preferredTheme;
+
+                document.documentElement.setAttribute('data-bs-theme', resolvedTheme);
+                document.documentElement.setAttribute('data-theme', resolvedTheme);
+            })();
+        </script>
+    }
     <link rel="stylesheet" href="~/_content/sorling.sqlconnauthweb/css/custom-theme.css" asp-append-version="true" />
     <sql-auth-themeswitcher-css />
     <sql-auth-context-script />
