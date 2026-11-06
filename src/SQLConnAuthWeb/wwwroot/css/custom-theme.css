@@ -188,6 +188,22 @@ body.sqlconnauth-index-page .db-list li {
     display: block;
 }
 
+.start-over-container {
+    margin-top: 0.75rem;
+}
+
+.start-over-link {
+    font-size: 0.875rem;
+    color: #6c757d;
+    text-decoration: none;
+}
+
+.start-over-link:hover,
+.start-over-link:focus {
+    color: #495057;
+    text-decoration: underline;
+}
+
 /* Custom spinner for sign-in button */
 .custom-spinner {
     display: inline-block;
